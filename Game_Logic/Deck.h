@@ -13,6 +13,10 @@ public:
     Card GetCardFromDeck()
     //Проверка на пустоту колоды
     bool isEmpty();
+    //Проверка на кол-во
+    bool isMax();
+
+    std::vector <Card> GetDeck();
 
 private:
     //Макс. Размер руки

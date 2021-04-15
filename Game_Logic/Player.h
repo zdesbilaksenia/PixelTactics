@@ -25,6 +25,10 @@ public:
     void EndTurn();
     //Узнать позицию лидера
     Position GetLeaderPosition();
+    //Узнать сторону игрока
+    int GetSide();
+    //
+    vector<Card>& GetHand();
 
 private:
     //Рука Карт
@@ -37,5 +41,6 @@ private:
     Deck deck;
     //Позиция лидера
     Position leader;
-
+    //Первый игрок или второй
+    int side;
 };

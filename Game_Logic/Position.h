@@ -5,7 +5,7 @@
 class Position{
 public:
     Position();
-    Position(int cell, int line);
+    Position(int cell_, int line_, int side_, bool empty_ = true);
     Position(const Position& other);
     Position& operator = (const Position& other);
     ~Position();
@@ -14,6 +14,14 @@ public:
     bool isEmpty();
     //Получить героя с клетки
     Hero& GetHero();
+    //Информация о позиции
+    Position GetPosition();
+    //Поставить героя
+    Position SetHero();
+    
+    int GetCell(){return cell};
+    int GetLine(){return line};
+    int GetSide(){return side};
 
 private:
     //Дальняя клетка - 1 Средняя - 2 Ближняя - 3

@@ -1,5 +1,7 @@
 #include <iostream>
+#include <vector>
 #include "Player.h"
+#include "Position.h"
 
 /*Class IStartGame(){
     virtual void shuffleCards();
@@ -9,6 +11,12 @@
 
 class Game{
 public:
+
+    Game(Game &other) = delete;
+    void operator = (const Game& other) = delete;
+
+    //Singleton Realisation
+    static Game *GetInstance();
     
     //Сделать ход. Передать управление игроку
     void MakeMove();
@@ -17,13 +25,16 @@ public:
 
     void GetMove();
 
+    Player& GetFirstPlayer() {return firstPlayer};
+    Player& GetSecondPlayer() {return secondPlayer};
+
+    void GetPole();
+
 protected:
     Game();
     static Game* game_;
 
 private:
-    Game(Game &other) = delete;
-    void operator = (const )
     //Ход
     unsigned int move;
     //Линия для размещения
@@ -36,7 +47,8 @@ private:
     unsigned int timePerMove;
     //Очередь хода
     unsigned int turn;
-
+    //Поле
+    std::vector <Position> Pole;
     //Начало игры
     void startGame();
 
@@ -45,7 +57,18 @@ private:
     void shuffleCards();
     void decideFirst();
     void ChooseLeader();
+    void InitializePole();
 
     //Конец игры
     void endGame();
+};
+
+Game* Game::game_ = nullptr;
+
+Game* Game::GetInstance(){
+    if(game_ = nullptr){
+        game_ = new game();
+    }
+    
+    return game_;
 };
