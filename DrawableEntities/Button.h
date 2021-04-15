@@ -5,10 +5,10 @@ class Button : public Widget
 {
 public:
     Button();
-    Button(string _text, Comand _cmd);
+    Button(std::string _text, Command* _cmd);
     void onClick();
     ~Button();
 
 private:
-    Comand comand;
+    Command* command;
 };

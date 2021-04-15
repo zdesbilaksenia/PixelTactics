@@ -17,4 +17,4 @@ private:
     int status;
     int mapX;
     int mapY;
-}
+};
