@@ -17,10 +17,7 @@ TEST(CardTest, MapPowers){
     Card card;
     Powers powers;
     powers.FillVectors();
-    powers.ReturnFrontPower(card);
-    powers.ReturnMiddlePower(card);
-    powers.ReturnBackPower(card);
-    powers.ReturnLeaderPower(card);
+    powers.SetPowers(card);
 
     EXPECT_TRUE(card.GetFrontLinePower() != nullptr);
     EXPECT_TRUE(card.GetMiddleLinePower() != nullptr);

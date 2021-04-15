@@ -8,7 +8,7 @@ typedef struct ConnectionDetails {
     string server;
     string user;
     string password;
-    string database;
+    string dataBase;
 } ConnectionDetails;
 
 #endif //PIXELTACTICS_CONNECTIONDETAILS_H

@@ -33,10 +33,7 @@ private:
 public:
     void FillVectors() {};
 
-    void ReturnFrontPower(Card &card) {};
-    void ReturnMiddlePower(Card &card) {};
-    void ReturnBackPower(Card &card) {};
-    void ReturnLeaderPower(Card &card) {};
+    void SetPowers(Card &card) {};
 };
 
 /*void Powers::FillVectors() {
