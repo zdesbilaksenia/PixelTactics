@@ -11,8 +11,10 @@ public:
     Player& operator = (const Player& other);
     ~Player();
 
+    //Выбрать карту из руки 
+    Card& ChooseCard();
     //Сыграть карту
-    void PlayCard(Card card);
+    void PlayCard(Card& card);
     //Взять карту из колоды
     void DrawCard();
     //Аттаковать своим героем
@@ -21,6 +23,8 @@ public:
     void RemoveDead(Position Corpse);
     //Закончить ход
     void EndTurn();
+    //Узнать позицию лидера
+    Position GetLeaderPosition();
 
 private:
     //Рука Карт
@@ -31,5 +35,7 @@ private:
     unsigned int movesAmount;
     //Колода игрока
     Deck deck;
+    //Позиция лидера
+    Position leader;
 
 };
