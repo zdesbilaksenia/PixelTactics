@@ -26,23 +26,27 @@ TEST(DataBaseBuilder, DataBaseBuildTest) {
 }
 
 TEST(Connection, ConnectionSetUp) {
-    Connection connection({0, 0, 0, 0});
+    ConnectionDetails details = {0,0,0,0};
+    Connection connection(details);
     EXPECT_TRUE(connection.MySqlConnectionSetup());
 }
 
 TEST(Connection, ExecuteQuery) {
-    Connection connection({0, 0, 0, 0});
+    ConnectionDetails details = {0,0,0,0};
+    Connection connection(details);
     EXPECT_TRUE(connection.ExecuteQuery("select * from smth"));
 }
 
 TEST(MySQL, CardsMapping) {
-    Connection connection({0, 0, 0, 0});
+    ConnectionDetails details = {0,0,0,0};
+    Connection connection(details);
     MySQL sql(connection);
     EXPECT_TRUE(!sql.GetCards().empty());
 }
 
 TEST(Mapper, CardsMapping) {
-    Connection connection({0, 0, 0, 0});
+    ConnectionDetails details = {0,0,0,0};
+    Connection connection(details);
     CardsMapper cardsMapper(connection);
     EXPECT_TRUE(!cardsMapper.MapCards().empty());
 }

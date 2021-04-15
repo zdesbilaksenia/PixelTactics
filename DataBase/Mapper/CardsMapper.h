@@ -14,7 +14,7 @@ private:
     Powers powers;
     std::shared_ptr<Connection> connection;
 public:
-    CardsMapper(Connection _connection) {};
+    CardsMapper(Connection &_connection) {};
 
     vector<Card> MapCards() {};
 };

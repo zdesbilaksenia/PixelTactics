@@ -11,7 +11,7 @@ private:
     ConnectionDetails details;
 public:
 
-    Connection(ConnectionDetails _details) {};
+    Connection(ConnectionDetails &_details) {};
 
     //bool InitDataBase();
 

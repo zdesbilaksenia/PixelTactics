@@ -3,7 +3,15 @@
 
 using std::vector;
 
-typedef void (*power)();
+#include "Card.h"
+
+typedef void (*FrontLinePower)();
+
+typedef void (*MiddleLinePower)();
+
+typedef void (*BackLinePower)();
+
+typedef void (*LeaderPower)();
 
 void PlusPower();
 
@@ -18,14 +26,17 @@ void TransferDamage();
 class Powers {
 
 private:
-    vector<power> frontLinePowerVector;
-    vector<power> middleLinePowerVector;
-    vector<power> backLinePowerVector;
-    vector<power> leaderPowerVector;
+    vector<FrontLinePower> frontLinePowerVector;
+    vector<MiddleLinePower> middleLinePowerVector;
+    vector<BackLinePower> backLinePowerVector;
+    vector<LeaderPower> leaderPowerVector;
 public:
     void FillVectors() {};
 
-    void ReturnPower(int ID) {};
+    void ReturnFrontPower(Card &card) {};
+    void ReturnMiddlePower(Card &card) {};
+    void ReturnBackPower(Card &card) {};
+    void ReturnLeaderPower(Card &card) {};
 };
 
 /*void Powers::FillVectors() {

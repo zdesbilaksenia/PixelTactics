@@ -21,7 +21,7 @@ private:
     void (*leaderPower)();
 
 public:
-    Hero(Card card) {};
+    Hero(Card &card) {};
 
     void UseFrontLinePower() {};
 
@@ -31,13 +31,13 @@ public:
 
     virtual void UseLeaderPower() {};
 
-    void Attack(Hero hero) {};
+    void Attack(/*Position &position*/) {};
 
-    bool CanAttack() {};
+    bool CanAttack(/*Position &position*/) {};
 
     int GetHealth() {};
 
-    void ReduceHealth() {};
+    void ReduceHealth(int damage) {};
 
     bool IsDead() {};
 
@@ -45,7 +45,7 @@ public:
 
     string GetName() {};
 
-    string GetStrength() {};
+    int GetStrength() {};
 
 };
 

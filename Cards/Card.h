@@ -3,6 +3,14 @@
 
 using std::string;
 
+typedef void (*FrontLinePower)();
+
+typedef void (*MiddleLinePower)();
+
+typedef void (*BackLinePower)();
+
+typedef void (*LeaderPower)();
+
 class Card {
 
 private:
@@ -11,18 +19,16 @@ private:
     int HP;
     int strength;
 
-    void (*frontLinePower)();
+    FrontLinePower frontLinePower() {};
 
-    void (*middleLinePower)();
+    MiddleLinePower middleLinePower() {};
 
-    void (*backLinePower)();
+    BackLinePower backLinePower() {};
 
-    void (*leaderPower)();
+    LeaderPower leaderPower() {};
 
 public:
     Card() {};
-
-    void MapPowers(void (*_frontLinePower)(), void (*_middleLinePower)(), void (*_backLinePower)(), void (*_leaderPower)()) {};
 
     void SetHP(int _HP) {};
 
@@ -36,6 +42,13 @@ public:
 
     int GetStrength() {};
 
+    FrontLinePower GetFrontLinePower() {};
+
+    FrontLinePower GetMiddleLinePower() {};
+
+    FrontLinePower GetBackLinePower() {};
+
+    FrontLinePower GetLeaderPower() {};
 };
 
 #endif //PIXELTACTICS_CARD_H

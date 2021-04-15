@@ -13,7 +13,7 @@ class MySQL {
 private:
     std::unique_ptr<CardsMapper> mapper;
 public:
-    MySQL(Connection connection) {};
+    MySQL(Connection &connection) {};
 
     vector<Card> GetCards() {};
 };
