@@ -1,8 +1,7 @@
 #ifndef PIXELTACTICS_CARDSMAPPER_H
 #define PIXELTACTICS_CARDSMAPPER_H
 
-#include "Connection.h"
-#include "../../Cards/Powers.h"
+#include "../Connection.h"
 #include "../../Cards/Card.h"
 #include <memory>
 
@@ -11,12 +10,11 @@ using std::vector;
 class CardsMapper {
 
 private:
-    Powers powers;
-    std::shared_ptr<Connection> connection;
+    Powers *powers;
 public:
-    CardsMapper(Connection &_connection) {};
+    CardsMapper() : powers(new Powers()) {};
 
-    vector<Card> MapCards() {};
+    void MapCard(Card &card);
 };
 
 #endif //PIXELTACTICS_CARDSMAPPER_H

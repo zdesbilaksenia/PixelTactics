@@ -1,27 +1,27 @@
 #ifndef PIXELTACTICS_POWERS_H
 #define PIXELTACTICS_POWERS_H
 
+#include <vector>
+#include <string>
+
+using std::string;
 using std::vector;
 
-#include "Card.h"
+typedef void (*FrontLinePower)(string &);
 
-typedef void (*FrontLinePower)();
+typedef void (*MiddleLinePower)(string &);
 
-typedef void (*MiddleLinePower)();
+typedef void (*BackLinePower)(string &);
 
-typedef void (*BackLinePower)();
+typedef void (*LeaderPower)(string &);
 
-typedef void (*LeaderPower)();
+void PlusPower(string &str);
 
-void PlusPower();
+void Resurrect(string &);
 
-void Resurrect();
+void HitFrontRowHeroes(string &str);
 
-void HitFrontRowHeroes();
-
-void HitOneColumn();
-
-void TransferDamage();
+void TransferDamage(string &str);
 
 class Powers {
 
@@ -31,22 +31,23 @@ private:
     vector<BackLinePower> backLinePowerVector;
     vector<LeaderPower> leaderPowerVector;
 public:
-    void FillVectors() {};
+    Powers();
 
-    void SetPowers(Card &card) {};
+    FrontLinePower ReturnFrontLinePower(int ID) {
+        return frontLinePowerVector[ID];
+    }
+
+    MiddleLinePower ReturnMiddleLinePower(int ID) {
+        return middleLinePowerVector[ID];
+    }
+
+    BackLinePower ReturnBackLinePower(int ID) {
+        return backLinePowerVector[ID];
+    }
+
+    LeaderPower ReturnLeaderPower(int ID) {
+        return leaderPowerVector[ID];
+    }
 };
-
-/*void Powers::FillVectors() {
-
-    frontLinePowerVector.push_back(PlusPower);
-    frontLinePowerVector.push_back(Resurrect);
-
-    middleLinePowerVector.push_back(HitFrontRowHeroes);
-
-    backLinePowerVector.push_back(HitOneColumn);
-
-    leaderPowerVector.push_back(TransferDamage);
-
-}*/
 
 #endif //PIXELTACTICS_POWERS_H

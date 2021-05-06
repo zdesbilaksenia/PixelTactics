@@ -3,19 +3,22 @@
 
 #include "CardsMapper.h"
 #include "Connection.h"
-#include "../../Cards/Card.h"
+#include "Card.h"
 #include <memory>
+#include <mysql.h>
+#include <vector>
 
 using std::vector;
 
 class MySQL {
 
 private:
-    std::unique_ptr<CardsMapper> mapper;
+    Connection *connection;
+    CardsMapper *mapper;
 public:
-    MySQL(Connection &connection) {};
+    MySQL();
 
-    vector<Card> GetCards() {};
+    vector<Card> GetCards();
 };
 
 #endif //PIXELTACTICS_MYSQL_H
