@@ -10,6 +10,16 @@ void Resurrect(string &str) {
     str = "resurrect";
 }
 
+void AttackerGetsDamage(string &str) {
+
+    str = "attacker gets damage";
+}
+
+void NoDamageFromDistantAttack(string &str) {
+
+    str = "no damage from distant attack";
+}
+
 void HitFrontRowHeroes(string &str) {
 
     str = "hit front row hero";
