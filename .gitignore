@@ -34,4 +34,7 @@
 /cmake-build-debug
 /build
 /demo
+/DrawableEntities
+/Commands
+/CommandManager
 .idea
