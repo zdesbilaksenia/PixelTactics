@@ -1,13 +1,21 @@
 #include "Commands/CommandReleaseUnit.h"
+#include <iostream>
+using namespace std;
 
 // ====================================
 // ========CommandReleaseUnit==========
 // ====================================
-CommandReleaseUnit::CommandReleaseUnit(Unit* _unit, TilesManager& _tilesManager) : unit(_unit), tilesManager(_tilesManager) {}
+CommandReleaseUnit::CommandReleaseUnit(TilesManager &_tilesManager) : tilesManager(_tilesManager) {}
 
 void CommandReleaseUnit::execute()
 {
-    tilesManager.setStatus(statusReleasingUnit);
+    ///////////////////////////////////////////////////////////////////COUT
+    cout << "HEY" << endl;
+    //То есть мы забираем юнита из буффера обмена tilesManager и сохраняем его в комманду.
+    unit = tilesManager.getUnitBuffer();
+    cout << unit << endl;
+
+    tilesManager.setStatus(TilesManagerStatus::statusReleasingUnit);
     tilesManager.setUnitBuffer(this->unit);
     //this->unit = nullptr;
 }

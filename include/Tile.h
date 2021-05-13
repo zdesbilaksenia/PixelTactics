@@ -6,7 +6,7 @@
 #include <vector>
 using std::vector;
 
-enum TileStatus
+enum class TileStatus
 {
     statusIsEmpty,
     statusHasDeadBody,
@@ -22,7 +22,7 @@ public:
     void setUnit(Unit *_unit);
     void setStatus(TileStatus _status);
     void draw() override;
-    int getStatus();
+    TileStatus getStatus();
     ~Tile();
 
 private:
@@ -35,31 +35,42 @@ private:
 //Сама комманда не знает, кого он аттакует, и она не может "ждать"
 //Сохраняем статус комманды в enum и уже в цикле обработки сообщений будем от него отталкиваться.
 //
-enum commandStatus
+enum class TilesManagerStatus
 {
     //Когда ничего не происходит
     statusNothingHappens,
     //Готовы выложить карту
     statusReleasingUnit,
     //Готовы атаковать юнита противника
-    statusAttackingUnit
+    statusAttackingUnit,
+    //Только что реализовали карту, статус нужен для CardManager
+    statusCardWasJustReleased
+};
+
+enum class Side
+{
+    sidePlayer,
+    sideOpponent
 };
 
 class TilesManager
 {
 public:
-    TilesManager();
+    TilesManager(RenderWindow& _window, Mouse& _mouse, const Side& _side);
 
-    void setStatus(const commandStatus &_status);
+    void setStatus(const TilesManagerStatus &_status);
     void setUnitBuffer(Unit *_unit);
-    void setTiles(vector<Tile *> _tiles);
+    Unit* getUnitBuffer();
     void mouseIsPressed();
     void updateFocus();
     void draw();
+    void setTexture(Texture* _texture);
+    TilesManagerStatus getStatus();
 
     ~TilesManager();
 
 private:
+    Side side;
     vector<Tile *> tiles;
 
     //Когда завершилось какое-то действие (разыграна карта или атакован игрок)
@@ -77,7 +88,7 @@ private:
     Unit *unitBuffer;
 
     //Статус
-    commandStatus status;
+    TilesManagerStatus status;
 
     //Цвета для всех случаев
     const Color colorBasic = Color::White;
@@ -86,5 +97,4 @@ private:
     const Color colorWhenCantReleaseUnit = Color::Black;
     const Color colorForDeadBody = Color::Magenta;
     const Color colorToBeAttacked = Color::Red;
-
 };

@@ -9,7 +9,7 @@ void CommandAttackTile::execute()
 {
     for (auto tile : this->tiles)
     {
-        if (tile->getStatus() == 1)
+        if (tile->getStatus() == TileStatus::statusHasUnit)
         {
             tile->setFillColor(Color::Yellow);
         }

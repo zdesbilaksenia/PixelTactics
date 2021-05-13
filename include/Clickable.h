@@ -14,7 +14,7 @@ class Clickable : public DrawableBox
         void setCommand(Command* _command);
 
         bool hasFocus();
-        void updateFocus();
+        virtual void updateFocus();
         //Не у всех наследников есть этот метод
         virtual void click();
         void release();

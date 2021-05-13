@@ -155,6 +155,7 @@ int main()
     lowerPanelRect.setTexture(&lowerPanelTx);
     lowerPanelRect.setPosition(Vector2f(0, windowHeight - windowWidth / 4 + 100));
 
+    /*
     //Текстура для союзных тайлов
     Texture playerTileTx;
     playerTileTx.loadFromFile("../img/tx_2.png");
@@ -169,16 +170,16 @@ int main()
         playerTiles[i]->setSize(tileWidth, tileHeight);
         playerTiles[i]->setPosition(150 * (i % 3 + 1) - 80, 100 * (i / 3 + 1) + 100);
         playerTiles[i]->setTexture(&playerTileTx);
-        playerTiles[i]->setStatus(statusIsEmpty);
+        playerTiles[i]->setStatus(TileStatus::statusIsEmpty);
 
         //Случайным образом выбрал тайлы, с которыми будет работать команда, вычисляющая, какие поля можно атаковать.
         if (i % 3 + 1 == i / 3 + 1)
         {
-            playerTiles[i]->setStatus(statusHasUnit);
+            playerTiles[i]->setStatus(TileStatus::statusHasUnit);
         }
     }
 
-    playerTiles[2]->setStatus(statusHasDeadBody);
+    playerTiles[2]->setStatus(TileStatus::statusHasDeadBody);
 
     vector<Tile *> opponentTiles;
     for (int i = 0; i < 9; ++i)
@@ -193,7 +194,7 @@ int main()
         //Случайным образом выбрал тайлы, с которыми будет работать команда, вычисляющая, какие поля можно атаковать.
         if (i % 3 == i / 3 + 2)
         {
-            opponentTiles[i]->setStatus(statusHasUnit);
+            opponentTiles[i]->setStatus(TileStatus::statusHasUnit);
         }
     }
 
@@ -202,13 +203,31 @@ int main()
 
     TilesManager opponentTilesManager;
     opponentTilesManager.setTiles(opponentTiles);
+    */
+
+    TilesManager playerTilesManager(window, mouse, Side::sidePlayer);
+    TilesManager opponentTilesManager(window, mouse, Side::sideOpponent);
+
+    //Текстура для союзных тайлов
+    Texture playerTileTx;
+    playerTileTx.loadFromFile("../img/tx_2.png");
+    playerTilesManager.setTexture(&playerTileTx);
+    //Текстура для тайлов соперника
+    Texture opponentTileTx;
+    opponentTileTx.loadFromFile("../img/tx_1.png");
+    opponentTilesManager.setTexture(&opponentTileTx);
 
     Texture skeletonTx;
     skeletonTx.loadFromFile("../img/unit1.png");
     Unit skeleton(window);
     skeleton.setTexture(&skeletonTx);
 
-    CommandReleaseUnit cmdreleaseunit(&skeleton, playerTilesManager);
+    Texture santaTx;
+    santaTx.loadFromFile("../img/unit2.png");
+    Unit santa(window);
+    santa.setTexture(&santaTx);
+
+    CommandReleaseUnit cmdreleaseunit(playerTilesManager);
 
     /*
     CommandSetUnit cmdsetunit(&skeleton, playerTilesManager);
@@ -242,7 +261,6 @@ int main()
     buttonSetUnit_2.setColors(Color::Cyan, Color::Green, Color::Magenta);
     */
 
-    
     //Без указателей не получалось почему-то
     vector<Button *> buttons = {};
     ButtonsManager buttonsManager;
@@ -256,7 +274,15 @@ int main()
     skeletonCard.setSize(cardWidth, cardHeight);
     skeletonCard.setPosition(300, 500);
     skeletonCard.setColors(Color::White, Color::Magenta, Color::Green);
-    vector<Card *> cards = {&skeletonCard};
+
+    Card santaCard(window, mouse, &cmdreleaseunit);
+    santaCard.setUnit(&santa);
+    santaCard.setTexture(&cardTexture);
+    santaCard.setSize(cardWidth, cardHeight);
+    santaCard.setPosition(600, 500);
+    santaCard.setColors(Color::White, Color::Magenta, Color::Green);
+
+    vector<Card *> cards = {&skeletonCard, &santaCard};
 
     CardsManager cardsManager;
     cardsManager.setCards(cards);
@@ -281,6 +307,7 @@ int main()
             //Если нажали на кнопку на мыши
             case (Event::MouseButtonPressed):
             {
+                //Порядок важен!
                 buttonsManager.mouseIsPressed();
                 playerTilesManager.mouseIsPressed();
                 cardsManager.mouseIsPressed();

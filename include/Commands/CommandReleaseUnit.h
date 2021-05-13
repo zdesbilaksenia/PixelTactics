@@ -9,8 +9,8 @@
 class CommandReleaseUnit : public Command
 {
     public:
-        CommandReleaseUnit(Unit* _unit, TilesManager& _tilesManager);
-        
+        CommandReleaseUnit(TilesManager& _tilesManager);
+
         void execute() override;
         ~CommandReleaseUnit();
 

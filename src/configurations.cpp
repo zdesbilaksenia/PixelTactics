@@ -6,3 +6,4 @@ const int tileWidth = 120;
 const int tileHeight = 80;
 const int cardWidth = 150;
 const int cardHeight = 250;
+const int numberOfTiles = 9;
