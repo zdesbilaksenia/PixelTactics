@@ -30,7 +30,7 @@ int main() {
 
     cout << "Назначаем лидера\nВведите номер: ";
     cin >> n;
-    heroes[n]->MakeLeader();
+    heroes[n-1]->MakeLeader();
 
     cout << "Маппим способности\n";
     PowerMapper mapper;
