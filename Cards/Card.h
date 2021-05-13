@@ -2,7 +2,6 @@
 #define PIXELTACTICS_CARD_H
 
 #include <string>
-#include "Powers.h"
 
 using std::string;
 
@@ -12,10 +11,10 @@ typedef struct Card {
     string name;
     int HP;
     int strength;
-    FrontLinePower frontLinePower;
-    MiddleLinePower middleLinePower;
-    BackLinePower backLinePower;
-    LeaderPower leaderPower;
+    string frontLinePower;
+    string middleLinePower;
+    string backLinePower;
+    string leaderPower;
 
     Card() {};
 } Card;

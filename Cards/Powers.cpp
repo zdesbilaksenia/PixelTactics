@@ -1,45 +1,175 @@
 #include "Powers.h"
 
-void PlusPower(string &str) {
-
-    str = "plus power";
+void PlusPower(vector<Hero *> &heroes) {
+    if (heroes.size() == 2) {
+        if (!heroes[1]->IsDead()) {
+            heroes[1]->SetCurStrength(heroes[1]->GetCurStrength() + 5);
+        }
+    }
 }
 
-void Resurrect(string &str) {
-
-    str = "resurrect";
+void Resurrect(vector<Hero *> &heroes) {
+    if (heroes.size() == 2) {
+        if (heroes[1]->IsDead()) {
+            heroes[1]->SetCurHealth(heroes[1]->GetHealth());
+        }
+    }
 }
 
-void AttackerGetsDamage(string &str) {
-
-    str = "attacker gets damage";
+void Castling(vector<Hero *> &heroes) {
+    if (heroes.size() == 3) {
+        if (!heroes[1]->IsDead() && !heroes[2]->IsDead()) {
+            Hero temp = *heroes[1];
+            *heroes[1] = *heroes[2];
+            *heroes[2] = temp;
+        }
+    }
 }
 
-void NoDamageFromDistantAttack(string &str) {
-
-    str = "no damage from distant attack";
+void HitFrontRowHeroes(vector<Hero *> &heroes) {
+    if (heroes.size() == 4 &&
+        for_each(heroes.begin() + 1, heroes.end(), [](Hero *hero) -> bool { return !hero->IsDead(); })) {
+        for_each(heroes.begin() + 1, heroes.end(), [](Hero *hero) {
+            hero->ReduceHealth(3);
+        });
+    }
 }
 
-void HitFrontRowHeroes(string &str) {
-
-    str = "hit front row hero";
+void TransferDamage(vector<Hero *> &heroes) {
+    if (heroes.size() == 3 &&
+        for_each(heroes.begin() + 1, heroes.end(),
+                 [](Hero *hero) -> bool { return !hero->IsDead() && !hero->IsLeader(); })) {
+        if (heroes[2]->IsDamaged()) {
+            heroes[2]->SetCurHealth(heroes[2]->GetCurHealth() + 2);
+            heroes[1]->ReduceHealth(2);
+        }
+    }
 }
 
-void TransferDamage(string &str) {
+void AttackDamageToHP(vector<Hero *> &heroes) {
+    if (heroes.size() == 2) {
+        heroes[0]->Attack(*heroes[1], heroes[0]->GetStrength());
+        heroes[0]->SetCurHealth(heroes[0]->GetCurHealth() + heroes[0]->GetStrength());
+    }
+}
 
-    str = "transfer damage";
+void CopyPower(vector<Hero *> &heroes) {
+    if (heroes.size() > 2) {
+        if (!heroes[0]->IsDead() && !heroes[1]->IsDead()) {
+            heroes.erase(heroes.begin());
+            heroes[1]->middleLinePower(heroes);
+        }
+    }
+}
+
+void Interception(vector<Hero *> &heroes) {
+    if (heroes.size() == 2 && !heroes[1]->IsDead()) {
+        heroes[1]->ForbidDistantAttack();
+    }
+}
+
+void DeadCanAttack(vector<Hero *> &heroes) {
+    if (heroes.size() == 3) {
+        if (heroes[1]->IsDead())
+            heroes[1]->Attack(*heroes[2], 3);
+    }
+}
+
+void PlusPowerInCloseAttack(vector<Hero *> &heroes) {
+    if (heroes.size() == 2 && !heroes[0]->IsDead()) {
+        heroes[0]->Attack(*heroes[1], heroes[0]->GetStrength() + 2);
+    }
+}
+
+void PlusPowerByDead(vector<Hero *> &heroes) {
+    if (for_each(heroes.begin() + 1, heroes.end(),
+                 [](Hero *hero) -> bool { return hero->IsDead(); })) {
+        if (!heroes[0]->IsDead())
+            heroes[0]->SetCurHealth(heroes.size() - 1 + heroes[0]->GetCurHealth());
+    }
+}
+
+void PlusPowerForDeath(vector<Hero *> &heroes) {
+    if (heroes.size() == 2 && !heroes[1]->IsDead()) {
+        heroes[0]->SetCurStrength(heroes[0]->GetCurStrength() + 4);
+        heroes[1]->Die();
+    }
+}
+
+void CastlingWithDead(vector<Hero *> &heroes) {
+    if (heroes.size() == 3) {
+        if (!heroes[1]->IsDead() && heroes[2]->IsDead()) {
+            Hero temp = *heroes[1];
+            *heroes[1] = *heroes[2];
+            *heroes[2] = temp;
+        }
+    }
+}
+
+void ResurrectAndGetDamage(vector<Hero *> &heroes) {
+    if (heroes.size() == 2) {
+        if (heroes[1]->IsDead()) {
+            heroes[1]->SetCurHealth(heroes[1]->GetHealth());
+            heroes[0]->ReduceHealth(heroes[1]->GetHealth());
+        }
+    }
+}
+
+void HitAvangard(vector<Hero *> &heroes) {
+    if (heroes.size() <= 4) {
+        for_each(heroes.begin() + 1, heroes.end(),
+                 [](Hero *hero) { hero->ReduceHealth(4); });
+    }
+}
+
+void MakeAttack(vector<Hero *> &heroes) {
+    if (heroes.size() == 3 && for_each(heroes.begin(), heroes.end(),
+                                       [](Hero *hero) -> bool { return !hero->IsDead(); })) {
+        heroes[0]->Attack(*heroes[2], heroes[1]->GetStrength());
+    }
+}
+
+void KillWithDamage(vector<Hero *> &heroes) {
+    if (heroes.size() == 2 && for_each(heroes.begin(), heroes.end(),
+                                       [](Hero *hero) -> bool { return !hero->IsDead() && !hero->IsLeader(); })) {
+        heroes[0]->ReduceHealth(3);
+        heroes[1]->Die();
+    }
+}
+
+void DoubleStrengthAgainstLeader(vector<Hero *> &heroes) {
+    if (heroes.size() == 2 && for_each(heroes.begin(), heroes.end(),
+                                       [](Hero *hero) -> bool { return !hero->IsDead(); })) {
+        if (heroes[1]->IsLeader())
+            heroes[0]->Attack(*heroes[1], heroes[0]->GetCurStrength() * 2);
+    }
+}
+
+void TransferDamageFromLeader(vector<Hero *> &heroes) {
+    if (heroes.size() == 3 && heroes[1]->IsLeader()) {
+        heroes[1]->SetCurHealth(heroes[1]->GetCurHealth() + 5);
+        heroes[2]->ReduceHealth(5);
+    }
 }
 
 Powers::Powers() {
+    frontLinePowerMap.insert(pair<string, FrontLinePower>("Рыцарь", &Interception));
+    frontLinePowerMap.insert(pair<string, FrontLinePower>("Ведьма", &DeadCanAttack));
+    frontLinePowerMap.insert(pair<string, FrontLinePower>("Алхимик", &PlusPower));
+    frontLinePowerMap.insert(pair<string, FrontLinePower>("Берсерк", &HitFrontRowHeroes));
+    frontLinePowerMap.insert(pair<string, FrontLinePower>("Боец", &AttackDamageToHP));
+    frontLinePowerMap.insert(pair<string, FrontLinePower>("Вампир", &TransferDamage));
+    frontLinePowerMap.insert(pair<string, FrontLinePower>("Дубликатор", &CopyPower));
+    frontLinePowerMap.insert(pair<string, FrontLinePower>("Жрица", &Resurrect));
+    frontLinePowerMap.insert(pair<string, FrontLinePower>("Маг-дракон", &Castling));
 
-    frontLinePowerVector.push_back(&PlusPower);
-    middleLinePowerVector.push_back(&Resurrect);
-    backLinePowerVector.push_back(&HitFrontRowHeroes);
-    leaderPowerVector.push_back(&TransferDamage);
-
-    frontLinePowerVector.push_back(&PlusPower);
-    middleLinePowerVector.push_back(&Resurrect);
-    backLinePowerVector.push_back(&HitFrontRowHeroes);
-    leaderPowerVector.push_back(&TransferDamage);
-
+    middleLinePowerMap.insert(pair<string, MiddleLinePower>("Рыцарь", &PlusPowerInCloseAttack));
+    middleLinePowerMap.insert(pair<string, MiddleLinePower>("Ведьма", &ResurrectAndGetDamage));
+    middleLinePowerMap.insert(pair<string, MiddleLinePower>("Алхимик", &KillWithDamage));
+    middleLinePowerMap.insert(pair<string, MiddleLinePower>("Берсерк", &MakeAttack));
+    middleLinePowerMap.insert(pair<string, MiddleLinePower>("Боец", &HitAvangard));
+    middleLinePowerMap.insert(pair<string, MiddleLinePower>("Вампир", &CastlingWithDead));
+    middleLinePowerMap.insert(pair<string, MiddleLinePower>("Дубликатор", &CopyPower));
+    middleLinePowerMap.insert(pair<string, MiddleLinePower>("Жрица", &PlusPowerByDead));
+    middleLinePowerMap.insert(pair<string, MiddleLinePower>("Маг-дракон", &PlusPowerForDeath));
 }

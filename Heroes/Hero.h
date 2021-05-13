@@ -2,51 +2,76 @@
 #define PIXELTACTICS_HERO_H
 
 #include "Card.h"
+#include <vector>
+
+using std::vector;
 
 class Hero {
 
 private:
+    int ID;
     int HP;
+    int curHP;
     string name;
     int strength;
+    int curStrength;
     bool isAlive;
     bool isLeader;
-
-    void (*frontLinePower)();
-
-    void (*middleLinePower)();
-
-    void (*backLinePower)();
-
-    void (*leaderPower)();
+    bool isDamaged;
+    bool canBeAttackedFromDistance;
+    bool canBeAttackedClosely;
+    int needReset;
 
 public:
-    Hero(Card &card) {};
+    Hero() {};
 
-    void UseFrontLinePower() {};
+    explicit Hero(Card &card);
 
-    void UseMiddleLinePower() {};
+    Hero(Hero &hero);
 
-    void UseBackLinePower() {};
+    void MakeLeader();
 
-    virtual void UseLeaderPower() {};
+    void (*frontLinePower)(vector<Hero *> &heroes);
 
-    void Attack(/*Position &position*/) {};
+    void (*middleLinePower)(vector<Hero *> &heroes);
 
-    bool CanAttack(/*Position &position*/) {};
+    void (*backLinePower)(vector<Hero *> &heroes);
 
-    int GetHealth() {};
+    void (*leaderPower)(vector<Hero *> &heroes);
 
-    void ReduceHealth(int damage) {};
+    void Attack(Hero &hero, int damage);
 
-    bool IsDead() {};
+    int GetHealth();
 
-    void Die() {};
+    int GetCurHealth();
 
-    string GetName() {};
+    void SetCurHealth(int HP);
 
-    int GetStrength() {};
+    int GetID();
+
+    void ReduceHealth(int damage);
+
+    bool IsDead();
+
+    bool IsLeader();
+
+    void Die();
+
+    string GetName();
+
+    int GetStrength();
+
+    void SetCurStrength(int power);
+
+    int GetCurStrength();
+
+    bool IsDamaged();
+
+    void ForbidDistantAttack();
+
+    void ForbidCloseAttack();
 
 };
+
 
 #endif //PIXELTACTICS_HERO_H

@@ -2,17 +2,19 @@
 #define PIXELTACTICS_CONNECTION_H
 
 #include <string>
+#include <memory>
 #include <iostream>
 #include "ConnectionDetails.h"
 #include "mysql.h"
 
 using std::cout;
 using std::string;
+using std::unique_ptr;
 
 class Connection {
 
 private:
-    MYSQL *connection;
+    unique_ptr<MYSQL> connection;
     ConnectionDetails details;
 public:
     Connection(ConnectionDetails &_details) : details(_details), connection(mysql_init(new MYSQL())) {};

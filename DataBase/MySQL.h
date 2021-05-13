@@ -1,7 +1,6 @@
 #ifndef PIXELTACTICS_MYSQL_H
 #define PIXELTACTICS_MYSQL_H
 
-#include "CardsMapper.h"
 #include "Connection.h"
 #include "Card.h"
 #include <memory>
@@ -9,12 +8,14 @@
 #include <vector>
 
 using std::vector;
+using std::unique_ptr;
+using std::make_unique;
+using std::move;
 
 class MySQL {
 
 private:
-    Connection *connection;
-    CardsMapper *mapper;
+    unique_ptr<Connection> connection;
 public:
     MySQL();
 
