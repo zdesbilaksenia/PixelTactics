@@ -5,20 +5,24 @@ using namespace std;
 #include <SFML/Graphics.hpp>
 using namespace sf;
 
+/*
 const int windowHeight = 720;
 const int windowWidth = 1080;
 const int buttonWidth = 200;
 const int buttonHeight = 40;
 const int tileWidth = 120;
 const int tileHeight = 80;
-const int cardWidth = 200;
-const int cardHeight = 400;
+const int cardWidth = 150;
+const int cardHeight = 250;
+*/
 
 #include "Button.h"
 #include "Command.h"
 #include "Commands/CommandAttackTile.h"
-#include "Commands/CommandSetUnit.h"
+//#include "Commands/CommandSetUnit.h"
+#include "Commands/CommandReleaseUnit.h"
 #include "Card.h"
+#include "configurations.cpp"
 
 /*
 1 - кнопки
@@ -126,6 +130,9 @@ int main()
 
 #include "Tile.h"
 
+//Чтобы визуально сжать код
+#define GAME_ELEMENTS
+
 int main()
 {
     RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "SFML works!");
@@ -133,6 +140,7 @@ int main()
     Mouse mouse;
     Event event;
 
+#ifdef GAME_ELEMENTS
     Texture backgroundTx;
     backgroundTx.loadFromFile("../img/fon_1.png");
     RectangleShape backgroundRect;
@@ -189,17 +197,20 @@ int main()
         }
     }
 
-    CommandTest cmd;
-    CommandStringTest cmdstr("Text for CommandStringTest!");
-    CommandAttackTile cmdattck(opponentTiles);
-
     TilesManager playerTilesManager;
     playerTilesManager.setTiles(playerTiles);
+
+    TilesManager opponentTilesManager;
+    opponentTilesManager.setTiles(opponentTiles);
 
     Texture skeletonTx;
     skeletonTx.loadFromFile("../img/unit1.png");
     Unit skeleton(window);
     skeleton.setTexture(&skeletonTx);
+
+    CommandReleaseUnit cmdreleaseunit(&skeleton, playerTilesManager);
+
+    /*
     CommandSetUnit cmdsetunit(&skeleton, playerTilesManager);
     Texture buttonSetUnitTx;
     buttonSetUnitTx.loadFromFile("../img/release.png");
@@ -209,7 +220,6 @@ int main()
     buttonSetUnit.setPosition(800, 665);
     buttonSetUnit.setColors(Color::White, Color::Green, Color::Magenta);
 
-    /*
     Texture button1Tx;
     button1Tx.loadFromFile("../img/release1.png");
     Button buttonTest(window, mouse, &cmdstr);
@@ -232,11 +242,27 @@ int main()
     buttonSetUnit_2.setColors(Color::Cyan, Color::Green, Color::Magenta);
     */
 
+    
     //Без указателей не получалось почему-то
-    vector<Button *> buttons = {&buttonSetUnit};
+    vector<Button *> buttons = {};
+    ButtonsManager buttonsManager;
+    buttonsManager.setButtons(buttons);
 
-    Card skeletonCard(window, mouse, &cmdsetunit);
+    Texture cardTexture;
+    cardTexture.loadFromFile("../img/card.png");
+    Card skeletonCard(window, mouse, &cmdreleaseunit);
+    skeletonCard.setUnit(&skeleton);
+    skeletonCard.setTexture(&cardTexture);
+    skeletonCard.setSize(cardWidth, cardHeight);
+    skeletonCard.setPosition(300, 500);
+    skeletonCard.setColors(Color::White, Color::Magenta, Color::Green);
     vector<Card *> cards = {&skeletonCard};
+
+    CardsManager cardsManager;
+    cardsManager.setCards(cards);
+    cardsManager.setTilesManager(&playerTilesManager);
+
+#endif //GAME_ELEMENTS
 
     while (window.isOpen())
     {
@@ -247,38 +273,23 @@ int main()
             //Если двигаем мышкой
             case (Event::MouseMoved):
             {
+                buttonsManager.updateFocus();
                 playerTilesManager.updateFocus();
-                // Смотрим, какие кнопки в фокусе, что бы их соответствующим образом отрисовывать
-                for (auto button : buttons)
-                {
-                    button->updateFocus();
-                }
+                cardsManager.updateFocus();
                 break;
             }
             //Если нажали на кнопку на мыши
             case (Event::MouseButtonPressed):
             {
+                buttonsManager.mouseIsPressed();
                 playerTilesManager.mouseIsPressed();
-                // Смотрим, на какую кнопку нажали
-                for (auto button : buttons)
-                {
-                    if (button->hasFocus())
-                    {
-                        button->click();
-                    }
-                }
+                cardsManager.mouseIsPressed();
                 break;
             }
             //Если отпустили кнопку на мыши
             case (Event::MouseButtonReleased):
             {
-                for (auto button : buttons)
-                {
-                    if (button->hasFocus())
-                    {
-                        button->updateFocus();
-                    }
-                }
+                buttonsManager.mouseIsReleased();
                 break;
             }
             //Закрытие окна
@@ -296,17 +307,10 @@ int main()
         window.draw(backgroundRect);
         window.draw(lowerPanelRect);
 
+        buttonsManager.draw();
         playerTilesManager.draw();
-
-        for (auto tile : opponentTiles)
-        {
-            tile->draw();
-        }
-
-        for (auto button : buttons)
-        {
-            button->draw();
-        }
+        opponentTilesManager.draw();
+        cardsManager.draw();
 
         window.display();
     }
