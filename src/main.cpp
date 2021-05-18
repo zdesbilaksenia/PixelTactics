@@ -22,7 +22,8 @@ using namespace sf;
 */
 
 //Чтобы визуально сжать код
-#define GAME_ELEME
+#define GAME_ELEMENTS
+
 
 int main()
 {
