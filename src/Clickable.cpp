@@ -3,7 +3,9 @@
 using namespace std;
 
 Clickable::Clickable(RenderWindow &_window, Mouse &_mouse) : DrawableBox(_window),
-                                                             mouse(_mouse) {}
+                                                             mouse(_mouse)
+{
+}
 
 Clickable::Clickable(RenderWindow &_window, Mouse &_mouse, Command *_command) : DrawableBox(_window),
                                                                                 mouse(_mouse),

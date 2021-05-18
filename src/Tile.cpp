@@ -39,7 +39,10 @@ void Tile::draw()
     }
 }
 
-Tile::~Tile() {}
+Tile::~Tile()
+{
+    unit = nullptr;
+}
 
 //===========================================
 //===============TilesManager================
@@ -51,40 +54,65 @@ TilesManager::TilesManager(RenderWindow &_window, Mouse &_mouse, const Side &_si
 
     if (side == Side::sidePlayer)
     {
-        for (int i = 0; i < numberOfTiles; ++i)
+        //Тайлы авангарда
+        for (int i = 0; i < 3; ++i)
         {
-            tiles.push_back(new Tile(_window, _mouse));
-            tiles[i]->setSize(tileWidth, tileHeight);
-            tiles[i]->setPosition(150 * (i % 3 + 1) - 80, 100 * (i / 3 + 1) + 100);
-            tiles[i]->setStatus(TileStatus::statusIsEmpty);
-
-            //Случайным образом выбрал тайлы, с которыми будет работать команда, вычисляющая, на каких полях можно ставить юнитов
-            if (i % 3 + 1 == i / 3 + 1)
-            {
-                tiles[i]->setStatus(TileStatus::statusHasUnit);
-            }
+            tilesAvangard.push_back(make_unique<Tile>(_window, _mouse));
+            tilesAvangard[i]->setSize(tileWidth, tileHeight);
+            tilesAvangard[i]->setPosition(150 * 3 - 80, 100 * i + 200);
+            tilesAvangard[i]->setStatus(TileStatus::statusIsEmpty);
+            tiles.push_back(tilesAvangard[i].get());
+        }
+        //Тайлы фланга
+        for (int i = 0; i < 3; ++i)
+        {
+            tilesFlank.push_back(make_unique<Tile>(_window, _mouse));
+            tilesFlank[i]->setSize(tileWidth, tileHeight);
+            tilesFlank[i]->setPosition(150 * 2 - 80, 100 * i + 200);
+            tilesFlank[i]->setStatus(TileStatus::statusIsEmpty);
+            tiles.push_back(tilesFlank[i].get());
+        }
+        //Тайлы тыла
+        for (int i = 0; i < 3; ++i)
+        {
+            tilesRear.push_back(make_unique<Tile>(_window, _mouse));
+            tilesRear[i]->setSize(tileWidth, tileHeight);
+            tilesRear[i]->setPosition(150 * 1 - 80, 100 * i + 200);
+            tilesRear[i]->setStatus(TileStatus::statusIsEmpty);
+            tiles.push_back(tilesRear[i].get());
         }
     }
     else if (side == Side::sideOpponent)
     {
-        for (int i = 0; i < numberOfTiles; ++i)
+        //Тайлы авангарда
+        for (int i = 0; i < 3; ++i)
         {
-            tiles.push_back(new Tile(_window, _mouse));
-            tiles[i]->setSize(tileWidth, tileHeight);
-            //Числа захардкожены!!!
-            tiles[i]->setPosition(150 * (i % 3 + 1) + windowWidth - 520 - tileWidth, 100 * (i / 3 + 1) + 100);
-            tiles[i]->setFillColor(Color::White);
-
-            //Случайным образом выбрал тайлы, с которыми будет работать команда, вычисляющая, какие поля можно атаковать.
-            if (i % 3 == i / 3 + 2)
-            {
-                tiles[i]->setStatus(TileStatus::statusHasUnit);
-            }
+            tilesAvangard.push_back(make_unique<Tile>(_window, _mouse));
+            tilesAvangard[i]->setSize(tileWidth, tileHeight);
+            tilesAvangard[i]->setPosition(150 * 1 + windowWidth - 520 - tileWidth, 100 * i + 200);
+            tilesAvangard[i]->setStatus(TileStatus::statusIsEmpty);
+            tiles.push_back(tilesAvangard[i].get());
+        }
+        //Тайлы фланга
+        for (int i = 0; i < 3; ++i)
+        {
+            tilesFlank.push_back(make_unique<Tile>(_window, _mouse));
+            tilesFlank[i]->setSize(tileWidth, tileHeight);
+            tilesFlank[i]->setPosition(150 * 2 + windowWidth - 520 - tileWidth, 100 * i + 200);
+            tilesFlank[i]->setStatus(TileStatus::statusIsEmpty);
+            tiles.push_back(tilesFlank[i].get());
+        }
+        //Тайлы тыла
+        for (int i = 0; i < 3; ++i)
+        {
+            tilesRear.push_back(make_unique<Tile>(_window, _mouse));
+            tilesRear[i]->setSize(tileWidth, tileHeight);
+            tilesRear[i]->setPosition(150 * 3 + windowWidth - 520 - tileWidth, 100 * i + 200);
+            tilesRear[i]->setStatus(TileStatus::statusIsEmpty);
+            tiles.push_back(tilesRear[i].get());
         }
     }
 }
-
-TilesManager::~TilesManager() {}
 
 void TilesManager::setStatus(const TilesManagerStatus &_status)
 {
@@ -93,15 +121,15 @@ void TilesManager::setStatus(const TilesManagerStatus &_status)
     {
     case TilesManagerStatus::statusReleasingUnit:
     {
-        for (auto tile : tiles)
+        for (size_t i = 0; i < 9; ++i)
         {
-            if (tile->getStatus() == TileStatus::statusIsEmpty)
+            if (tiles[i]->getStatus() == TileStatus::statusIsEmpty)
             {
-                tile->setFillColor(colorForReleasingUnit);
+                tiles[i]->setFillColor(colorForReleasingUnit);
             }
             else
             {
-                tile->setFillColor(colorWhenCantReleaseUnit);
+                tiles[i]->setFillColor(colorWhenCantReleaseUnit);
             }
         }
     }
@@ -123,6 +151,13 @@ void TilesManager::mouseIsPressed()
     {
     case TilesManagerStatus::statusNothingHappens:
     {
+        for (int i = 0; i < numberOfTiles; ++i)
+        {
+            if (tiles[i]->hasFocus())
+            {
+                cout << "TilesManager::mouseIsPressed() tile was clicked!" << endl;
+            }
+        }
         return;
         break;
     }
@@ -131,20 +166,21 @@ void TilesManager::mouseIsPressed()
         if (unitBuffer == nullptr)
         {
             ////////////////////////////////////////////////////////////////////////////////////////COUT
-            cout << "ERROR, TilesManager::mouseIsPressed:: === unitBuffer is nullptr === " << endl;
+            cout << "ERROR, TilesManager::mouseIsPressed:: unitBuffer is nullptr" << endl;
 
             return;
         }
-        for (auto tile : tiles)
+        for (int i = 0; i < numberOfTiles; ++i)
         {
-            if (tile->hasFocus() && tile->getStatus() == TileStatus::statusIsEmpty)
+            if (tiles[i]->hasFocus() && tiles[i]->getStatus() == TileStatus::statusIsEmpty)
             {
                 ////////////////////////////////////////////////////////////////////////////////////////COUT
-                cout << "TilesManager::mouseIsPressed:: === RELEASING UNIT!!! === " << endl;
+                cout << "TilesManager::mouseIsPressed:: RELEASING UNIT!!!" << endl;
 
-                tile->setUnit(unitBuffer);
+                tiles[i]->setUnit(unitBuffer);
                 this->setNormalColors();
                 this->status = TilesManagerStatus::statusCardWasJustReleased;
+                unitBuffer = nullptr;
                 return;
             }
         }
@@ -154,9 +190,9 @@ void TilesManager::mouseIsPressed()
 
 void TilesManager::setNormalColors()
 {
-    for (auto tile : tiles)
+    for (int i = 0; i < numberOfTiles; ++i)
     {
-        tile->setFillColor(colorBasic);
+        tiles[i]->setFillColor(colorBasic);
     }
 }
 
@@ -165,30 +201,30 @@ void TilesManager::updateFocus()
     switch (status)
     {
     case TilesManagerStatus::statusNothingHappens:
-        for (auto tile : tiles)
+        for (int i = 0; i < numberOfTiles; ++i)
         {
-            if (tile->hasFocus())
+            if (tiles[i]->hasFocus())
             {
-                tile->setFillColor(colorInFocus);
+                tiles[i]->setFillColor(colorInFocus);
             }
             else
             {
-                tile->setFillColor(colorBasic);
+                tiles[i]->setFillColor(colorBasic);
             }
         }
         break;
     case TilesManagerStatus::statusReleasingUnit:
-        for (auto tile : tiles)
+        for (int i = 0; i < numberOfTiles; ++i)
         {
-            if (tile->hasFocus() && tile->getStatus() == TileStatus::statusIsEmpty)
+            if (tiles[i]->hasFocus() && tiles[i]->getStatus() == TileStatus::statusIsEmpty)
             {
-                tile->setFillColor(colorInFocus);
+                tiles[i]->setFillColor(colorInFocus);
             }
             else
             {
-                if (tile->getStatus() == TileStatus::statusIsEmpty)
+                if (tiles[i]->getStatus() == TileStatus::statusIsEmpty)
                 {
-                    tile->setFillColor(colorForReleasingUnit);
+                    tiles[i]->setFillColor(colorForReleasingUnit);
                 }
             }
         }
@@ -202,9 +238,9 @@ void TilesManager::updateFocus()
 
 void TilesManager::draw()
 {
-    for (auto tile : tiles)
+    for (int i = 0; i < numberOfTiles; ++i)
     {
-        tile->draw();
+        tiles[i]->draw();
     }
 }
 
@@ -215,13 +251,30 @@ TilesManagerStatus TilesManager::getStatus()
 
 void TilesManager::setTexture(Texture *_texture)
 {
-    for (auto tile : tiles)
+    for (int i = 0; i < numberOfTiles; ++i)
     {
-        tile->setTexture(_texture);
+        tiles[i]->setTexture(_texture);
     }
 }
 
-Unit* TilesManager::getUnitBuffer()
+Unit *TilesManager::getUnitBuffer()
 {
     return unitBuffer;
+}
+
+bool TilesManager::hasEmptyTiles()
+{
+    for (int i = 0; i < numberOfTiles; ++i)
+    {
+        if (tiles[i]->getStatus() == TileStatus::statusIsEmpty)
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+TilesManager::~TilesManager()
+{
+    unitBuffer = nullptr;
 }

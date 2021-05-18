@@ -8,33 +8,41 @@ using namespace sf;
 
 class Clickable : public DrawableBox
 {
-    public:
-        Clickable(RenderWindow& _window, Mouse& _mouse);
-        Clickable(RenderWindow& _window, Mouse& _mouse, Command* _command);
-        void setCommand(Command* _command);
+public:
+    Clickable(RenderWindow &_window, Mouse &_mouse);
+    Clickable(RenderWindow &_window, Mouse &_mouse, Command *_command);
+    void setCommand(Command *_command);
 
-        bool hasFocus();
-        virtual void updateFocus();
-        //Не у всех наследников есть этот метод
-        virtual void click();
-        void release();
+    bool hasFocus();
+    virtual void updateFocus();
+    //Не у всех наследников есть этот метод
+    virtual void click();
+    void release();
 
-        virtual void draw() = 0;
-        ~Clickable();
+    virtual void draw() = 0;
+    ~Clickable();
 
-        //Потом удалить!!
-        void setColors(Color _basicColor, Color _focusedColor, Color _clickedColor);
+    //Потом удалить!!
+    void setColors(Color _basicColor, Color _focusedColor, Color _clickedColor);
 
-    protected:
-        const Mouse& mouse;
-        //bool wasClicked;
-        Command* command;
+    //Потом доделать
+    //void makeDisabled();
+    //void makeEnabled();
 
-        bool isInFocus;
-        bool isPressed;
+protected:
+    const Mouse &mouse;
+    //bool wasClicked;
+    Command *command;
 
-        //Потом заменить на текстуры!
-        Color basicColor;
-        Color focusedColor;
-        Color clickedColor;
+    bool isInFocus;
+    bool isPressed;
+
+    //Потом заменить на текстуры!
+    Color basicColor;
+    Color focusedColor;
+    Color clickedColor;
+
+//Это потом применить надо (типа чтобы кнопка не нажималась)
+    //bool isEnabled;
+    //const Color disabledColor = Color(40, 40, 40);
 };

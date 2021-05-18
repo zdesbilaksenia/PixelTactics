@@ -6,6 +6,8 @@
 #include "Tile.h"
 #include "Card.h"
 
+//Комманда, видимо, вообще не пригодится
+
 class CommandReleaseUnit : public Command
 {
     public:
@@ -15,6 +17,5 @@ class CommandReleaseUnit : public Command
         ~CommandReleaseUnit();
 
     private:
-        Unit* unit;
         TilesManager& tilesManager;
 };

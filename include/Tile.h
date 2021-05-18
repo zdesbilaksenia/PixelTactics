@@ -4,6 +4,9 @@
 #include "Clickable.h"
 #include "Unit.h"
 #include <vector>
+#include <memory>
+using std::make_unique;
+using std::unique_ptr;
 using std::vector;
 
 enum class TileStatus
@@ -27,7 +30,6 @@ public:
 
 private:
     Unit *unit;
-    int side;
     TileStatus status;
 };
 
@@ -56,15 +58,16 @@ enum class Side
 class TilesManager
 {
 public:
-    TilesManager(RenderWindow& _window, Mouse& _mouse, const Side& _side);
+    TilesManager(RenderWindow &_window, Mouse &_mouse, const Side &_side);
 
     void setStatus(const TilesManagerStatus &_status);
     void setUnitBuffer(Unit *_unit);
-    Unit* getUnitBuffer();
+    Unit *getUnitBuffer();
     void mouseIsPressed();
     void updateFocus();
     void draw();
-    void setTexture(Texture* _texture);
+    void setTexture(Texture *_texture);
+    bool hasEmptyTiles();
     TilesManagerStatus getStatus();
 
     ~TilesManager();
@@ -72,16 +75,15 @@ public:
 private:
     Side side;
     vector<Tile *> tiles;
+    //Тайлы авангарда
+    vector<unique_ptr<Tile>> tilesAvangard;
+    //Тайлы фланга
+    vector<unique_ptr<Tile>> tilesFlank;
+    //Тайлы тыла
+    vector<unique_ptr<Tile>> tilesRear;
 
     //Когда завершилось какое-то действие (разыграна карта или атакован игрок)
     void setNormalColors();
-
-    //Тайлы авангарда
-    //vector<Tile *> avangardTiles;
-    //Тайлы фланга
-    //vector<Tile *> flankTiles;
-    //Тайлы тыла
-    //vector<Tile *> rearTiles;
 
     //Какую карту мы хотим вывести в игру
     //Указатель или ссылка?

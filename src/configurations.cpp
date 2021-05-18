@@ -4,6 +4,14 @@ const int buttonWidth = 200;
 const int buttonHeight = 40;
 const int tileWidth = 120;
 const int tileHeight = 80;
+
+//Cards
 const int cardWidth = 150;
 const int cardHeight = 250;
+const int cardsInStackPosX = 40;
+const int cardsInStackPosY = 500;
+const int cardsInHandPosX = 300;
+const int cardsInHandPosY = 500;
+
+//Tiles
 const int numberOfTiles = 9;

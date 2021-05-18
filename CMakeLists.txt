@@ -1,13 +1,26 @@
 cmake_minimum_required(VERSION 3.16)
 project(PixelTactics CXX)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #Скопировал с какого-то сайта
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -pedantic")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -pedantic")
 
-set(LIB_SOURCE_FILES src/DrawableBox.cpp src/Clickable.cpp src/Command.cpp src/Button.cpp src/Card.cpp src/Label.cpp src/Tile.cpp src/Unit.cpp src/Commands/CommandAttackTile.cpp src/Commands/CommandSetUnit.cpp src/Commands/CommandReleaseUnit.cpp)
+set(LIB_SOURCE_FILES 
+    src/DrawableBox.cpp 
+    src/Clickable.cpp 
+    src/Command.cpp 
+    src/Button.cpp 
+    src/Card.cpp 
+    src/Label.cpp 
+    src/Tile.cpp 
+    src/Unit.cpp 
+    src/Commands/CommandAttack.cpp 
+    src/Commands/CommandSetUnit.cpp 
+    src/Commands/CommandReleaseUnit.cpp
+    src/Commands/CommandTakeCard.cpp    )
+
 # Что бы не было относительных ссылок на файлы
 include_directories(include)
 
