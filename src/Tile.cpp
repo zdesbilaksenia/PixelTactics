@@ -112,6 +112,12 @@ TilesManager::TilesManager(RenderWindow &_window, Mouse &_mouse, const Side &_si
             tilesRear[i]->setStatus(TileStatus::statusIsEmpty);
             tiles.push_back(tilesRear[i].get());
         }
+
+        //УДАЛИТЬ, ЗАГЛУШКА!!!
+        for(auto tile : tiles)
+        {
+            tile->setStatus(TileStatus::statusHasUnit);
+        }
     }
 }
 
@@ -186,23 +192,24 @@ void TilesManager::mouseIsPressed()
     case TilesManagerStatus::statusWaitingForAttack:
         for (auto tile : tiles)
         {
-            if (tile->hasFocus()) //&& tile->getStatus() == TileStatus::statusHasUnit)
+            if (tile->hasFocus() && tile->getStatus() == TileStatus::statusHasUnit)
             {
                 //Потом надо заменить на отдачу информации серверу
                 tile->setStatus(TileStatus::statusHasDeadBody);
 
                 cout << "TilesManager::mouseIsPressed(): Tile was attacked!" << endl;
                 this->setStatus(TilesManagerStatus::statusNothingHappens);
-                break;
+                this->updateFocus();
+                return;
             }
         }
+        break;
     case TilesManagerStatus::statusReleasingUnit:
     {
         if (unitBuffer == nullptr)
         {
             ////////////////////////////////////////////////////////////////////////////////////////COUT
-            cout << "ERROR, TilesManager::mouseIsPressed:: unitBuffer is nullptr" << endl;
-
+            cout << "TilesManager::mouseIsPressed:: ERROR! statusReleasingUnit : unitBuffer is nullptr" << endl;
             return;
         }
         for (auto tile : tiles)
@@ -214,6 +221,7 @@ void TilesManager::mouseIsPressed()
 
                 tile->setUnit(*unitBuffer);
                 this->setNormalColors();
+                //Эту информацию сразу отлавливает CardsManager
                 this->status = TilesManagerStatus::statusCardWasJustReleased;
                 unitBuffer = nullptr;
                 return;
@@ -265,8 +273,7 @@ void TilesManager::updateFocus()
             {
                 tile->setFillColor(colorInFocus);
             }
-            else
-            if(tile->getStatus()==TileStatus::statusHasDeadBody)
+            else if (tile->getStatus() == TileStatus::statusHasDeadBody)
             {
                 tile->setFillColor(colorForDeadBody);
             }
@@ -279,9 +286,13 @@ void TilesManager::updateFocus()
     case TilesManagerStatus::statusWaitingForAttack:
         for (auto tile : tiles)
         {
-            if (tile->hasFocus())
+            if (tile->hasFocus() && tile->getStatus() == TileStatus::statusHasUnit)
             {
                 tile->setFillColor(colorInFocus);
+            }
+            else if (tile->getStatus() == TileStatus::statusHasDeadBody)
+            {
+                tile->setFillColor(colorForDeadBody);
             }
             else
             {

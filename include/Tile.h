@@ -68,7 +68,7 @@ enum class TilesManagerStatus
     //Когда атакуем тайлы противника
     statusWaitingForAttack,
     //Когда используем силу на тайлы противника
-    statusWaitngForMagic
+    statusWaitngForPower
 };
 
 enum class Side
@@ -146,9 +146,9 @@ private:
     const Color colorInFocus = Color(65, 105, 225);
     const Color colorForReleasingUnit = Color::Yellow;
     const Color colorWhenCantReleaseUnit = Color::Black;
-    const Color colorForDeadBody = Color::Magenta;
+    const Color colorForDeadBody = Color(100, 30, 100);
     const Color colorToBeAttacked = Color::Red;
     const Color colorWhenCantAttack = Color(30, 30, 30);
     const Color colorWhenCanAttack = Color(255, 162, 50);
-    const Color colorWaitingForAttack = Color(230, 40, 240);
+    const Color colorWaitingForAttack = Color(200, 40, 240);
 };

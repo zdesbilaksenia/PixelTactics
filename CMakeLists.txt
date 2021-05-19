@@ -17,9 +17,7 @@ set(LIB_SOURCE_FILES
     src/Tile.cpp 
     src/Unit.cpp 
     src/Commands/CommandAttack.cpp 
-    src/Commands/CommandSetUnit.cpp 
-    src/Commands/CommandReleaseUnit.cpp
-    src/Commands/CommandTakeCard.cpp    )
+    src/Commands/CommandTakeCard.cpp)
 
 # Что бы не было относительных ссылок на файлы
 include_directories(include)

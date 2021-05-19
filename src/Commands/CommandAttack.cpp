@@ -19,12 +19,12 @@ void CommandAttack::execute()
         else
         {
                 cout << "CommandAttack::execute(): Attacking!" << endl;
-
-                //playerTilesManager->setStatus(TilesManagerStatus::statusNothingHappens);
                 opponentTilesManager->setStatus(TilesManagerStatus::statusWaitingForAttack);
-                opponentTilesManager->setTileBuffer(playerTilesManager->getTileBuffer());
+                //opponentTilesManager->setTileBuffer(playerTilesManager->getTileBuffer());
+
                 playerTilesManager->setTileBuffer(nullptr);
-                //playerTilesManager->updateFocus();
+                playerTilesManager->setStatus(TilesManagerStatus::statusNothingHappens);
+                playerTilesManager->updateFocus();
                 opponentTilesManager->updateFocus();
         }
 }

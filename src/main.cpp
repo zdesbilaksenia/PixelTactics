@@ -8,22 +8,10 @@ using namespace sf;
 #include "Button.h"
 #include "Command.h"
 #include "Commands/CommandAttack.h"
-#include "Commands/CommandReleaseUnit.h"
 #include "Commands/CommandTakeCard.h"
 #include "Card.h"
 #include "Tile.h"
 #include "configurations.cpp"
-
-/*
-enum class GameStage
-{
-    stageGameStart,
-    stageReleasingHero,
-    stageOpponentsMove,
-    stageAvangard,
-    stageFlank,
-    stageRear
-};*/
 
 //Чтобы визуально сжать код
 #define GAME_ELEMENTS
@@ -172,7 +160,7 @@ int main()
     takeCardButtonTx.loadFromFile("../img/take_card.png");
     CommandTakeCard cmdtakecard(cardsManager);
     Button buttonTakeCard(window, mouse, &cmdtakecard);
-    buttonTakeCard.setPosition(50, 50);
+    buttonTakeCard.setPosition(50, 30);
     buttonTakeCard.setTexture(&takeCardButtonTx);
     buttonTakeCard.setColors(Color::White, Color(20, 100, 255), Color::Magenta);
 
@@ -184,13 +172,13 @@ int main()
     CommandAttack cmdattack(&playerTilesManager, &opponentTilesManager);
     Button attackButton(window, mouse, &cmdattack);
     attackButton.setColors(Color::White, Color(240, 200, 150), Color(190, 70, 80));
-    attackButton.setPosition((windowWidth - buttonWidth) / 2, 50);
+    attackButton.setPosition(50, 80);
     attackButton.setTexture(&attackButtonTx);
 
     CommandStringTest cmdtest2("CommandStringTest::execute(): Magic!");
     Button powerButton(window, mouse, &cmdtest2);
     powerButton.setColors(Color::White, Color(240, 200, 150), Color(190, 70, 80));
-    powerButton.setPosition((windowWidth - buttonWidth) / 2, 100);
+    powerButton.setPosition(50, 130);
     powerButton.setTexture(&powerButtonTx);
 
     playerTilesManager.setButtons(&attackButton, &powerButton);
@@ -200,6 +188,18 @@ int main()
     buttonsManager.setButtons(buttons);
 
 #endif //GAME_ELEMENTS
+
+    RectangleShape stageText;
+    stageText.setSize(Vector2f(400, 100));
+    stageText.setPosition((windowWidth - 400) / 2, 50);
+    stageText.setFillColor(Color::White);
+
+    Texture AvangardTx;
+    AvangardTx.loadFromFile("../img/avangard.png");
+    Texture FlankTx;
+    FlankTx.loadFromFile("../img/flank.png");
+    Texture RearTx;
+    RearTx.loadFromFile("../img/rear.png");
 
     while (window.isOpen())
     {
@@ -236,8 +236,23 @@ int main()
             //УДАЛИТЬ
             case (Event::KeyPressed):
             {
-                playerTilesManager.setStage(Stage::stageAvangard);
+                if (Keyboard::isKeyPressed(Keyboard::A))
+                {
+                    playerTilesManager.setStage(Stage::stageAvangard);
+                    stageText.setTexture(&AvangardTx);
+                }
+                if (Keyboard::isKeyPressed(Keyboard::B))
+                {
+                    playerTilesManager.setStage(Stage::stageFlank);
+                    stageText.setTexture(&FlankTx);
+                }
+                if (Keyboard::isKeyPressed(Keyboard::C))
+                {
+                    playerTilesManager.setStage(Stage::stageRear);
+                    stageText.setTexture(&RearTx);
+                }
                 playerTilesManager.setStatus(TilesManagerStatus::statusAttackingUnit);
+                playerTilesManager.updateFocus();
             }
             break;
 
@@ -255,6 +270,10 @@ int main()
 
         window.draw(backgroundRect);
         window.draw(lowerPanelRect);
+        if (playerTilesManager.getStatus() == TilesManagerStatus::statusAttackingUnit)
+        {
+            window.draw(stageText);
+        }
 
         buttonsManager.draw();
         playerTilesManager.draw();

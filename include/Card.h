@@ -65,9 +65,20 @@ public:
     void updateHand();
     void setCardShirtTexture(Texture* _texture);
 
+    void setUnitBuffer(Unit* _unit)
+    {
+        unitBuffer = _unit;
+    };
+
+    Unit& getUnitBuffer()
+    {
+        return *unitBuffer;
+    };
+
     ~CardsManager();
 
 private:
+    Unit* unitBuffer;
     RenderWindow& window;
     CardsManagerStatus status;
     //Заменить на умные указатели!

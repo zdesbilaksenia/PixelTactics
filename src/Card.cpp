@@ -180,7 +180,7 @@ void CardsManager::draw()
 {
     for (size_t i = 0; i < cardsInStack.size(); ++i)
     {
-        cardShirtRect.setPosition(Vector2f(cardsInStackPosX - 2 * i, cardsInStackPosY));
+        cardShirtRect.setPosition(Vector2f(cardsInStackPosX - 4 * i, cardsInStackPosY));
         window.draw(cardShirtRect);
     }
 
