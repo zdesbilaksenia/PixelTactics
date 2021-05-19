@@ -20,7 +20,7 @@ private:
     bool isDamaged;
     bool canBeAttackedFromDistance;
     bool canBeAttackedClosely;
-    int needReset;
+    bool canUseLeaderPower;
 
 public:
     Hero() {};
@@ -70,6 +70,14 @@ public:
     void ForbidDistantAttack();
 
     void ForbidCloseAttack();
+
+    bool CanBeAttackedClosely();
+
+    bool CanBeAttackedDistantly();
+
+    bool CanUseLeaderPower();
+
+    bool ForbidLeaderPower();
 
 };
 

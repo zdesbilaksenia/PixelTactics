@@ -152,11 +152,87 @@ void TransferDamageFromLeader(vector<Hero *> &heroes) {
     }
 }
 
+void DieAndAttack(vector<Hero *> &heroes) {
+    if (heroes.size() == 3 && !heroes[1]->IsDead() && heroes[2]->CanBeAttackedDistantly()) {
+        heroes[1]->Attack(*heroes[2], heroes[1]->GetCurStrength());
+        heroes[1]->Die();
+    }
+}
+
+void DamageTwoColsInBothSquad(vector<Hero *> &heroes) {
+    if (heroes.size() <= 7 && for_each(heroes.begin(), heroes.end(),
+                                       [](Hero *hero) -> bool { return !hero->IsDead(); })) {
+        for_each(heroes.begin() + 1, heroes.end(),
+                 [](Hero *hero) { hero->ReduceHealth(1); });
+    }
+}
+
+
+void DamageTwoRowsInBothSquad(vector<Hero *> &heroes) {
+    if (heroes.size() <= 7 && for_each(heroes.begin(), heroes.end(),
+                                       [](Hero *hero) -> bool { return !hero->IsDead(); })) {
+        for_each(heroes.begin() + 1, heroes.end(),
+                 [](Hero *hero) { hero->ReduceHealth(1); });
+    }
+}
+
+void TransferDamageWithoutUsingAction(vector<Hero *> &heroes) {
+    if (heroes.size() == 2 && !heroes[0]->IsDead()) {
+        if (heroes[1]->GetHealth() - heroes[1]->GetCurHealth() > 0) {
+            heroes[0]->ReduceHealth(heroes[1]->GetHealth() - heroes[1]->GetCurHealth());
+            heroes[1]->SetCurHealth(heroes[1]->GetHealth());
+        }
+    }
+}
+
+void InterceptionAndPlusPower(vector<Hero *> &heroes) {
+    if (heroes.size() == 2 && !heroes[0]->IsDead() && !heroes[1]->IsDead()) {
+        heroes[0]->SetCurStrength(heroes[0]->GetCurStrength() + 2);
+        heroes[1]->ForbidDistantAttack();
+    }
+}
+
+void MakeDistantAttack(vector<Hero *> &heroes) {
+    if (heroes.size() == 2 && heroes[1]->CanBeAttackedDistantly()) {
+        heroes[0]->Attack(*heroes[1], heroes[0]->GetCurStrength());
+    }
+}
+
+void FrontAndBackAttackDistantly(vector<Hero *> &heroes) {
+    if (heroes.size() == 5 && heroes[3]->CanBeAttackedDistantly() && heroes[4]->CanBeAttackedDistantly()) {
+        heroes[1]->Attack(*heroes[3], heroes[1]->GetCurStrength());
+        heroes[2]->Attack(*heroes[4], heroes[2]->GetCurStrength());
+    }
+}
+
+void PowerFromCurDamage(vector<Hero *> &heroes) {
+    if (heroes.size() == 1 && heroes[0]->IsDamaged() && heroes[0]->GetHealth() > heroes[0]->GetCurHealth()) {
+        heroes[0]->SetCurStrength(heroes[0]->GetHealth() - heroes[0]->GetCurHealth());
+    }
+}
+
+void AnotherHeroMakeDistantAttack(vector<Hero *> &heroes) {
+    if (heroes.size() == 3 && heroes[2]->CanBeAttackedDistantly() && !heroes[1]->IsDead()) {
+        heroes[1]->Attack(*heroes[2], heroes[1]->GetCurStrength());
+    }
+}
+
+// Leader
+
+void ForbidDistantAttackForThreeHeroes(vector<Hero *> &heroes) {
+    if (heroes.size() == 4 && heroes[0]->IsLeader() && heroes[0]->CanUseLeaderPower() &&
+        for_each(heroes.begin(), heroes.end(),
+                 [](Hero *hero) -> bool { return !hero->IsDead(); })) {
+        for_each(heroes.begin(), heroes.end(),
+                 [](Hero *hero) -> bool { hero->ForbidDistantAttack(); });
+    }
+}
+
 Powers::Powers() {
     frontLinePowerMap.insert(pair<string, FrontLinePower>("Рыцарь", &Interception));
     frontLinePowerMap.insert(pair<string, FrontLinePower>("Ведьма", &DeadCanAttack));
     frontLinePowerMap.insert(pair<string, FrontLinePower>("Алхимик", &PlusPower));
-    frontLinePowerMap.insert(pair<string, FrontLinePower>("Берсерк", &HitFrontRowHeroes));
+    frontLinePowerMap.insert(pair<string, FrontLinePower>("Берсерк", &InterceptionAndPlusPower));
     frontLinePowerMap.insert(pair<string, FrontLinePower>("Боец", &AttackDamageToHP));
     frontLinePowerMap.insert(pair<string, FrontLinePower>("Вампир", &TransferDamage));
     frontLinePowerMap.insert(pair<string, FrontLinePower>("Дубликатор", &CopyPower));
@@ -171,5 +247,15 @@ Powers::Powers() {
     middleLinePowerMap.insert(pair<string, MiddleLinePower>("Вампир", &CastlingWithDead));
     middleLinePowerMap.insert(pair<string, MiddleLinePower>("Дубликатор", &CopyPower));
     middleLinePowerMap.insert(pair<string, MiddleLinePower>("Жрица", &PlusPowerByDead));
-    middleLinePowerMap.insert(pair<string, MiddleLinePower>("Маг-дракон", &PlusPowerForDeath));
+    middleLinePowerMap.insert(pair<string, MiddleLinePower>("Маг-дракон", &DamageTwoRowsInBothSquad));
+
+    middleLinePowerMap.insert(pair<string, MiddleLinePower>("Рыцарь", &DoubleStrengthAgainstLeader));
+    middleLinePowerMap.insert(pair<string, MiddleLinePower>("Ведьма", &DieAndAttack));
+    middleLinePowerMap.insert(pair<string, MiddleLinePower>("Алхимик", &PowerFromCurDamage));
+    middleLinePowerMap.insert(pair<string, MiddleLinePower>("Берсерк", &PlusPowerForDeath));
+    middleLinePowerMap.insert(pair<string, MiddleLinePower>("Боец", &DamageTwoColsInBothSquad));
+    middleLinePowerMap.insert(pair<string, MiddleLinePower>("Вампир", &TransferDamageFromLeader));
+    middleLinePowerMap.insert(pair<string, MiddleLinePower>("Дубликатор", &CopyPower));
+    middleLinePowerMap.insert(pair<string, MiddleLinePower>("Жрица", &TransferDamageWithoutUsingAction));
+    middleLinePowerMap.insert(pair<string, MiddleLinePower>("Маг-дракон", &HitFrontRowHeroes));
 }

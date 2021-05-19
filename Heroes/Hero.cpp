@@ -1,7 +1,7 @@
 #include "Hero.h"
 
 Hero::Hero(Card &card) : isAlive(true), isLeader(false), isDamaged(false), canBeAttackedFromDistance(false),
-                         canBeAttackedClosely(true) {
+                         canBeAttackedClosely(true), canUseLeaderPower(false) {
     name = card.name;
     HP = card.HP;
     curHP = HP;
@@ -20,6 +20,9 @@ Hero::Hero(Hero &hero) {
     isDamaged = hero.isDamaged;
     isAlive = hero.isAlive;
     isLeader = hero.isLeader;
+    canBeAttackedFromDistance = hero.canBeAttackedFromDistance;
+    canBeAttackedClosely = hero.canBeAttackedClosely;
+    canUseLeaderPower = hero.canUseLeaderPower;
 }
 
 void Hero::MakeLeader() {
@@ -28,6 +31,7 @@ void Hero::MakeLeader() {
         HP += 10;
         curHP = HP;
     }
+    canUseLeaderPower = true;
 }
 
 void Hero::ReduceHealth(int damage) {
@@ -105,4 +109,20 @@ void Hero::ForbidDistantAttack() {
 void Hero::ForbidCloseAttack() {
     if (isAlive)
         canBeAttackedClosely = false;
+}
+
+bool Hero::CanBeAttackedClosely() {
+    return canBeAttackedClosely;
+}
+
+bool Hero::CanBeAttackedDistantly() {
+    return canBeAttackedFromDistance;
+}
+
+bool Hero::CanUseLeaderPower() {
+    return canUseLeaderPower;
+}
+
+bool Hero::ForbidLeaderPower() {
+    canUseLeaderPower = false;
 }
