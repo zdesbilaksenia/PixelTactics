@@ -19,7 +19,7 @@ int main(){
 
     std::cout << "//////////////////////////" << std::endl;*/
     std::vector<Card*> LeaderCards; 
-    int choice = 0;
+    int choice = -1;
 
     Breed LeaderMageBreed(NULL,15,7);
     Card* LeaderMageCard = LeaderMageBreed.NewCard();
@@ -37,7 +37,6 @@ int main(){
     for(int i = 0; i < LeaderCards.size(); i++){
         std::cout << "Здоровье Героя:"<< LeaderCards[i]->GetBreed().GetHealth() << " " << "Атака Героя:" << LeaderCards[i]->GetBreed().GetStrength() << std::endl;
     }
-    std::cin >> choice;
     FirstPlayerLeader.SetHero(LeaderCards[choice]);
     poleshko.SetPosition(FirstPlayerLeader);
 
@@ -45,7 +44,6 @@ int main(){
     for(int i = 0; i < LeaderCards.size(); i++){
         std::cout << "Здоровье Героя:"<< LeaderCards[i]->GetBreed().GetHealth() << " " << "Атака Героя:" << LeaderCards[i]->GetBreed().GetStrength() << std::endl;
     }
-    std::cin >> choice;
     SecondPlayerLeader.SetHero(LeaderCards[choice]);
     poleshko.SetPosition(SecondPlayerLeader);
     
