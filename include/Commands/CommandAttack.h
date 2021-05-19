@@ -4,12 +4,12 @@
 class CommandAttack : public Command
 {
     public:
-        CommandAttack(TilesManager* _tilesManager);
+        CommandAttack(TilesManager* _playerTM, TilesManager* _opponentTM);
         void execute() override;
         ~CommandAttack();
 
     private:
-        TilesManager* tilesManager;
-        Tile* attackerTile;
-        Tile* attackedTile;
+        TilesManager* playerTilesManager;
+        TilesManager* opponentTilesManager;
+
 };

@@ -140,7 +140,7 @@ void CardsManager::mouseIsPressed()
             if ((*cardId)->hasFocus())
             {
                 cardToDeleteId = cardId;
-                tilesManager->setUnitBuffer((*cardId)->unit);
+                tilesManager->setUnitBuffer(*(*cardId)->unit);
                 tilesManager->setStatus(TilesManagerStatus::statusReleasingUnit);
                 status = CardsManagerStatus::statusReleasingCard;
                 return;
@@ -155,7 +155,7 @@ void CardsManager::mouseIsPressed()
             if ((*cardId)->hasFocus())
             {
                 cardToDeleteId = cardId;
-                tilesManager->setUnitBuffer((*cardId)->unit);
+                tilesManager->setUnitBuffer(*(*cardId)->unit);
                 tilesManager->setStatus(TilesManagerStatus::statusReleasingUnit);
                 status = CardsManagerStatus::statusReleasingCard;
                 return;

@@ -15,15 +15,18 @@ using namespace sf;
 #include "configurations.cpp"
 
 /*
-1 - кнопки
-2 - тайлы
-3 - юниты
-4 - карты
-*/
+enum class GameStage
+{
+    stageGameStart,
+    stageReleasingHero,
+    stageOpponentsMove,
+    stageAvangard,
+    stageFlank,
+    stageRear
+};*/
 
 //Чтобы визуально сжать код
 #define GAME_ELEMENTS
-
 
 int main()
 {
@@ -173,8 +176,26 @@ int main()
     buttonTakeCard.setTexture(&takeCardButtonTx);
     buttonTakeCard.setColors(Color::White, Color(20, 100, 255), Color::Magenta);
 
-    //Без указателей не получалось почему-то
-    vector<Button *> buttons = {&buttonTakeCard};
+    Texture attackButtonTx;
+    attackButtonTx.loadFromFile("../img/attack.png");
+    Texture powerButtonTx;
+    powerButtonTx.loadFromFile("../img/power.png");
+
+    CommandAttack cmdattack(&playerTilesManager, &opponentTilesManager);
+    Button attackButton(window, mouse, &cmdattack);
+    attackButton.setColors(Color::White, Color(240, 200, 150), Color(190, 70, 80));
+    attackButton.setPosition((windowWidth - buttonWidth) / 2, 50);
+    attackButton.setTexture(&attackButtonTx);
+
+    CommandStringTest cmdtest2("CommandStringTest::execute(): Magic!");
+    Button powerButton(window, mouse, &cmdtest2);
+    powerButton.setColors(Color::White, Color(240, 200, 150), Color(190, 70, 80));
+    powerButton.setPosition((windowWidth - buttonWidth) / 2, 100);
+    powerButton.setTexture(&powerButtonTx);
+
+    playerTilesManager.setButtons(&attackButton, &powerButton);
+
+    vector<Button *> buttons = {&buttonTakeCard, &attackButton, &powerButton};
     ButtonsManager buttonsManager;
     buttonsManager.setButtons(buttons);
 
@@ -191,6 +212,7 @@ int main()
             {
                 buttonsManager.updateFocus();
                 playerTilesManager.updateFocus();
+                opponentTilesManager.updateFocus();
                 cardsManager.updateFocus();
                 break;
             }
@@ -200,6 +222,7 @@ int main()
                 //Порядок важен!
                 buttonsManager.mouseIsPressed();
                 playerTilesManager.mouseIsPressed();
+                opponentTilesManager.mouseIsPressed();
                 cardsManager.mouseIsPressed();
                 break;
             }
@@ -209,6 +232,15 @@ int main()
                 buttonsManager.mouseIsReleased();
                 break;
             }
+
+            //УДАЛИТЬ
+            case (Event::KeyPressed):
+            {
+                playerTilesManager.setStage(Stage::stageAvangard);
+                playerTilesManager.setStatus(TilesManagerStatus::statusAttackingUnit);
+            }
+            break;
+
             //Закрытие окна
             case (Event::Closed):
             {

@@ -3,6 +3,7 @@
 //#include "DrawableBox.h"
 #include "Clickable.h"
 #include "Unit.h"
+#include "Button.h"
 #include <vector>
 #include <memory>
 using std::make_unique;
@@ -13,7 +14,8 @@ enum class TileStatus
 {
     statusIsEmpty,
     statusHasDeadBody,
-    statusHasUnit
+    statusHasUnit,
+    statusAttacker
 };
 
 class Tile : public Clickable
@@ -22,15 +24,31 @@ class Tile : public Clickable
 public:
     Tile(RenderWindow &_window, Mouse &_mouse);
     //Tile(RenderWindow& _window);
-    void setUnit(Unit *_unit);
+    void setUnit(Unit &_unit);
     void setStatus(TileStatus _status);
     void draw() override;
+
+    void setButtons(Button *_btnAttack, Button *_btnPower)
+    {
+        buttonAttack = _btnAttack;
+        buttonPower = _btnPower;
+    };
+    Unit *getUnit()
+    {
+        return unit.get();
+    }
+
     TileStatus getStatus();
     ~Tile();
 
 private:
-    Unit *unit;
+    Button *buttonAttack;
+    Button *buttonPower;
+
+    unique_ptr<Unit> unit;
+    //Unit *unit;
     TileStatus status;
+    const Color colorForAttack = Color(255, 111, 0);
 };
 
 //Например, игрок нажал на кнопку "Аттаковать"
@@ -46,7 +64,11 @@ enum class TilesManagerStatus
     //Готовы атаковать юнита противника
     statusAttackingUnit,
     //Только что реализовали карту, статус нужен для CardManager
-    statusCardWasJustReleased
+    statusCardWasJustReleased,
+    //Когда атакуем тайлы противника
+    statusWaitingForAttack,
+    //Когда используем силу на тайлы противника
+    statusWaitngForMagic
 };
 
 enum class Side
@@ -55,19 +77,42 @@ enum class Side
     sideOpponent
 };
 
+enum class Stage
+{
+    stageAvangard,
+    stageFlank,
+    stageRear
+};
+
 class TilesManager
 {
 public:
     TilesManager(RenderWindow &_window, Mouse &_mouse, const Side &_side);
 
     void setStatus(const TilesManagerStatus &_status);
-    void setUnitBuffer(Unit *_unit);
+    void setUnitBuffer(Unit &_unit);
     Unit *getUnitBuffer();
+    void setTileBuffer(Tile *_tile)
+    {
+        tileBuffer = _tile;
+    };
+    Tile *getTileBuffer()
+    {
+        return tileBuffer;
+    };
     void mouseIsPressed();
     void updateFocus();
     void draw();
     void setTexture(Texture *_texture);
     bool hasEmptyTiles();
+    void setStage(Stage _stage);
+    void setButtons(Button *_btn1, Button *_btn2)
+    {
+        for (auto tile : tiles)
+        {
+            tile->setButtons(_btn1, _btn2);
+        }
+    }
     TilesManagerStatus getStatus();
 
     ~TilesManager();
@@ -86,11 +131,15 @@ private:
     void setNormalColors();
 
     //Какую карту мы хотим вывести в игру
-    //Указатель или ссылка?
-    Unit *unitBuffer;
+    unique_ptr<Unit> unitBuffer;
+
+    //Какой тайл будет атаковать/использовать способность
+    Tile *tileBuffer;
 
     //Статус
     TilesManagerStatus status;
+    //Стадия игры
+    Stage stage;
 
     //Цвета для всех случаев
     const Color colorBasic = Color::White;
@@ -99,4 +148,7 @@ private:
     const Color colorWhenCantReleaseUnit = Color::Black;
     const Color colorForDeadBody = Color::Magenta;
     const Color colorToBeAttacked = Color::Red;
+    const Color colorWhenCantAttack = Color(30, 30, 30);
+    const Color colorWhenCanAttack = Color(255, 162, 50);
+    const Color colorWaitingForAttack = Color(230, 40, 240);
 };

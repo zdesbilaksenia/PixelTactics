@@ -11,13 +11,13 @@ Tile::Tile(RenderWindow &_window, Mouse &_mouse) : Clickable(_window, _mouse)
 
 //Tile::Tile(RenderWindow &_window) : DrawableBox(_window) {};
 
-void Tile::setUnit(Unit *_unit)
+void Tile::setUnit(Unit &_unit)
 {
-    this->unit = _unit;
+    this->unit = make_unique<Unit>(_unit);
     this->status = TileStatus::statusHasUnit;
     unit->setPosition(this->rect.getPosition().x, this->rect.getPosition().y);
     ////////////////////////////////////////////////////////////////////////////////////////COUT
-    cout << "Tile::setUnit === " << unit << " ===" << endl;
+    cout << "Tile::setUnit === " << unit.get() << " ===" << endl;
 }
 
 void Tile::setStatus(TileStatus _status)
@@ -50,6 +50,7 @@ Tile::~Tile()
 TilesManager::TilesManager(RenderWindow &_window, Mouse &_mouse, const Side &_side) : side(_side)
 {
     status = TilesManagerStatus::statusNothingHappens;
+    stage = Stage::stageAvangard;
     unitBuffer = nullptr;
 
     if (side == Side::sidePlayer)
@@ -121,15 +122,15 @@ void TilesManager::setStatus(const TilesManagerStatus &_status)
     {
     case TilesManagerStatus::statusReleasingUnit:
     {
-        for (size_t i = 0; i < 9; ++i)
+        for (auto tile : tiles)
         {
-            if (tiles[i]->getStatus() == TileStatus::statusIsEmpty)
+            if (tile->getStatus() == TileStatus::statusIsEmpty)
             {
-                tiles[i]->setFillColor(colorForReleasingUnit);
+                tile->setFillColor(colorForReleasingUnit);
             }
             else
             {
-                tiles[i]->setFillColor(colorWhenCantReleaseUnit);
+                tile->setFillColor(colorWhenCantReleaseUnit);
             }
         }
     }
@@ -140,10 +141,39 @@ void TilesManager::setStatus(const TilesManagerStatus &_status)
     }
 }
 
-void TilesManager::setUnitBuffer(Unit *_unit)
+void TilesManager::setUnitBuffer(Unit &_unit)
 {
-    this->unitBuffer = _unit;
+    this->unitBuffer = make_unique<Unit>(_unit);
 }
+
+auto pressTileOnStage{
+    [](vector<unique_ptr<Tile>> *_tiles, TilesManager &_tileManager) {
+        for (size_t i = 0; i < 3; ++i)
+        {
+            if ((*_tiles)[i]->hasFocus() && (*_tiles)[i]->getStatus() == TileStatus::statusHasUnit)
+            {
+                cout << "TilesManager::mouseIsPressed(): tile was clicked!" << endl;
+                _tileManager.setTileBuffer((*_tiles)[i].get());
+            }
+        }
+        return;
+    }};
+
+auto focusTileOnStage{
+    [](vector<unique_ptr<Tile>> *_tiles, const Color &_colorWhenCanAttack, const Color &_colorInFocus) {
+        for (size_t i = 0; i < 3; ++i)
+        {
+            if ((*_tiles)[i]->getStatus() == TileStatus::statusHasUnit)
+            {
+                (*_tiles)[i]->setFillColor(_colorWhenCanAttack);
+                if ((*_tiles)[i]->hasFocus())
+                {
+                    (*_tiles)[i]->setFillColor(_colorInFocus);
+                }
+            }
+        }
+        return;
+    }};
 
 void TilesManager::mouseIsPressed()
 {
@@ -151,16 +181,21 @@ void TilesManager::mouseIsPressed()
     {
     case TilesManagerStatus::statusNothingHappens:
     {
-        for (int i = 0; i < numberOfTiles; ++i)
+    }
+    break;
+    case TilesManagerStatus::statusWaitingForAttack:
+        for (auto tile : tiles)
         {
-            if (tiles[i]->hasFocus())
+            if (tile->hasFocus()) //&& tile->getStatus() == TileStatus::statusHasUnit)
             {
-                cout << "TilesManager::mouseIsPressed() tile was clicked!" << endl;
+                //Потом надо заменить на отдачу информации серверу
+                tile->setStatus(TileStatus::statusHasDeadBody);
+
+                cout << "TilesManager::mouseIsPressed(): Tile was attacked!" << endl;
+                this->setStatus(TilesManagerStatus::statusNothingHappens);
+                break;
             }
         }
-        return;
-        break;
-    }
     case TilesManagerStatus::statusReleasingUnit:
     {
         if (unitBuffer == nullptr)
@@ -170,14 +205,14 @@ void TilesManager::mouseIsPressed()
 
             return;
         }
-        for (int i = 0; i < numberOfTiles; ++i)
+        for (auto tile : tiles)
         {
-            if (tiles[i]->hasFocus() && tiles[i]->getStatus() == TileStatus::statusIsEmpty)
+            if (tile->hasFocus() && tile->getStatus() == TileStatus::statusIsEmpty)
             {
                 ////////////////////////////////////////////////////////////////////////////////////////COUT
                 cout << "TilesManager::mouseIsPressed:: RELEASING UNIT!!!" << endl;
 
-                tiles[i]->setUnit(unitBuffer);
+                tile->setUnit(*unitBuffer);
                 this->setNormalColors();
                 this->status = TilesManagerStatus::statusCardWasJustReleased;
                 unitBuffer = nullptr;
@@ -185,14 +220,37 @@ void TilesManager::mouseIsPressed()
             }
         }
     }
+    break;
+    case TilesManagerStatus::statusAttackingUnit:
+    {
+        switch (stage)
+        {
+        case Stage::stageAvangard:
+        {
+            pressTileOnStage(&tilesAvangard, *this);
+        }
+        break;
+        case Stage::stageFlank:
+        {
+            pressTileOnStage(&tilesFlank, *this);
+        }
+        break;
+        case Stage::stageRear:
+        {
+            pressTileOnStage(&tilesRear, *this);
+        }
+        break;
+        }
+    }
+    break;
     }
 }
 
 void TilesManager::setNormalColors()
 {
-    for (int i = 0; i < numberOfTiles; ++i)
+    for (auto tile : tiles)
     {
-        tiles[i]->setFillColor(colorBasic);
+        tile->setFillColor(colorBasic);
     }
 }
 
@@ -201,32 +259,70 @@ void TilesManager::updateFocus()
     switch (status)
     {
     case TilesManagerStatus::statusNothingHappens:
-        for (int i = 0; i < numberOfTiles; ++i)
+        for (auto tile : tiles)
         {
-            if (tiles[i]->hasFocus())
+            if (tile->hasFocus())
             {
-                tiles[i]->setFillColor(colorInFocus);
+                tile->setFillColor(colorInFocus);
+            }
+            else
+            if(tile->getStatus()==TileStatus::statusHasDeadBody)
+            {
+                tile->setFillColor(colorForDeadBody);
             }
             else
             {
-                tiles[i]->setFillColor(colorBasic);
+                tile->setFillColor(colorBasic);
+            }
+        }
+        break;
+    case TilesManagerStatus::statusWaitingForAttack:
+        for (auto tile : tiles)
+        {
+            if (tile->hasFocus())
+            {
+                tile->setFillColor(colorInFocus);
+            }
+            else
+            {
+                tile->setFillColor(colorWaitingForAttack);
             }
         }
         break;
     case TilesManagerStatus::statusReleasingUnit:
-        for (int i = 0; i < numberOfTiles; ++i)
+        for (auto tile : tiles)
         {
-            if (tiles[i]->hasFocus() && tiles[i]->getStatus() == TileStatus::statusIsEmpty)
+            if (tile->hasFocus() && tile->getStatus() == TileStatus::statusIsEmpty)
             {
-                tiles[i]->setFillColor(colorInFocus);
+                tile->setFillColor(colorInFocus);
             }
             else
             {
-                if (tiles[i]->getStatus() == TileStatus::statusIsEmpty)
+                if (tile->getStatus() == TileStatus::statusIsEmpty)
                 {
-                    tiles[i]->setFillColor(colorForReleasingUnit);
+                    tile->setFillColor(colorForReleasingUnit);
                 }
             }
+        }
+        break;
+    case TilesManagerStatus::statusAttackingUnit:
+        for (auto tile : tiles)
+        {
+            tile->setFillColor(colorWhenCantAttack);
+        }
+        switch (stage)
+        {
+        case Stage::stageAvangard:
+            focusTileOnStage(&tilesAvangard, colorWhenCanAttack, colorInFocus);
+            break;
+        case Stage::stageFlank:
+            focusTileOnStage(&tilesFlank, colorWhenCanAttack, colorInFocus);
+            break;
+        case Stage::stageRear:
+            focusTileOnStage(&tilesRear, colorWhenCanAttack, colorInFocus);
+            break;
+        default:
+            break;
         }
         break;
 
@@ -236,11 +332,16 @@ void TilesManager::updateFocus()
     }
 }
 
+void TilesManager::setStage(Stage _stage)
+{
+    stage = _stage;
+}
+
 void TilesManager::draw()
 {
-    for (int i = 0; i < numberOfTiles; ++i)
+    for (auto tile : tiles)
     {
-        tiles[i]->draw();
+        tile->draw();
     }
 }
 
@@ -251,22 +352,22 @@ TilesManagerStatus TilesManager::getStatus()
 
 void TilesManager::setTexture(Texture *_texture)
 {
-    for (int i = 0; i < numberOfTiles; ++i)
+    for (auto tile : tiles)
     {
-        tiles[i]->setTexture(_texture);
+        tile->setTexture(_texture);
     }
 }
 
 Unit *TilesManager::getUnitBuffer()
 {
-    return unitBuffer;
+    return unitBuffer.get();
 }
 
 bool TilesManager::hasEmptyTiles()
 {
-    for (int i = 0; i < numberOfTiles; ++i)
+    for (auto tile : tiles)
     {
-        if (tiles[i]->getStatus() == TileStatus::statusIsEmpty)
+        if (tile->getStatus() == TileStatus::statusIsEmpty)
         {
             return 1;
         }

@@ -26,8 +26,9 @@ public:
     void setColors(Color _basicColor, Color _focusedColor, Color _clickedColor);
 
     //Потом доделать
-    //void makeDisabled();
-    //void makeEnabled();
+    void Disable();
+    void Enable();
+    bool isEnabled();
 
 protected:
     const Mouse &mouse;
@@ -43,6 +44,6 @@ protected:
     Color clickedColor;
 
 //Это потом применить надо (типа чтобы кнопка не нажималась)
-    //bool isEnabled;
+    bool enabled;
     //const Color disabledColor = Color(40, 40, 40);
 };

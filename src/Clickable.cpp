@@ -3,13 +3,16 @@
 using namespace std;
 
 Clickable::Clickable(RenderWindow &_window, Mouse &_mouse) : DrawableBox(_window),
-                                                             mouse(_mouse)
+                                                             mouse(_mouse), enabled(true)
 {
 }
 
 Clickable::Clickable(RenderWindow &_window, Mouse &_mouse, Command *_command) : DrawableBox(_window),
                                                                                 mouse(_mouse),
-                                                                                command(_command) {}
+                                                                                command(_command),
+                                                                                enabled(true)
+{
+}
 
 Clickable::~Clickable()
 {
@@ -59,4 +62,19 @@ void Clickable::setColors(Color _basicColor, Color _focusedColor, Color _clicked
     focusedColor = _focusedColor;
     clickedColor = _clickedColor;
     this->setFillColor(this->basicColor);
+}
+
+void Clickable::Enable()
+{
+    enabled = true;
+}
+
+void Clickable::Disable()
+{
+    enabled = false;
+}
+
+bool Clickable::isEnabled()
+{
+    return enabled;
 }

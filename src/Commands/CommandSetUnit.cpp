@@ -9,7 +9,7 @@ CommandSetUnit::CommandSetUnit(Unit* _unit, TilesManager& _tilesManager) : unit(
 void CommandSetUnit::execute()
 {
     tilesManager.setStatus(TilesManagerStatus::statusReleasingUnit);
-    tilesManager.setUnitBuffer(this->unit);
+    tilesManager.setUnitBuffer(*this->unit);
 }
 
 CommandSetUnit::~CommandSetUnit() {}
