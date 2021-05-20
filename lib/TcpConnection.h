@@ -1,27 +1,58 @@
 #pragma once
-//#include <boost/bind/bind.hpp>
+
 #include <boost/shared_ptr.hpp>
-//#include <boost/thread/thread.hpp>
+#include <boost/make_shared.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/asio.hpp>
 
-class TcpConnection : public boost::enable_shared_from_this<TcpConnection> {
+#include "TsQueue.h"
+#include "OwnedMessage.h"
+#include "Message.h"
+// #include "TcpServer.h"
+
+template <typename T>
+class TcpServer;
+
+template <typename T>
+class TcpConnection : public boost::enable_shared_from_this<TcpConnection<T>> {
 public:
-    typedef boost::shared_ptr<TcpConnection> pointer;
+     enum class owner {
+        server,
+        client
+    };
 
-    //virtual ~TcpConnection() = 0;
+   TcpConnection(owner parent, boost::asio::io_context& ioContext_, boost::asio::ip::tcp::socket sock_, TsQueue<OwnedMessage<T>>& qMsgIn_);
     virtual ~TcpConnection();
-    static pointer Create(boost::asio::io_context& io_context);
-    boost::asio::ip::tcp::socket& Socket();
-    virtual void Start() = 0;
 
+    uint32_t getID() const;
+
+    void connectToClient(TcpServer<T>* server, uint32_t uid = 0);
+    void connectToServer(const boost::asio::ip::tcp::resolver::results_type& endpoints);
+    void disconnect();
+    bool isConnected() const;
+    void send(const Message<T>& msg);
 protected:
-    TcpConnection(boost::asio::io_context& _ioContext);
+    boost::asio::ip::tcp::socket sock;
+    boost::asio::io_context& ioContext;
+    TsQueue<Message<T>> qMsgOut;
+    TsQueue<OwnedMessage<T>>& qMsgIn;
+    Message<T> tempMsg;
 
-    virtual void handleWrite(const boost::system::error_code& error, size_t bytes_transferred) = 0;
+    owner ownerType = owner::server;
+    uint32_t id = 0;
 
-    virtual void handleRead(const boost::system::error_code& error, size_t bytes_transferred) = 0;
+    uint64_t handshakeOut = 0;
+    uint64_t handshakeIn = 0;
+    uint64_t handshakeCheck = 0;
 
-    boost::asio::ip::tcp::socket socket;
-    char message[128];
+private:
+    void readHeader();
+    void readBody();
+    void writeHeader();
+    void writeBody();
+
+    void addToMsgQueue();
+    uint64_t scramble(uint64_t input);
+    void writeValidation();
+    void readValidation(TcpServer<T>* server = nullptr);
 };

@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
 project(Network)
-
 set(CMAKE_CXX_STANDARD 17)
 
 find_library(PTHREAD_LIBRARY pthread)
@@ -14,21 +13,37 @@ FIND_PACKAGE(Boost 1.75.0 REQUIRED)
 #  LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
 #ENDIF(Boost_FOUND)
 
-SET(USED_LIBS ${Boost_SYSTEM_LIBRARY} ${Boost_THREAD_LIBRARY} ${Boost_REGEX_LIBRARY})
+SET(USED_LIBS ${Boost_SYSTEM_LIBRARY} ${Boost_THREAD_LIBRARY} ${Boost_REGEX_LIBRARY} ${PTHREAD_LIBRARY})
 
 file(GLOB SOURCES src/main.cpp)
 include_directories(lib/)
-add_library(Network_lib ${SOURCES} ${PTHREAD_LIBRARY} ${USED_LIBS})
 
-add_executable(prog ${SOURCES})
-target_link_libraries(prog Network_lib ${PTHREAD_LIBRARY} ${USED_LIBS})
+add_library(NETWORK_LIB STATIC
+    lib/Message.cpp
+    lib/OwnedMessage.cpp
+    lib/TsQueue.cpp
+    lib/TcpConnection.cpp
+    lib/TcpServer.cpp
+    lib/TcpClient.cpp
+    lib/Lobby.cpp
+    lib/GameTcpClient.cpp
+    lib/GameTcpServer.cpp)
 
-enable_testing()
-find_package(GTest REQUIRED)
+add_executable(cl src/client.cpp)
+target_link_libraries(cl PUBLIC NETWORK_LIB ${USED_LIBS})
 
-include_directories(${GTEST_INCLUDE_DIRS})
-message(${GTEST_LIBRARIES})
+add_executable(serv src/server.cpp)
+target_link_libraries(serv PUBLIC NETWORK_LIB ${USED_LIBS})
 
-add_executable(tests tests/main.cpp tests/tests.cpp)
-target_link_libraries(tests ${GTEST_LIBRARIES} ${PTHREAD_LIBRARY} ${USED_LIBS})
+#add_executable(prog ${SOURCES})
+#target_link_libraries(prog NETWORK_LIB ${PTHREAD_LIBRARY} ${USED_LIBS})
+
+#enable_testing()
+#find_package(GTest REQUIRED)
+
+#include_directories(${GTEST_INCLUDE_DIRS})
+#message(${GTEST_LIBRARIES})
+
+#add_executable(tests tests/main.cpp tests/tests.cpp)
+#target_link_libraries(tests ${GTEST_LIBRARIES} ${PTHREAD_LIBRARY} ${USED_LIBS})
 

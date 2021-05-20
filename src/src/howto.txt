@@ -1,1 +1,0 @@
-g++ server.cpp -o serv -lboost_system -lboost_thread -std=c++17 -lpthread

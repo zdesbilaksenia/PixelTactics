@@ -1,19 +1,26 @@
 #pragma once
-#include <boost/bind/bind.hpp>
-//#include <boost/shared_ptr.hpp>
-#include <boost/thread/thread.hpp>
-//#include <boost/enable_shared_from_this.hpp>
-#include <boost/asio.hpp>
 
-#include "ServerTcpConnection.h"
+#include <boost/shared_ptr.hpp>
+#include <cstdint>
+#include <map>
 
-class GameTcpServer : public TcpServer {
+#include "TcpConnection.h"
+#include "Message.h"
+#include "TcpServer.h"
+#include "Lobby.h"
+#include "GameMsgTypes.h"
+
+class GameTcpServer : public TcpServer<GameMsgTypes> {
 public:
-    ~GameTcpServer() override;
+    GameTcpServer(std::string ip = "127.0.0.1", uint16_t port = 55555, uint8_t maxLobbiesNum_ = 5);
 
 protected:
-    void startAccept() override;
-    void handleAccept(ServerTcpConnection::pointer newConnection, const boost::system::error_code& error) override;
-
-    std::vector<boost::thread> threads;
+    virtual void onClientValidated(boost::shared_ptr<TcpConnection<GameMsgTypes>> client);
+    virtual bool onClientConnect(boost::shared_ptr<TcpConnection<GameMsgTypes>> client);
+    virtual void onClientDisconnect(boost::shared_ptr<TcpConnection<GameMsgTypes>> client);
+    virtual void onMessage(boost::shared_ptr<TcpConnection<GameMsgTypes>> client, Message<GameMsgTypes>& msg);
+private:
+    std::map<unsigned int, Lobby> lobbies;
+    uint8_t maxLobbiesNum;
 };
+
