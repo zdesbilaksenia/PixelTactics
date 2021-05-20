@@ -1,6 +1,6 @@
 #include "Hero.h"
 
-Hero::Hero(Card &card) : isAlive(true), isLeader(false), isDamaged(false), canBeAttackedFromDistance(false),
+Hero::Hero(Card &card) : isAlive(true), isLeader(false), isDamaged(false), canBeAttackedFromDistance(true),
                          canBeAttackedClosely(true), canUseLeaderPower(false) {
     name = card.name;
     HP = card.HP;

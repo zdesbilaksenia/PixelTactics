@@ -217,6 +217,19 @@ void AnotherHeroMakeDistantAttack(vector<Hero *> &heroes) {
     }
 }
 
+void PlusStrengthMinusHP(vector<Hero *> &heroes) {
+    if (heroes.size() == 1 && !heroes[0]->IsDead()) {
+        heroes[0]->ReduceHealth(1);
+        heroes[0]->SetCurStrength(heroes[0]->GetCurStrength() + 1);
+    }
+}
+
+void LeaderMakeDistantAttack(vector<Hero *> &heroes) {
+    if (heroes.size() == 3 && !heroes[0]->IsDead() && heroes[1]->IsLeader() && heroes[2]->CanBeAttackedDistantly()) {
+        heroes[1]->Attack(*heroes[2], heroes[1]->GetCurStrength());
+    }
+}
+
 // Leader
 
 void ForbidDistantAttackForThreeHeroes(vector<Hero *> &heroes) {
@@ -238,6 +251,9 @@ Powers::Powers() {
     frontLinePowerMap.insert(pair<string, FrontLinePower>("Дубликатор", &CopyPower));
     frontLinePowerMap.insert(pair<string, FrontLinePower>("Жрица", &Resurrect));
     frontLinePowerMap.insert(pair<string, FrontLinePower>("Маг-дракон", &Castling));
+    frontLinePowerMap.insert(pair<string, FrontLinePower>("Зверолов", &PlusStrengthMinusHP));
+    frontLinePowerMap.insert(pair<string, FrontLinePower>("Оракул", &Interception));
+    frontLinePowerMap.insert(pair<string, FrontLinePower>("Паладин", &LeaderMakeDistantAttack));
 
     middleLinePowerMap.insert(pair<string, MiddleLinePower>("Рыцарь", &PlusPowerInCloseAttack));
     middleLinePowerMap.insert(pair<string, MiddleLinePower>("Ведьма", &ResurrectAndGetDamage));
@@ -248,14 +264,20 @@ Powers::Powers() {
     middleLinePowerMap.insert(pair<string, MiddleLinePower>("Дубликатор", &CopyPower));
     middleLinePowerMap.insert(pair<string, MiddleLinePower>("Жрица", &PlusPowerByDead));
     middleLinePowerMap.insert(pair<string, MiddleLinePower>("Маг-дракон", &DamageTwoRowsInBothSquad));
+    middleLinePowerMap.insert(pair<string, MiddleLinePower>("Зверолов", &InterceptionAndPlusPower));
+    middleLinePowerMap.insert(pair<string, MiddleLinePower>("Оракул", &FrontAndBackAttackDistantly));
+    middleLinePowerMap.insert(pair<string, MiddleLinePower>("Паладин", &MakeDistantAttack));
 
-    middleLinePowerMap.insert(pair<string, MiddleLinePower>("Рыцарь", &DoubleStrengthAgainstLeader));
-    middleLinePowerMap.insert(pair<string, MiddleLinePower>("Ведьма", &DieAndAttack));
-    middleLinePowerMap.insert(pair<string, MiddleLinePower>("Алхимик", &PowerFromCurDamage));
-    middleLinePowerMap.insert(pair<string, MiddleLinePower>("Берсерк", &PlusPowerForDeath));
-    middleLinePowerMap.insert(pair<string, MiddleLinePower>("Боец", &DamageTwoColsInBothSquad));
-    middleLinePowerMap.insert(pair<string, MiddleLinePower>("Вампир", &TransferDamageFromLeader));
-    middleLinePowerMap.insert(pair<string, MiddleLinePower>("Дубликатор", &CopyPower));
-    middleLinePowerMap.insert(pair<string, MiddleLinePower>("Жрица", &TransferDamageWithoutUsingAction));
-    middleLinePowerMap.insert(pair<string, MiddleLinePower>("Маг-дракон", &HitFrontRowHeroes));
+    backLinePowerMap.insert(pair<string, BackLinePower>("Рыцарь", &DoubleStrengthAgainstLeader));
+    backLinePowerMap.insert(pair<string, BackLinePower>("Ведьма", &DieAndAttack));
+    backLinePowerMap.insert(pair<string, BackLinePower>("Алхимик", &PowerFromCurDamage));
+    backLinePowerMap.insert(pair<string, BackLinePower>("Берсерк", &PlusPowerForDeath));
+    backLinePowerMap.insert(pair<string, BackLinePower>("Боец", &DamageTwoColsInBothSquad));
+    backLinePowerMap.insert(pair<string, BackLinePower>("Вампир", &TransferDamageFromLeader));
+    backLinePowerMap.insert(pair<string, BackLinePower>("Дубликатор", &CopyPower));
+    backLinePowerMap.insert(pair<string, BackLinePower>("Жрица", &TransferDamageWithoutUsingAction));
+    backLinePowerMap.insert(pair<string, BackLinePower>("Маг-дракон", &HitFrontRowHeroes));
+    backLinePowerMap.insert(pair<string, BackLinePower>("Зверолов", &AnotherHeroMakeDistantAttack));
+    backLinePowerMap.insert(pair<string, BackLinePower>("Оракул", &MakeDistantAttack));
+    backLinePowerMap.insert(pair<string, BackLinePower>("Паладин", &PlusPower));
 }

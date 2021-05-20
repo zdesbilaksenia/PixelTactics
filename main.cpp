@@ -30,7 +30,7 @@ int main() {
 
     cout << "Назначаем лидера\nВведите номер: ";
     cin >> n;
-    heroes[n-1]->MakeLeader();
+    heroes[n - 1]->MakeLeader();
 
     cout << "Маппим способности\n";
     PowerMapper mapper;
@@ -84,6 +84,19 @@ int main() {
                     check.push_back(heroes[m[1] - 1]);
                 }
                 heroes[n - 1]->middleLinePower(check);
+                cout << "Готово\n";
+                break;
+            }
+            case 4: {
+                cout << cards[n - 1].name << ": " << cards[n - 1].backLinePower << "\n";
+                cout << "Сколько героев задействовано в спопобности: ";
+                cin >> m[0];
+                for (int i = 0; i < m[0]; i++) {
+                    cout << "Выберите героев для способности: ";
+                    cin >> m[1];
+                    check.push_back(heroes[m[1] - 1]);
+                }
+                heroes[n - 1]->backLinePower(check);
                 cout << "Готово\n";
                 break;
             }

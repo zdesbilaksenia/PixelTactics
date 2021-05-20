@@ -23,6 +23,7 @@ vector<Card> MySQL::GetCards() {
         card.strength = atoi(row[3]);
         card.frontLinePower = row[4];
         card.middleLinePower = row[5];
+        card.backLinePower = row[6];
         cards.push_back(card);
     }
 
