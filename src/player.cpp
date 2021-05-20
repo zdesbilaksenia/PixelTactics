@@ -12,7 +12,7 @@ Deck& Player::GetHand(){
 }
 
 void Player::StartingHand(){
-    for(int i = 0; i < 3; i++){
+    for(int i = 0; i < 4; i++){
         DrawCard();
     }
 }
@@ -23,12 +23,12 @@ void Player::DrawCard(){
     deck_.GetVector().pop_back();
 }
 
-Card* Player::ChooseCard(int CardIndex){
+Card Player::ChooseCard(int CardIndex){
     int size = deck_.GetVector().size();
     if(CardIndex < 0 || CardIndex >= size){
         //throw exception
     }
-    Card* card = hand_.GetVector()[CardIndex];
+    Card card = hand_.GetVector()[CardIndex];
     hand_.GetVector().erase(hand_.GetVector().begin()+CardIndex);
     return card;
 }
@@ -38,8 +38,9 @@ int Player::GetSide(){
 }
 
 void Player::Attack(Position& FriendlyHero, Position& EnemyHero){
-    EnemyHero.GetHero().ReduceHealth(FriendlyHero.GetHero().GetStrength());
-    if(EnemyHero.GetHero().GetHealth() <= 0) EnemyHero.RemoveHero();
+    Hero* Friend = &(FriendlyHero.GetHero());
+    Hero* Enemy = &(EnemyHero.GetHero());
+    Friend->Attack(*Enemy,Friend->GetCurStrength());
 }
 bool Player::MeleeAttackCheck(Position& EnemyHero, Pole& pole){
     if(EnemyHero.GetLine() == 0) return true;

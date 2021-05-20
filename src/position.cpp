@@ -1,10 +1,9 @@
-#include "position.h"
-
-Position::Position():cell_(0),line_(0),side_(0),empty_(true),hero_(Hero()){};
-Position::Position(int cell, int line, int side):cell_(cell),line_(line),side_(side),empty_(true),hero_(Hero()){};
+#include "../lib/position.h"
 
 
-void Position::SetHero(Card* card){
+
+
+void Position::SetHero(Card card){
     Hero hero(card);
     hero_ = hero;
     empty_ = false;
@@ -26,3 +25,4 @@ void Position::InfoPosition(){
 void Position::RemoveHero(){
         empty_ = true;
     }
+    

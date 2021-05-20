@@ -1,11 +1,113 @@
-#include "hero.h"
+#include "../lib/hero.h"
 
 
-Hero::Hero():health_(0),strength_(0){}
+Hero::Hero():ID(0),HP(0),curHP(0),name("Болванчик"),strength(0),curStrength(0),isAlive(false),isLeader(false),isDamaged(false),canBeAttackedFromDistance(false),canBeAttackedClosely(false),needReset(0){}
 
-Hero::Hero(Card* card){
-    health_ = card->GetBreed().GetHealth();
-    strength_ = card->GetBreed().GetStrength();
+Hero::Hero(Card &card) : isAlive(true), isLeader(false), isDamaged(false), canBeAttackedFromDistance(false),
+                         canBeAttackedClosely(true) {
+    name = card.name;
+    HP = card.HP;
+    curHP = HP;
+    strength = card.strength;
+    curStrength = strength;
+    ID = card.ID;
+}
+
+Hero::Hero(Hero &hero) {
+    name = hero.name;
+    HP = hero.HP;
+    curHP = HP;
+    strength = hero.strength;
+    curStrength = hero.curStrength;
+    ID = hero.ID;
+    isDamaged = hero.isDamaged;
+    isAlive = hero.isAlive;
+    isLeader = hero.isLeader;
+}
+
+void Hero::MakeLeader() {
+    isLeader = true;
+    if (!isDamaged) {
+        HP += 10;
+        curHP = HP;
+    }
+}
+
+void Hero::ReduceHealth(int damage) {
+    isDamaged = true;
+    curHP -= damage;
+    if (curHP <= 0)
+        Die();
+}
+
+void Hero::Attack(Hero &hero, int damage) {
+    if (hero.isAlive)
+        hero.ReduceHealth(damage);
+}
+
+int Hero::GetID() {
+    return ID;
+}
+
+bool Hero::IsDead() {
+    return !isAlive;
+}
+
+void Hero::Die() {
+    isAlive = false;
+    canBeAttackedFromDistance = false;
+    curHP = 0;
+    isDamaged = true;
+}
+
+int Hero::GetHealth() {
+    return HP;
+}
+
+int Hero::GetCurHealth() {
+    return curHP;
+}
+
+void Hero::SetCurHealth(int health) {
+    curHP = health;
+    if (curHP == 0)
+        Die();
+    else
+        isAlive = true;
+}
+
+int Hero::GetStrength() {
+    return strength;
+}
+
+void Hero::SetCurStrength(int power) {
+    curStrength = power;
+}
+
+int Hero::GetCurStrength() {
+    return curStrength;
+}
+
+std::string Hero::GetName() {
+    return name;
+}
+
+bool Hero::IsLeader() {
+    return isLeader;
+}
+
+bool Hero::IsDamaged() {
+    return isDamaged;
+}
+
+void Hero::ForbidDistantAttack() {
+    if (isAlive)
+        canBeAttackedFromDistance = false;
+}
+
+void Hero::ForbidCloseAttack() {
+    if (isAlive)
+        canBeAttackedClosely = false;
 }
 
 /*Hero& Hero::operator=(const Hero& hero){

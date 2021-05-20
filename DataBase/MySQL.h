@@ -2,10 +2,11 @@
 #define PIXELTACTICS_MYSQL_H
 
 #include "Connection.h"
-#include "Card.h"
+#include "card.h"
 #include <memory>
 #include <mysql.h>
 #include <vector>
+#include "../lib/deck.h"
 
 using std::vector;
 using std::unique_ptr;
@@ -19,7 +20,7 @@ private:
 public:
     MySQL();
 
-    vector<Card> GetCards();
+    Deck GetCards();
 };
 
 #endif //PIXELTACTICS_MYSQL_H

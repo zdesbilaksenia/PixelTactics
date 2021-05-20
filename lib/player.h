@@ -18,7 +18,7 @@ public:
     //~Player();
 
     //Выбрать карту из руки 
-    Card* ChooseCard(int CardIndex);
+    Card ChooseCard(int CardIndex);
     //Сыграть карту
     //Взять карту из колоды
     void DrawCard();

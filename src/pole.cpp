@@ -1,4 +1,4 @@
-#include "pole.h"
+#include "../lib/pole.h"
 
 Pole::Pole(){
     pole_.resize(0);

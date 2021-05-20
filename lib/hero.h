@@ -3,30 +3,74 @@
 #define HERO_H
 
 #include "card.h"
-
+#include <vector>
+#include <string>
 
 class Hero{
+private:
+    int ID;
+    int HP;
+    int curHP;
+    std::string name;
+    int strength;
+    int curStrength;
+    bool isAlive;
+    bool isLeader;
+    bool isDamaged;
+    bool canBeAttackedFromDistance;
+    bool canBeAttackedClosely;
+    int needReset;
+
 public:
     Hero();
-    Hero(Card* card);
-    //Hero& operator = (const Hero& hero);
-    int GetHealth(){
-        return health_;
-    }
-    int GetStrength(){
-        return strength_;
-    }
-    void ReduceHealth(int damage){
-        health_ -= damage;
-    }
-    /*void Attack(Position& Enemy){
-        Enemy.GetHero().ReduceHealth(strength_);
-        if(Enemy.GetHero().GetHealth() <=0){
-            Enemy.RemoveHero();
-        }
-    }*/
-private:
-    int health_;
-    int strength_;
+
+    explicit Hero(Card &card);
+
+    Hero(Hero &hero);
+
+    void MakeLeader();
+
+    void (*frontLinePower)(std::vector<Hero *> &heroes);
+
+    void (*middleLinePower)(std::vector<Hero *> &heroes);
+
+    void (*backLinePower)(std::vector<Hero *> &heroes);
+
+    void (*leaderPower)(std::vector<Hero *> &heroes);
+
+    void Attack(Hero &hero, int damage);
+
+    int GetHealth();
+
+    int GetCurHealth();
+
+    void SetCurHealth(int HP);
+
+    int GetID();
+
+    void ReduceHealth(int damage);
+
+    bool Empty();
+
+    bool IsDead();
+
+    bool IsLeader();
+
+    void Die();
+
+    std::string GetName();
+
+    int GetStrength();
+
+    void SetCurStrength(int power);
+
+    int GetCurStrength();
+
+    bool IsDamaged();
+
+    void ForbidDistantAttack();
+
+    void ForbidCloseAttack();
+
 };
 #endif

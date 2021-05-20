@@ -2,14 +2,26 @@
 #ifndef POSITION_H
 #define POSITION_H
 
-#include "hero.h"
-#include "card.h"
+#include "Powers.h"
 
 
 class Position{
 public:
-    Position();
-    Position(int cell, int line, int side);
+    Position():cell_(0),line_(0),side_(0),empty_(true){
+        Hero temp;
+        hero_ = temp;
+    }
+    Position(int cell, int line, int side):cell_(cell),line_(line),side_(side),empty_(true){
+        Hero temp;
+        hero_ = temp;
+    }
+    Position(const Position& position){
+        cell_ = position.cell_;
+        line_ = position.line_;
+        side_ = position.side_;
+        empty_ = position.empty_;
+        hero_ = position.hero_;
+    }
 
     //Пустая ли клетка?
     bool isEmpty();
@@ -17,7 +29,7 @@ public:
     //Hero& GetHero();
     //Информация о позиции
     //Поставить героя
-    void SetHero(Card* card);
+    void SetHero(Card card);
     void RemoveHero();
     
     int GetCell();

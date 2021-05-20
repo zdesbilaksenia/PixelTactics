@@ -7,13 +7,13 @@ MySQL::MySQL() {
     connection->MySqlConnectionSetup();
 }
 
-vector<Card> MySQL::GetCards() {
+Deck MySQL::GetCards() {
 
     MYSQL_ROW row;
     MYSQL_RES *res;
     res = connection->ExecuteQuery("select * from Cards");
 
-    vector<Card> cards;
+    Deck cards;
 
     while ((row = mysql_fetch_row(res)) != nullptr) {
         Card card;

@@ -3,33 +3,20 @@
 #define CARD_H
 
 #include <iostream>
+#include <string>
 
-class Card;
+typedef struct Card {
 
-class Breed{
-public:
-    Card* NewCard();
-    Breed(Breed* parent, int health, int strength);
-
-    int GetHealth();
-    int GetStrength();
-
-private:
-    Breed* parent_;
-    int health_; 
-    int strength_;
-};
-
-class Card{
-
-friend class Breed;
-public:
-    Breed& GetBreed();
-    
-private:
-    Card(Breed& breed);
-    int health;
+    int ID;
+    std::string name;
+    int HP;
     int strength;
-    Breed& breed;
-};
+    std::string frontLinePower;
+    std::string middleLinePower;
+    std::string backLinePower;
+    std::string leaderPower;
+
+    Card() {};
+} Card;
+
 #endif
