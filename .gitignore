@@ -1,4 +1,3 @@
-
 # Prerequisites
 *.d
 
@@ -35,3 +34,13 @@
 
 build/
 .vscode/
+
+/cmake-build-debug
+/build
+/demo
+/DrawableEntities
+/Commands
+/CommandManager
+.idea
+.vscode
+
