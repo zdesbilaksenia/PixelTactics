@@ -42,6 +42,7 @@ void Player::Attack(Position& FriendlyHero, Position& EnemyHero){
     Hero* Enemy = &(EnemyHero.GetHero());
     Friend->Attack(*Enemy,Friend->GetCurStrength());
 }
+//Убрать 
 bool Player::MeleeAttackCheck(Position& EnemyHero, Pole& pole){
     if(EnemyHero.GetLine() == 0) return true;
     if(EnemyHero.GetLine() == 1){
