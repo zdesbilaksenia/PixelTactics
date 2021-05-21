@@ -3,8 +3,8 @@
 
 Hero::Hero():ID(0),HP(0),curHP(0),name("Болванчик"),strength(0),curStrength(0),isAlive(false),isLeader(false),isDamaged(false),canBeAttackedFromDistance(false),canBeAttackedClosely(false),needReset(0){}
 
-Hero::Hero(Card &card) : isAlive(true), isLeader(false), isDamaged(false), canBeAttackedFromDistance(false),
-                         canBeAttackedClosely(true) {
+Hero::Hero(Card &card) : isAlive(true), isLeader(false), isDamaged(false), canBeAttackedFromDistance(true),
+                         canBeAttackedClosely(true), canUseLeaderPower(false) {
     name = card.name;
     HP = card.HP;
     curHP = HP;
@@ -23,6 +23,9 @@ Hero::Hero(Hero &hero) {
     isDamaged = hero.isDamaged;
     isAlive = hero.isAlive;
     isLeader = hero.isLeader;
+    canBeAttackedFromDistance = hero.canBeAttackedFromDistance;
+    canBeAttackedClosely = hero.canBeAttackedClosely;
+    canUseLeaderPower = hero.canUseLeaderPower;
 }
 
 void Hero::MakeLeader() {
@@ -31,6 +34,7 @@ void Hero::MakeLeader() {
         HP += 10;
         curHP = HP;
     }
+    canUseLeaderPower = true;
 }
 
 void Hero::ReduceHealth(int damage) {
@@ -110,7 +114,25 @@ void Hero::ForbidCloseAttack() {
         canBeAttackedClosely = false;
 }
 
+<<<<<<< HEAD:src/hero.cpp
 /*Hero& Hero::operator=(const Hero& hero){
     health_ = hero.health_;
     strength_ = hero.strength_;
 }*/
+=======
+bool Hero::CanBeAttackedClosely() {
+    return canBeAttackedClosely;
+}
+
+bool Hero::CanBeAttackedDistantly() {
+    return canBeAttackedFromDistance;
+}
+
+bool Hero::CanUseLeaderPower() {
+    return canUseLeaderPower;
+}
+
+bool Hero::ForbidLeaderPower() {
+    canUseLeaderPower = false;
+}
+>>>>>>> b8946ff70a20d0b4d43bbe458706865dcf587d42:Heroes/Hero.cpp

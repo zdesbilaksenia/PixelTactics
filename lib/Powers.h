@@ -21,49 +21,6 @@ typedef void (*BackLinePower)(vector<Hero *> &);
 
 typedef void (*LeaderPower)(vector<Hero *> &);
 
-void PlusPower(vector<Hero *> &heroes);
-
-void Resurrect(vector<Hero *> &heroes);
-
-void Castling(vector<Hero *> &heroes);
-
-void HitFrontRowHeroes(vector<Hero *> &heroes);
-
-void TransferDamage(vector<Hero *> &heroes);
-
-void AttackDamageToHP(vector<Hero *> &heroes);
-
-void CopyPower(vector<Hero *> &heroes);
-
-void Interception(vector<Hero *> &heroes);
-
-void DeadCanAttack(vector<Hero *> &heroes);
-
-void ProtectLeader(vector<Hero *> &heroes);
-
-void PlusPowerInCloseAttack(vector<Hero *> &heroes);
-
-void TransferDamageFromLeader(vector<Hero *> &heroes);
-
-void PlusPowerByDead(vector<Hero *> &heroes);
-
-void PlusPowerForDeath(vector<Hero *> &heroes);
-
-void CastlingWithDead(vector<Hero *> &heroes);
-
-void ResurrectAndGetDamage(vector<Hero *> &heroes);
-
-void ReplaceHeroByDuplicator(vector<Hero *> &heroes);
-
-void HitAvangard(vector<Hero *> &heroes);
-
-void MakeAttack(vector<Hero *> &heroes);
-
-void KillWithDamage(vector<Hero *> &heroes);
-
-void DoubleStrengthAgainstLeader(vector<Hero *> &heroes);
-
-
 class Powers {
 
 private:

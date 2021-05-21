@@ -23,7 +23,7 @@ set(LIB_SOURCE_FILES
 
 include_directories(lib/)
 include_directories(DataBase/ Mapper/ /usr/include/mysql /usr/mysql /usr/lib/mysql)
-add_library(DataBase_lib src/newmain.cpp DataBase/Connection.cpp DataBase/MySQL.cpp Mapper/PowerMapper.cpp)
+add_library(DataBase_lib src/newmain.cpp DataBase/Connection.cpp DataBase/MySQL.cpp Mapper/PowerMapper.cpp )
 
 
 add_library(position src/position.cpp)
@@ -34,7 +34,7 @@ add_library(player src/player.cpp)
 add_library(study_std_lib STATIC ${LIB_SOURCE_FILES})
 
 
-add_executable(main src/newmain.cpp DataBase/Connection.cpp src/Powers.cpp src/hero.cpp Mapper/PowerMapper.cpp)
+add_executable(main src/newmain.cpp DataBase/Connection.cpp src/hero.cpp Mapper/PowerMapper.cpp)
 add_executable(prog src/main.cpp)
 
 target_link_libraries(main position)
