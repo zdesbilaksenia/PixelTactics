@@ -1,5 +1,7 @@
 #include <iostream>
 #include <vector>
+#include "GameTcpClient.h"
+#include "GameMsgTypes.h"
 using namespace std;
 
 #include <SFML/Graphics.hpp>
@@ -13,31 +15,198 @@ using namespace sf;
 #include "Tile.h"
 #include "configurations.cpp"
 
-//Чтобы визуально сжать код
-#define GAME_ELEMENTS
-
-int main()
+class CommandMakeLobby : public Command
 {
-    RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "SFML works!");
+public:
+    CommandMakeLobby(GameTcpClient *_client, bool &_lobbyWasCreated) : lobbyWasCreated(_lobbyWasCreated), client(_client) {}
+    void execute() override
+    {
+        if (client->isConnected())
+        {
+            cout << "CommandMakeLobby::execute() : client is connected!!" << endl;
+            client->makeLobby();
+            client->incoming().wait();
+            auto msg = client->incoming().popFront().msg;
+            cout << msg << endl;
+            if (msg.header.id == GameMsgTypes::LobbyWaitingForPlayer)
+            {
+                cout << "CommandMakeLobby::execute() : Lobby waiting for player" << endl;
+                client->incoming().wait();
+                msg = client->incoming().popFront().msg;
+                if (msg.header.id == GameMsgTypes::LobbyGameStart)
+                {
+                    cout << "Lobby Game started!!!" << endl;
+                }
+            }
+            else
+            {
+                cout << "Didn't recieve LobbyWaitingForPlayer" << endl;
+            }
+        }
+    }
 
-    Mouse mouse;
-    Event event;
+    ~CommandMakeLobby() { client = nullptr; }
 
-#ifdef GAME_ELEMENTS
+private:
+    bool lobbyWasCreated;
+    GameTcpClient *client;
+};
 
+bool menu(RenderWindow &window,
+          Mouse &mouse,
+          Event &event,
+          GameTcpClient *client)
+{
     Texture backgroundTx;
-    backgroundTx.loadFromFile("../img/fon_1.png");
+    backgroundTx.loadFromFile("../img/low_panel.png");
     RectangleShape backgroundRect;
     backgroundRect.setSize(Vector2f(windowWidth, windowHeight));
     backgroundRect.setTexture(&backgroundTx);
-    backgroundRect.setPosition(Vector2f(0, -100));
+    backgroundRect.setPosition(Vector2f(0, 0));
 
-    Texture lowerPanelTx;
-    lowerPanelTx.loadFromFile("../img/low_panel.png");
-    RectangleShape lowerPanelRect;
-    lowerPanelRect.setSize(Vector2f(windowWidth, windowWidth / 4));
-    lowerPanelRect.setTexture(&lowerPanelTx);
-    lowerPanelRect.setPosition(Vector2f(0, windowHeight - windowWidth / 4 + 100));
+    bool lobbyWasCreated = false;
+    CommandMakeLobby cmdMakeLobby(client, lobbyWasCreated);
+    //CommandStringTest cmdMakeLobby("Connecting to lobby");
+    CommandStringTest cmdConnectToLobby("Button2 : Connecting to lobby");
+
+    Texture txMakeLobby;
+    txMakeLobby.loadFromFile("../img/make_lobby.png");
+    Button btnMakeLobby(window, mouse, &cmdMakeLobby);
+    btnMakeLobby.setTexture(&txMakeLobby);
+
+    Button btnConnectToLobby(window, mouse, &cmdConnectToLobby);
+
+    btnMakeLobby.setColors(Color::Blue, Color::Magenta, Color::Green);
+    btnConnectToLobby.setColors(Color::Blue, Color::Magenta, Color::Green);
+    btnMakeLobby.setPosition(100, 100);
+    btnConnectToLobby.setPosition(100, 200);
+
+    vector<Button *> buttons = {&btnMakeLobby, &btnConnectToLobby};
+    ButtonsManager buttonsManager;
+    buttonsManager.setButtons(buttons);
+
+    while (window.isOpen())
+    {
+        while (window.pollEvent(event))
+        {
+            switch (event.type)
+            {
+            //Если нажали на кнопку на мыши
+            case (Event::MouseButtonPressed):
+            {
+                buttonsManager.mouseIsPressed();
+                if (lobbyWasCreated)
+                {
+                    cout << "Lobby was created!!!" << endl;
+                    return 1;
+                }
+                break;
+            }
+            case (Event::MouseButtonReleased):
+            {
+                buttonsManager.mouseIsReleased();
+            }
+            case (Event::MouseMoved):
+            {
+                buttonsManager.updateFocus();
+                break;
+            }
+            //Закрытие окна
+            case (Event::Closed):
+            {
+                window.close();
+            }
+            default:
+                break;
+            }
+        }
+
+        window.clear();
+
+        window.draw(backgroundRect);
+        buttonsManager.draw();
+
+        window.display();
+    }
+    return 0;
+}
+
+//Чтобы визуально сжать код
+#define GAME_ELEMENTS 1
+
+bool otherPlayersTurn(RenderWindow &window,
+                      Mouse &mouse,
+                      Event &event,
+                      GameTcpClient *client,
+                      TilesManager &playerTilesManager,
+                      TilesManager &opponentTilesManager,
+                      CardsManager &cardsManager,
+                      ButtonsManager &buttonsManager,
+                      RectangleShape &backgroundRect,
+                      RectangleShape &lowerPanelRect)
+{
+    while (window.isOpen())
+    {
+        while (window.pollEvent(event))
+        {
+            switch (event.type)
+            {
+            //Если двигаем мышкой
+            case (Event::MouseMoved):
+            {
+                buttonsManager.updateFocus();
+                playerTilesManager.updateFocus();
+                opponentTilesManager.updateFocus();
+                cardsManager.updateFocus();
+                break;
+            }
+
+            //ИСПРАВИТЬ!!!
+            //Необходимо ждать ответ от сервера
+            case (Event::KeyPressed):
+            {
+                if (Keyboard::isKeyPressed(Keyboard::A))
+                {
+                    return 1;
+                }
+                break;
+            }
+            //
+
+            //Закрытие окна
+            case (Event::Closed):
+            {
+                window.close();
+                return 0;
+                break;
+            }
+            default:
+                break;
+            }
+        }
+
+        window.clear();
+
+        window.draw(backgroundRect);
+        window.draw(lowerPanelRect);
+
+        buttonsManager.draw();
+        playerTilesManager.draw();
+        opponentTilesManager.draw();
+        cardsManager.draw();
+
+        window.display();
+    }
+}
+
+//Потом разбить на стадии игры (начало, авангард и т.п.)
+void game(RenderWindow &window,
+          Mouse &mouse,
+          Event &event,
+          GameTcpClient *client)
+{
+
+#if GAME_ELEMENTS == 1
 
     TilesManager playerTilesManager(window, mouse, Side::sidePlayer);
     TilesManager opponentTilesManager(window, mouse, Side::sideOpponent);
@@ -51,108 +220,65 @@ int main()
     opponentTileTx.loadFromFile("../img/tx_1.png");
     opponentTilesManager.setTexture(&opponentTileTx);
 
-    Texture skeletonTx;
-    skeletonTx.loadFromFile("../img/unit1.png");
-    Texture santaTx;
-    santaTx.loadFromFile("../img/unit2.png");
-    Texture unit_1tx;
-    unit_1tx.loadFromFile("../img/unit_1.png");
-    Texture unit_2tx;
-    unit_2tx.loadFromFile("../img/unit_2.png");
-    Texture unit_3tx;
-    unit_3tx.loadFromFile("../img/unit_3.png");
-    Texture unit_4tx;
-    unit_4tx.loadFromFile("../img/unit_4.png");
-    Texture unit_5tx;
-    unit_5tx.loadFromFile("../img/unit_5.png");
-    Texture unit_6tx;
-    unit_6tx.loadFromFile("../img/unit_6.png");
-    Texture unit_7tx;
-    unit_7tx.loadFromFile("../img/unit_7.png");
+    Texture texturesForUnits[9];
+    texturesForUnits[0].loadFromFile("../img/unit1.png");
+    texturesForUnits[1].loadFromFile("../img/unit2.png");
+    texturesForUnits[2].loadFromFile("../img/unit_1.png");
+    texturesForUnits[3].loadFromFile("../img/unit_2.png");
+    texturesForUnits[4].loadFromFile("../img/unit_3.png");
+    texturesForUnits[5].loadFromFile("../img/unit_4.png");
+    texturesForUnits[6].loadFromFile("../img/unit_5.png");
+    texturesForUnits[7].loadFromFile("../img/unit_6.png");
+    texturesForUnits[8].loadFromFile("../img/unit_7.png");
 
-    Unit skeleton(window);
-    skeleton.setTexture(&skeletonTx);
-    Unit santa(window);
-    santa.setTexture(&santaTx);
-    Unit unit_1(window);
-    unit_1.setTexture(&unit_1tx);
-    Unit unit_2(window);
-    unit_2.setTexture(&unit_2tx);
-    Unit unit_3(window);
-    unit_3.setTexture(&unit_3tx);
-    Unit unit_4(window);
-    unit_4.setTexture(&unit_4tx);
-    Unit unit_5(window);
-    unit_5.setTexture(&unit_5tx);
-    Unit unit_6(window);
-    unit_6.setTexture(&unit_6tx);
-    Unit unit_7(window);
-    unit_7.setTexture(&unit_7tx);
+    Unit units[9] = {
+        Unit(window),
+        Unit(window),
+        Unit(window),
+        Unit(window),
+        Unit(window),
+        Unit(window),
+        Unit(window),
+        Unit(window),
+        Unit(window)};
 
-    //CommandReleaseUnit cmdreleaseunit(playerTilesManager);
+    for (int i = 0; i < 9; ++i)
+    {
+        units[i].setTexture(&texturesForUnits[i]);
+    }
 
     Texture cardTexture;
     cardTexture.loadFromFile("../img/card.png");
 
-    Card skeletonCard(window, mouse);
-    skeletonCard.setUnit(&skeleton);
-    skeletonCard.setTexture(&cardTexture);
-    skeletonCard.setColors(Color::White, Color::Magenta, Color::Green);
+    Card cards[9] = {
+        Card(window, mouse),
+        Card(window, mouse),
+        Card(window, mouse),
+        Card(window, mouse),
+        Card(window, mouse),
+        Card(window, mouse),
+        Card(window, mouse),
+        Card(window, mouse),
+        Card(window, mouse),
+    };
 
-    Card santaCard(window, mouse);
-    santaCard.setUnit(&santa);
-    santaCard.setTexture(&cardTexture);
-    santaCard.setColors(Color::White, Color::Magenta, Color::Green);
+    for (int i = 0; i < 9; ++i)
+    {
+        cards[i].setUnit(&units[i]);
+        cards[i].setTexture(&cardTexture);
+        cards[i].setColors(Color::White, Color::Magenta, Color::Green);
+    }
 
-    Card unit_1Card(window, mouse);
-    unit_1Card.setUnit(&unit_1);
-    unit_1Card.setTexture(&cardTexture);
-    unit_1Card.setColors(Color::White, Color::Magenta, Color::Green);
+    stack<Card *> cardsStack;
 
-    Card unit_2Card(window, mouse);
-    unit_2Card.setUnit(&unit_2);
-    unit_2Card.setTexture(&cardTexture);
-    unit_2Card.setColors(Color::White, Color::Magenta, Color::Green);
-
-    Card unit_3Card(window, mouse);
-    unit_3Card.setUnit(&unit_3);
-    unit_3Card.setTexture(&cardTexture);
-    unit_3Card.setColors(Color::White, Color::Magenta, Color::Green);
-
-    Card unit_4Card(window, mouse);
-    unit_4Card.setUnit(&unit_4);
-    unit_4Card.setTexture(&cardTexture);
-    unit_4Card.setColors(Color::White, Color::Magenta, Color::Green);
-
-    Card unit_5Card(window, mouse);
-    unit_5Card.setUnit(&unit_5);
-    unit_5Card.setTexture(&cardTexture);
-    unit_5Card.setColors(Color::White, Color::Magenta, Color::Green);
-
-    Card unit_6Card(window, mouse);
-    unit_6Card.setUnit(&unit_6);
-    unit_6Card.setTexture(&cardTexture);
-    unit_6Card.setColors(Color::White, Color::Magenta, Color::Green);
-
-    Card unit_7Card(window, mouse);
-    unit_7Card.setUnit(&unit_7);
-    unit_7Card.setTexture(&cardTexture);
-    unit_7Card.setColors(Color::White, Color::Magenta, Color::Green);
-
-    stack<Card *> cards;
-    cards.push(&santaCard);
-    cards.push(&skeletonCard);
-    cards.push(&unit_1Card);
-    cards.push(&unit_2Card);
-    cards.push(&unit_3Card);
-    cards.push(&unit_4Card);
-    cards.push(&unit_5Card);
-    cards.push(&unit_6Card);
-    cards.push(&unit_7Card);
+    for (int i = 0; i < 9; ++i)
+    {
+        cardsStack.push(&cards[i]);
+    }
 
     Texture cardShirtTexture;
     cardShirtTexture.loadFromFile("../img/card_shirt.png");
-    CardsManager cardsManager(window, cards);
+    CardsManager cardsManager(window, cardsStack);
     cardsManager.setTilesManager(&playerTilesManager);
     cardsManager.setCardShirtTexture(&cardShirtTexture);
 
@@ -175,7 +301,7 @@ int main()
     attackButton.setPosition(50, 80);
     attackButton.setTexture(&attackButtonTx);
 
-    CommandStringTest cmdtest2("CommandStringTest::execute(): Magic!");
+    CommandStringTest cmdtest2("CommandStringTest::execute(): Power!");
     Button powerButton(window, mouse, &cmdtest2);
     powerButton.setColors(Color::White, Color(240, 200, 150), Color(190, 70, 80));
     powerButton.setPosition(50, 130);
@@ -189,6 +315,20 @@ int main()
 
 #endif //GAME_ELEMENTS
 
+    Texture backgroundTx;
+    backgroundTx.loadFromFile("../img/fon_1.png");
+    RectangleShape backgroundRect;
+    backgroundRect.setSize(Vector2f(windowWidth, windowHeight));
+    backgroundRect.setTexture(&backgroundTx);
+    backgroundRect.setPosition(Vector2f(0, -100));
+
+    Texture lowerPanelTx;
+    lowerPanelTx.loadFromFile("../img/low_panel.png");
+    RectangleShape lowerPanelRect;
+    lowerPanelRect.setSize(Vector2f(windowWidth, windowWidth / 4));
+    lowerPanelRect.setTexture(&lowerPanelTx);
+    lowerPanelRect.setPosition(Vector2f(0, windowHeight - windowWidth / 4 + 100));
+
     RectangleShape stageText;
     stageText.setSize(Vector2f(400, 100));
     stageText.setPosition((windowWidth - 400) / 2, 50);
@@ -200,6 +340,10 @@ int main()
     FlankTx.loadFromFile("../img/flank.png");
     Texture RearTx;
     RearTx.loadFromFile("../img/rear.png");
+
+    cout << "Other player's turn started!!" << endl;
+    otherPlayersTurn(window, mouse, event, client, playerTilesManager, opponentTilesManager, cardsManager, buttonsManager, backgroundRect, lowerPanelRect);
+    cout << "Other player's turn ended!!" << endl;
 
     while (window.isOpen())
     {
@@ -282,6 +426,61 @@ int main()
 
         window.display();
     }
+}
 
+#define SERVER_CONNECTING 0
+
+int main()
+{
+
+#if SERVER_CONNECTING == 1
+
+    GameTcpClient client;
+    if (client.connect("10.147.17.33") == false)
+    {
+        cout << "ERROR, CONNECTION FAILED!" << endl;
+        return 0;
+    }
+    else
+    {
+        //!!!!!!!!!!!!!!!!!!!!!!!!РАСКОММЕНТИТЬ!!!!!!!!!!!!!!
+        //client.incoming().wait();
+        auto msg = client.incoming().popFront().msg;
+        if (msg.header.id == GameMsgTypes::ServerAccept)
+        {
+            cout << "Server accepted!!" << endl;
+        }
+        else
+        {
+            cout << "Server didn't accept" << endl;
+        }
+    }
+
+    RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "SFML works!");
+
+    Mouse mouse;
+    Event event;
+
+    if (menu(window, mouse, event, &client) == false)
+    {
+        cout << "Can't create lobby!" << endl;
+        return 0;
+    }
+
+#endif //SERVER_CONNECTING
+
+#if SERVER_CONNECTING == 0
+    RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "SFML works!");
+
+    Mouse mouse;
+    Event event;
+
+#endif
+
+#if SERVER_CONNECTING == 0
+    GameTcpClient *client;
+#endif
+
+    game(window, mouse, event, client);
     return 0;
 }

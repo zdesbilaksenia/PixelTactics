@@ -1,7 +1,6 @@
 #pragma once
 
 #include "DrawableBox.h"
-#include "Label.h"
 
 class Unit : public DrawableBox
 {
