@@ -22,7 +22,7 @@ set(LIB_SOURCE_FILES
 
 include_directories(lib/)
 include_directories(DataBase/ Mapper/ /usr/include/mysql /usr/mysql /usr/lib/mysql)
-add_library(DataBase_lib src/newmain.cpp DataBase/Connection.cpp DataBase/MySQL.cpp Mapper/PowerMapper.cpp)
+add_library(DataBase_lib DataBase/Connection.cpp DataBase/MySQL.cpp Mapper/PowerMapper.cpp)
 include_directories(Request/)
 
 add_library(position src/position.cpp)
@@ -32,6 +32,7 @@ add_library(pole src/pole.cpp)
 add_library(player src/player.cpp)
 add_library(study_std_lib STATIC ${LIB_SOURCE_FILES})
 add_library(request Request/request.cpp)
+add_library(powers Mapper/PowerMapper.cpp src/Powers.cpp)
 
 
 add_executable(main src/newmain.cpp DataBase/Connection.cpp src/hero.cpp Mapper/PowerMapper.cpp)
@@ -45,6 +46,7 @@ target_link_libraries(main player)
 target_link_libraries(main DataBase_lib mysqlclient)
 target_link_libraries(prog study_std_lib)
 target_link_libraries(main request)
+target_link_libraries(main powers)
 
 if(SFML_FOUND)
     include_directories(${SFML_INCLUDE_DIR})

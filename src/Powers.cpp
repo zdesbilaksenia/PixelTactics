@@ -1,4 +1,4 @@
-#include "../lib/Powers.h"
+#include "Powers.h"
 
 void PlusPower(vector<Hero *> &heroes) {
     if (heroes.size() == 2) {

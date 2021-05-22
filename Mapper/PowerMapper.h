@@ -10,7 +10,7 @@ class PowerMapper {
 private:
     Powers *powers;
 public:
-    PowerMapper() : powers(new Powers()) {};
+    PowerMapper();
 
     void MapPowers(Hero &hero);
 };

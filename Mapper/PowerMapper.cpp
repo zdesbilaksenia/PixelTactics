@@ -5,3 +5,5 @@ void PowerMapper::MapPowers(Hero &hero) {
     hero.middleLinePower = powers->ReturnMiddleLinePower(hero.GetName());
     hero.backLinePower = powers->ReturnBackLinePower(hero.GetName());
 }
+
+PowerMapper::PowerMapper() : powers(new Powers()) {};
