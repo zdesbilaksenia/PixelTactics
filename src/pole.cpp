@@ -57,7 +57,7 @@ void Pole::SetPosition(Position& position){
 
 void Pole::InfoPosition(Position& position){
     if(!position.isEmpty()){
-        std::cout << "Здоровье Героя:" << position.GetHero().GetHealth() << " " << "Атака Героя:" << position.GetHero().GetStrength() << std::endl; 
+        std::cout << "Здоровье Героя:" << position.GetHero()->GetHealth() << " " << "Атака Героя:" << position.GetHero()->GetStrength() << std::endl;
     }
 }
 
@@ -73,4 +73,40 @@ bool Pole::CheckLeader(){
         return false;
     }
     return true;
+}
+
+std::vector<bool> Pole::CanBeMeleeAttackedRequest(int side){
+    std::vector<bool> CanBeMeleeAttacked;
+    CanBeMeleeAttacked.resize(0);
+    
+    for(int itline = 0; itline < 3; itline++){
+
+        for(int itcell = 0; itcell < 3; itcell++){
+            Position position = GetPosition(itcell,itline,side);
+            if(position.isEmpty()){
+                CanBeMeleeAttacked.push_back(false);
+            }else if (itline == 0){
+                CanBeMeleeAttacked.push_back(true);
+            }else if (itline == 1){
+                position = GetPosition(itcell,0,side);
+                if(position.isEmpty()){
+                    CanBeMeleeAttacked.push_back(true);
+                }
+            }else if (itline == 2){
+                position = GetPosition(itcell,1,side);
+                if(!position.isEmpty()){
+                    CanBeMeleeAttacked.push_back(false);
+                }else{
+                    position = GetPosition(itcell,0,side);
+                    if(position.isEmpty()){
+                        CanBeMeleeAttacked.push_back(false);
+                    }else{
+                        CanBeMeleeAttacked.push_back(true);
+                    }
+                }
+            }
+        }
+
+    }
+    return CanBeMeleeAttacked;
 }

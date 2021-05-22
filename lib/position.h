@@ -35,7 +35,7 @@ public:
     int GetCell();
     int GetLine();
     int GetSide();
-    Hero& GetHero();
+    Hero* GetHero();
 
     void InfoPosition();
 

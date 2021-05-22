@@ -2,7 +2,7 @@
 #define PIXELTACTICS_MYSQL_H
 
 #include "Connection.h"
-#include "card.h"
+#include "../lib/card.h"
 #include <memory>
 #include <mysql.h>
 #include <vector>

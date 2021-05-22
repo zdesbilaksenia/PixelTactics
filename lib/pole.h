@@ -16,7 +16,10 @@ public:
     void SetPosition(Position& position);
     void InfoPosition(Position& position);
     bool CheckLeader();
+    std::vector<bool> CanBeMeleeAttackedRequest(int side);
 private:
     std::vector<Position> pole_;
 };
+
+
 #endif

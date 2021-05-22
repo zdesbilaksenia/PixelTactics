@@ -202,7 +202,7 @@ void FrontAndBackGetDamage(vector<Hero *> &heroes) {
                                        [](Hero *hero) -> bool { return !hero->IsDead(); })) {
         heroes[0]->SetCurStrength(heroes[0]->GetCurStrength() + 1);
         for_each(heroes.begin() + 1, heroes.end(),
-                 [](Hero *hero) { hero->ReduceHealth(1) });
+                 [](Hero *hero) { hero->ReduceHealth(1); });
     }
 }
 

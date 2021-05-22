@@ -1,7 +1,7 @@
-#include "../lib/hero.h"
+#include "hero.h"
 
-
-Hero::Hero():ID(0),HP(0),curHP(0),name("Болванчик"),strength(0),curStrength(0),isAlive(false),isLeader(false),isDamaged(false),canBeAttackedFromDistance(false),canBeAttackedClosely(false),needReset(0){}
+Hero::Hero():ID(0),HP(0),curHP(0),name("Болванчик"),strength(0),curStrength(0),isAlive(true), isLeader(false), isDamaged(false), canBeAttackedFromDistance(true),
+                         canBeAttackedClosely(true), canUseLeaderPower(false) {}
 
 Hero::Hero(Card &card) : isAlive(true), isLeader(false), isDamaged(false), canBeAttackedFromDistance(true),
                          canBeAttackedClosely(true), canUseLeaderPower(false) {
@@ -114,12 +114,6 @@ void Hero::ForbidCloseAttack() {
         canBeAttackedClosely = false;
 }
 
-<<<<<<< HEAD:src/hero.cpp
-/*Hero& Hero::operator=(const Hero& hero){
-    health_ = hero.health_;
-    strength_ = hero.strength_;
-}*/
-=======
 bool Hero::CanBeAttackedClosely() {
     return canBeAttackedClosely;
 }
@@ -135,4 +129,3 @@ bool Hero::CanUseLeaderPower() {
 bool Hero::ForbidLeaderPower() {
     canUseLeaderPower = false;
 }
->>>>>>> b8946ff70a20d0b4d43bbe458706865dcf587d42:Heroes/Hero.cpp

@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.1)
 project(PixelTactics)
 
-FIND_PACKAGE(Boost 1.75.0 REQUIRED)
 find_package(SFML 2 COMPONENTS network audio graphics window system)
 
 set(CMAKE_CXX_STANDARD 17)

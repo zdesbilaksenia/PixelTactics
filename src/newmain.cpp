@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-#include "pole.h"
+#include "../lib/pole.h"
 #include "../lib/player.h"
 #include "../DataBase/MySQL.h"
 
@@ -39,7 +39,7 @@ int main(){
     int choice;
     std::cin >> choice;
     FirstPlayerLeader.SetHero(FirstLeaderCards.GetVector()[choice]);
-    FirstPlayerLeader.GetHero().MakeLeader();
+    FirstPlayerLeader.GetHero()->MakeLeader();
     pole.SetPosition(FirstPlayerLeader);
 
     std::cout << "Выбери лидера Второй игрок" << std::endl;
@@ -48,7 +48,7 @@ int main(){
     }
     std::cin >> choice;
     SecondPlayerLeader.SetHero(SecondLeaderCards.GetVector()[choice]);
-    SecondPlayerLeader.GetHero().MakeLeader();
+    SecondPlayerLeader.GetHero()->MakeLeader();
     pole.SetPosition(SecondPlayerLeader);
 
     pole.Show();
@@ -136,7 +136,8 @@ int main(){
                 Position EnemyHero = pole.GetPosition(cell,line,EnemySide);
 
                 if(CurrentPlayer.MeleeAttackCheck(EnemyHero,pole)){
-                CurrentPlayer.Attack(YourHero,EnemyHero);
+                //CurrentPlayer.Attack(YourHero,EnemyHero);
+                YourHero.GetHero()->Attack(*EnemyHero.GetHero(), EnemyHero.GetHero()->GetCurStrength());
                 pole.SetPosition(EnemyHero);
                 MovesAmount--;
                 } else {
@@ -146,6 +147,11 @@ int main(){
             }
             case(5):{
                 pole.Show();
+                std::vector<bool> Test;
+                Test = pole.CanBeMeleeAttackedRequest(CurrentPlayer.GetSide());
+                for(int i = 0; i < Test.size(); i++){
+                    std::cout << std::boolalpha << Test[i] << " ";
+                }
                 break;
             }
             case(6):{
