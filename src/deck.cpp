@@ -30,3 +30,13 @@ int Deck::roll_card(int count) {
 std::vector <Card>& Deck::GetVector(){
     return deck_;
 }
+
+Card Deck::ChooseCard(int CardIndex){
+    int size = deck_.size();
+    if(CardIndex < 0 || CardIndex >= size){
+        //throw exception
+    }
+    Card card = deck_[CardIndex];
+    deck_.erase(deck_.begin()+CardIndex);
+    return card;
+}

@@ -14,6 +14,7 @@ public:
     void ShowDeck();
     void push_back(Card card);
     std::vector <Card>& GetVector();
+    Card ChooseCard(int cardIndex);
 
 private:
     std::vector<Card> deck_;

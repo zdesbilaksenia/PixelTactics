@@ -25,13 +25,7 @@ void Game::StartGame(){
 
     for (size_t i = 0; i < 3; i++) {
         int random = allCards.roll_card(SecondPlayerDeck.GetVector().size());
-        int random = allCards.roll_card(FirstPlayerDeck.GetVector().size());
         FirstLeaderCards.push_back(allCards.GetVector()[random]);
-    }
-
-    for (size_t i = 0; i < 3; i++) {
-        int random = allCards.roll_card(SecondPlayerDeck.GetVector().size());
-        SecondLeaderCards.push_back(allCards.GetVector()[random]);
     }
 
     std::cout << "Выбери лидера Первый игрок" << std::endl;
@@ -41,7 +35,14 @@ void Game::StartGame(){
                   << FirstLeaderCards.GetVector()[i].strength << std::endl;
     }
     int choice;
-    std::cin >> choice;
+    lobby->incoming().wait();
+    auto msg = lobby->incoming().popFront().msg;
+    if (msg.header.id == GameMsgTypes::GameLeaderChoice) {
+        msg >> choice;
+    } else {
+        std::cout << "Error in leader choice!\n";
+        return;
+    }
     FirstPlayerLeader.SetHero(FirstLeaderCards.GetVector()[choice]);
     mapper.MapPowers(FirstPlayerLeader.GetHero());
     FirstPlayerLeader.GetHero().MakeLeader();
@@ -54,7 +55,14 @@ void Game::StartGame(){
                   << SecondLeaderCards.GetVector()[i].HP << " " << "Атака Героя:"
                   << SecondLeaderCards.GetVector()[i].strength << std::endl;
     }
-    std::cin >> choice;
+    lobby->incoming().wait();
+    auto msg = lobby->incoming().popFront().msg;
+    if (msg.header.id == GameMsgTypes::GameLeaderChoice) {
+        msg >> choice;
+    } else {
+        std::cout << "Error in leader choice!\n";
+        return;
+    }
     SecondPlayerLeader.SetHero(SecondLeaderCards.GetVector()[choice]);
     mapper.MapPowers(SecondPlayerLeader.GetHero());
     SecondPlayerLeader.GetHero().MakeLeader();
