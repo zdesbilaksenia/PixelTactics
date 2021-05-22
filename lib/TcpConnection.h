@@ -8,7 +8,6 @@
 #include "TsQueue.h"
 #include "OwnedMessage.h"
 #include "Message.h"
-// #include "TcpServer.h"
 
 template <typename T>
 class TcpServer;
