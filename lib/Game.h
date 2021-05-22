@@ -14,8 +14,8 @@
 class Game {
 public:
     void StartGame();
+    
 private:
-
 };
 
 #endif

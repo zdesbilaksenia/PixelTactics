@@ -19,12 +19,18 @@ void Game::StartGame(){
     PowerMapper mapper;
 
     for (size_t i = 0; i < 3; i++) {
-        int random = allCards.roll_card(allCards.GetVector().size());
+        int random = allCards.roll_card(FirstPlayerDeck.GetVector().size());
         FirstLeaderCards.push_back(allCards.GetVector()[random]);
     }
 
     for (size_t i = 0; i < 3; i++) {
-        int random = allCards.roll_card(allCards.GetVector().size());
+        int random = allCards.roll_card(SecondPlayerDeck.GetVector().size());
+        int random = allCards.roll_card(FirstPlayerDeck.GetVector().size());
+        FirstLeaderCards.push_back(allCards.GetVector()[random]);
+    }
+
+    for (size_t i = 0; i < 3; i++) {
+        int random = allCards.roll_card(SecondPlayerDeck.GetVector().size());
         SecondLeaderCards.push_back(allCards.GetVector()[random]);
     }
 
@@ -113,6 +119,7 @@ void Game::StartGame(){
         std::cout << "Посмотреть поле(5)" << std::endl;
         std::cout << "Поставить героя(6)" << std::endl;
         std::cout << "Способность(7)" << std::endl;
+        std::cout << "Убрать труп(8)" << std::endl;
         std::cout << "//////////////////////////" << std::endl;
 
         choice = 0;
@@ -212,12 +219,21 @@ void Game::StartGame(){
                     }
                     case (2): {
                         Position *Hero = pole.GetPosition(cell, line, currentside);
-                        //BackRequest(Hero, pole,currentside);
+                        BackRequest(Hero, pole,currentside);
                         break;;
                     }
                     default:
                         break;
                 }
+            }
+            case(8):{
+                std::cout << "Введите клетку и линию" << std::endl;
+                int line = 0;
+                int cell = 0;
+                std::cin >> cell >> line;
+
+                Position *kletka = pole.GetPosition(cell, line, CurrentPlayer.GetSide());
+                kletka->RemoveHero();
             }
             default: {
                 break;

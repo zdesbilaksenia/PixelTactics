@@ -23,6 +23,8 @@ void Position::InfoPosition(){
 }
 
 void Position::RemoveHero(){
-        empty_ = true;
-    }
+    Hero hero;
+    hero_= hero;
+    empty_ = true;
+}
     
