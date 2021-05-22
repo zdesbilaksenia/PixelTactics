@@ -39,7 +39,7 @@ void UseMagic(int xAttack, int yAttack, int friendlyside, Pole &pole_, int phase
             break;
         }
         case (2): {
-            BackRequest(friendPosition->GetHero().GetID());
+            BackRequest(friendPosition, pole_, friendlyside);
             break;
         }
     }
@@ -117,6 +117,52 @@ void FrontRequest(Position *friendPosition, Pole &pole, int friendlyside) {
 }
 
 void MiddleRequest(Position *friendPosition, Pole &pole, int friendlyside) {
+    switch (friendPosition->GetHero().GetID()) {
+        case (1): {
+            PlusPowerInCloseAttack(friendPosition, pole, friendlyside);
+            break;
+        }
+        case (2): {
+            ResAndGetDamage(friendPosition, pole, friendlyside);
+            break;
+        }
+        case (3): {
+            KillWthDamage(friendPosition, pole, friendlyside);
+            break;
+        }
+        case (4): {
+            MakeDistantAttack(friendPosition, pole,friendlyside);
+            break;
+        }
+        case (5): {
+            HitAvangard(friendPosition, pole, friendlyside);
+            break;
+        }
+        case (6): {
+            CastlingWithDead(friendPosition, pole, friendlyside);
+            break;
+        }
+        case (7): {
+            PlusPowerByDead(friendPosition, pole, friendlyside);
+            break;
+        }
+        case (8): {
+            DamageTwoRows(friendPosition, pole, friendlyside);
+            break;
+        }
+        case (9): {
+            InterceptionPlusPower(friendPosition, pole);
+            break;
+        }
+        case (10): {
+            FrontAndBackGetDamage(friendPosition, pole,friendlyside);
+            break;
+        }
+        case (11): {
+            MakeDistantAttack(friendPosition, pole, friendlyside);
+            break;
+        }
+    }
     //switch(){}
     //5:
     //HitAvangard
@@ -141,8 +187,33 @@ void MiddleRequest(Position *friendPosition, Pole &pole, int friendlyside) {
 
 }
 
-void BackRequest(int ID) {
-
+void BackRequest(Position *friendPosition, Pole &pole, int friendlyside) {
+switch (friendPosition->GetHero().GetID()) {
+        case (2, 3, 5,9): {
+            //SendAllAliveEnemies(friendPosition, pole, friendlyside);
+            break;
+        }
+        case (4, 6, 7):
+        {
+            //SendAllAliveFriends(friendPosition, pole, friendlyside);
+            break;
+        }
+        case(1):
+        {
+            //DoubleStrengthAgainstLeader(friendPosition, pole, friendlyside);
+        }
+        case(8):{
+            //HitFrontRowHeroes(friendPosition, pole, friendlyside);
+        }
+        case(10):{
+            MakeDistantAttack(friendPosition, pole, friendlyside);
+            break;
+        }
+        case(11):{
+            PlusPower(friendPosition, pole, friendlyside);
+            break;
+        }
+    }
 }
 
 
@@ -186,8 +257,8 @@ void InterceptionPlusPower(Position *position, Pole &pole_) {
     heroes.resize(0);
     heroes.push_back(&(position->GetHero()));
     Position *push_pos;
-    push_pos = pole_.GetPosition(position->GetCell(), position->GetLine() - 1, position->GetSide());
-    if ((!push_pos->isEmpty()) && !(push_pos->GetHero().IsDead())) {
+    push_pos = pole_.GetPosition(position->GetCell(), position->GetLine() + 1, position->GetSide());
+    if (!(push_pos->isEmpty()) && !(push_pos->GetHero().IsDead())) {
         heroes.push_back(&(push_pos->GetHero()));
         position->GetHero().frontLinePower(heroes);
     }
@@ -216,7 +287,7 @@ void PlusPower(Position *position, Pole &pole_, int friendlyside) {
     HeroesAlive.resize(0);
     int count = 0;
     for (int i = 0; i < pole_.GetVector().size(); i++) {
-        if ((pole_.GetVector()[i]->GetHero().IsDead()) && (!pole_.GetVector()[i]->isEmpty())) {
+        if (!(pole_.GetVector()[i]->GetHero().IsDead()) && (!pole_.GetVector()[i]->isEmpty())) {
             HeroesAlive.push_back(true);
             count++;
         } else {
@@ -248,7 +319,7 @@ void AttackDamageToHP(Position *position, Pole &pole_, int friendlyside) {
     HeroesAlive.resize(0);
     int count = 0;
     for (int i = 0; i < pole_.GetVector().size(); i++) {
-        if ((pole_.GetVector()[i]->GetHero().IsDead()) && (!pole_.GetVector()[i]->isEmpty())) {
+        if (!(pole_.GetVector()[i]->GetHero().IsDead()) && (!pole_.GetVector()[i]->isEmpty())) {
             HeroesAlive.push_back(true);
         } else {
             HeroesAlive.push_back(false);
@@ -278,7 +349,7 @@ void TransferDamage(Position *position, Pole &pole_, int friendlyside) {
     HeroesDamaged.resize(0);
     int count = 0;
     for (int i = 0; i < pole_.GetVector().size(); i++) {
-        if ((pole_.GetVector()[i]->GetHero().IsDamaged()) && (!pole_.GetVector()[i]->isEmpty())) {
+        if ((pole_.GetVector()[i]->GetHero().IsDamaged()) && (!pole_.GetVector()[i]->isEmpty()) && (!pole_.GetVector()[i]->GetHero().IsDead())) {
             HeroesDamaged.push_back(true);
             count++;
         } else {
@@ -372,7 +443,7 @@ void LeaderMakeDistantAttack(Position *position, Pole &pole_, int friendlyside) 
     heroes.push_back(&leader->GetHero());
     int count = 0;
     for (int i = 0; i < pole_.GetVector().size(); i++) {
-        if ((pole_.GetVector()[i]->GetHero().IsDead()) && (!pole_.GetVector()[i]->isEmpty())) {
+        if (!(pole_.GetVector()[i]->GetHero().IsDead()) && (!pole_.GetVector()[i]->isEmpty())) {
             HeroesCanBeAttackedDistantly.push_back(true);
         } else {
             HeroesCanBeAttackedDistantly.push_back(false);
@@ -608,5 +679,35 @@ void DamageTwoRows(Position *position, Pole &pole_, int friendlyside) {
     // 1-7)персонажи, которые стоят в той же линии, где персонаж, которого выбрал Степа
     //персонаж_чью_способность_используем->middleLinePower(heroes);
     //Степе отправляется массив из 18 полей (в каждом поле хп и сила героя)
+
 }
 
+void SendAllAlliveEnemies(Position *position, Pole &pole_) {
+    //отправить Степе массив bool, среди которых 1 живые персонажи на поле противника
+    //СТепа вернет координаты выбранного персонажа
+    //в вектор vector<Hero*> heroes добавить 0)персонажа, чью спсобность используем
+    // 1) персонаж, которого выбрал Степа
+    //персонаж_чью_способность_используем->middleLinePower(heroes);
+    //Степе отправляется массив из 18 полей (в каждом поле хп и сила героя)
+}
+
+void SendAllAlliveFriends(Position *position, Pole &pole_) {
+    //отправить Степе массив bool, среди которых 1 живые персонажи на своем поле
+    //СТепа вернет координаты выбранного персонажа
+    //в вектор vector<Hero*> heroes добавить 0)персонажа, чью спсобность используем
+    // 1) персонаж, которого выбрал Степа
+    //персонаж_чью_способность_используем->middleLinePower(heroes);
+    //Степе отправляется массив из 18 полей (в каждом поле хп и сила героя)
+}
+
+void DoubleStrengthAgainstLeader(Position *position, Pole &pole_) {
+    //в вектор vector<Hero*> heroes добавить 0)персонажа, чью спсобность используем 1)лидера противника
+    //персонаж_чью_способность_используем->middleLinePower(heroes);
+    //Степе отправляется массив из 18 полей (в каждом поле хп и сила героя)
+}
+
+void HitFrontRowHeroes(Position *position, Pole &pole_) {
+    //в вектор vector<Hero*> heroes добавить 0)персонажа, чью спсобность используем 1-4)всех героев в ближнем бою
+    //персонаж_чью_способность_используем->middleLinePower(heroes);
+    //Степе отправляется массив из 18 полей (в каждом поле хп и сила героя)
+}

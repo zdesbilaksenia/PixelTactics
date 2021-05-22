@@ -21,7 +21,7 @@ void FrontRequest(Position *friendPosition, Pole &pole, int friendlyside);
 
 void MiddleRequest(Position *friendPosition, Pole &pole, int friendlyside);
 
-void BackRequest(int ID);
+void BackRequest(Position *friendPosition, Pole &pole, int friendlyside);
 
 void Interception(Position *position, Pole &pole_);
 
@@ -44,5 +44,23 @@ void PlusStrMinusHP(Position *friendPosition, Pole &pole);
 void Resurrect(Position *friendPosition, Pole &pole, int friendlyside);
 
 void LeaderMakeDistantAttack(Position *position, Pole &pole_, int friendlyside);
+
+void PlusPowerInCloseAttack(Position *position,Pole &pole_, int friendlyside);
+
+void ResAndGetDamage(Position *position,Pole &pole_, int friendlyside);
+
+void KillWthDamage(Position *position,Pole &pole_, int friendlyside);
+
+void HitAvangard(Position *position,Pole &pole_, int friendlyside);
+
+void CastlingWithDead(Position *position,Pole &pole_, int friendlyside);
+
+void PlusPowerByDead(Position *position,Pole &pole_, int friendlyside);
+
+void DamageTwoRows(Position *position,Pole &pole_, int friendlyside);
+
+void FrontAndBackGetDamage(Position *position,Pole &pole_, int friendlyside);
+
+void MakeDistantAttack(Position *position,Pole &pole_, int friendlyside);
 
 

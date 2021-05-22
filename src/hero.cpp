@@ -1,7 +1,11 @@
 #include "hero.h"
 
 Hero::Hero():ID(0),HP(0),curHP(0),name("Болванчик"),strength(0),curStrength(0),isAlive(true), isLeader(false), isDamaged(false), canBeAttackedFromDistance(true),
-                         canBeAttackedClosely(true), canUseLeaderPower(false) {}
+                         canBeAttackedClosely(true), canUseLeaderPower(false) {
+                             frontLinePower=NULL;
+                             middleLinePower=NULL;
+                             backLinePower=NULL;
+                         }
 
 Hero::Hero(Card &card) : isAlive(true), isLeader(false), isDamaged(false), canBeAttackedFromDistance(true),
                          canBeAttackedClosely(true), canUseLeaderPower(false) {
