@@ -43,15 +43,15 @@ void Player::Attack(Position& FriendlyHero, Position& EnemyHero){
     Friend->Attack(*Enemy,Friend->GetCurStrength());
 }
 //Убрать 
-bool Player::MeleeAttackCheck(Position& EnemyHero, Pole& pole){
-    if(EnemyHero.GetLine() == 0) return true;
-    if(EnemyHero.GetLine() == 1){
-        if(pole.GetPosition(EnemyHero.GetCell(),0,EnemyHero.GetSide()).isEmpty()) return true;
+bool Player::MeleeAttackCheck(Position* EnemyHero, Pole& pole){
+    if(EnemyHero->GetLine() == 0) return true;
+    if(EnemyHero->GetLine() == 1){
+        if(pole.GetPosition(EnemyHero->GetCell(),0,EnemyHero->GetSide())->isEmpty()) return true;
         else return false;
     }
-    if(EnemyHero.GetLine() == 2){
-        if((pole.GetPosition(EnemyHero.GetCell(),0,EnemyHero.GetSide()).isEmpty()) && 
-            (pole.GetPosition(EnemyHero.GetCell(),1,EnemyHero.GetSide()).isEmpty())) return true;
+    if(EnemyHero->GetLine() == 2){
+        if((pole.GetPosition(EnemyHero->GetCell(),0,EnemyHero->GetSide())->isEmpty()) && 
+            (pole.GetPosition(EnemyHero->GetCell(),1,EnemyHero->GetSide())->isEmpty())) return true;
         else return false;
     }
 }

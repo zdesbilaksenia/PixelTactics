@@ -18,7 +18,7 @@ Hero& Position::GetHero(){return hero_;}
 
 void Position::InfoPosition(){
     if(!(*this).isEmpty()){
-        std::cout << "Здоровье Героя:" << (*this).GetHero().GetHealth() << " " << "Атака Героя:" << (*this).GetHero().GetStrength() << std::endl; 
+        std::cout << "Name"<<(*this).GetHero().GetName()<<" " << "Здоровье Героя:" << (*this).GetHero().GetCurHealth() << " " << "Атака Героя:" << (*this).GetHero().GetCurStrength() << std::endl; 
     }
 }
 
