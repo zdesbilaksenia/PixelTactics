@@ -1,3 +1,8 @@
+#pragma once
+
+#ifndef REQUEST_H
+#define REQUEST_H
+
 #include "pole.h"
 #include "vector"
 
@@ -77,5 +82,5 @@ void DoubleStrengthAgainstLeader(Position *position,Pole &pole_, int friendlysid
 
 void HitFrontRowHeroes(Position *position,Pole &pole_, int friendlyside);
 
-
+#endif
 
