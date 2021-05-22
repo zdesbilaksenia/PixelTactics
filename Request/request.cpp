@@ -48,9 +48,12 @@ void UseMagic(int xAttack, int yAttack, int friendlyside, Pole &pole_, int phase
 
 void FrontRequest(Position *friendPosition, Pole &pole, int friendlyside) {
     switch (friendPosition->GetHero().GetID()) {
-        case (5, 11): {
+        case (5): {
             SendAllAliveEnemies(friendPosition, pole, friendlyside, 0);
             break;
+        }
+        case (11): {
+            MakeDistantAttack(friendPosition, pole, friendlyside);
         }
         case (6, 8): {
             SendAllAliveFriends(friendPosition, pole, friendlyside, 0);
@@ -94,9 +97,12 @@ void MiddleRequest(Position *friendPosition, Pole &pole, int friendlyside) {
             SendAllDeadFriends(friendPosition, pole, friendlyside, 1);
             break;
         }
-        case (3, 4, 8, 11): {
+        case (3, 8): {
             SendAllAliveEnemies(friendPosition, pole, friendlyside, 1);
             break;
+        }
+        case (4, 11): {
+            MakeDistantAttack(friendPosition, pole, friendlyside);
         }
         case (1): {
             PlusPowerInCloseAttack(friendPosition, pole, friendlyside);
@@ -119,9 +125,12 @@ void MiddleRequest(Position *friendPosition, Pole &pole, int friendlyside) {
 
 void BackRequest(Position *friendPosition, Pole &pole, int friendlyside) {
     switch (friendPosition->GetHero().GetID()) {
-        case (2, 3, 5, 9): {
+        case (3, 5): {
             SendAllAliveEnemies(friendPosition, pole, friendlyside, 2);
             break;
+        }
+        case (2, 9): {
+            MakeDistantAttack(friendPosition, pole, friendlyside);
         }
         case (4, 6, 7): {
             SendAllAliveFriends(friendPosition, pole, friendlyside, 2);
@@ -536,7 +545,8 @@ void MakeDistantAttack(Position *position, Pole &pole_, int friendlyside) {
     HeroesCanBeAttackedDistantly.resize(0);
     int count = 0;
     for (int i = 0; i < pole_.GetVector().size(); i++) {
-        if ((pole_.GetVector()[i]->GetHero().IsDead()) && (!pole_.GetVector()[i]->isEmpty())) {
+        if ((pole_.GetVector()[i]->GetHero().IsDead()) && (!pole_.GetVector()[i]->isEmpty()) &&
+            pole_.GetVector()[1]->GetHero().CanBeAttackedDistantly()) {
             HeroesCanBeAttackedDistantly.push_back(true);
         } else {
             HeroesCanBeAttackedDistantly.push_back(false);
@@ -619,7 +629,8 @@ void SendAllAliveEnemies(Position *position, Pole &pole_, int friendlyside, int 
     HeroesAlive.resize(0);
     int count = 0;
     for (int i = 0; i < pole_.GetVector().size(); i++) {
-        if (!(pole_.GetVector()[i]->GetHero().IsDead()) && (!pole_.GetVector()[i]->isEmpty() && (pole_.GetVector()[i]->GetSide() != friendlyside))) {
+        if (!(pole_.GetVector()[i]->GetHero().IsDead()) &&
+            (!pole_.GetVector()[i]->isEmpty() && (pole_.GetVector()[i]->GetSide() != friendlyside))) {
             HeroesAlive.push_back(true);
         } else {
             HeroesAlive.push_back(false);
@@ -659,7 +670,8 @@ void SendAllAliveFriends(Position *position, Pole &pole_, int friendlyside, int 
     HeroesAlive.resize(0);
     int count = 0;
     for (int i = 0; i < pole_.GetVector().size(); i++) {
-        if (!(pole_.GetVector()[i]->GetHero().IsDead()) && (!pole_.GetVector()[i]->isEmpty()) && (pole_.GetVector()[i]->GetSide() == friendlyside)) {
+        if (!(pole_.GetVector()[i]->GetHero().IsDead()) && (!pole_.GetVector()[i]->isEmpty()) &&
+            (pole_.GetVector()[i]->GetSide() == friendlyside)) {
             HeroesAlive.push_back(true);
         } else {
             HeroesAlive.push_back(false);
@@ -699,7 +711,8 @@ void SendAllDeadFriends(Position *position, Pole &pole_, int friendlyside, int t
     HeroesAlive.resize(0);
     int count = 0;
     for (int i = 0; i < pole_.GetVector().size(); i++) {
-        if ((pole_.GetVector()[i]->GetHero().IsDead()) && (!pole_.GetVector()[i]->isEmpty()) && (pole_.GetVector()[i]->GetSide() == friendlyside)) {
+        if ((pole_.GetVector()[i]->GetHero().IsDead()) && (!pole_.GetVector()[i]->isEmpty()) &&
+            (pole_.GetVector()[i]->GetSide() == friendlyside)) {
             HeroesAlive.push_back(true);
         } else {
             HeroesAlive.push_back(false);
@@ -731,11 +744,11 @@ void SendAllDeadFriends(Position *position, Pole &pole_, int friendlyside, int t
     std::vector<Breed> request = ReturnRequest(pole_);
 }
 
-void DoubleStrengthAgainstLeader(Position *position, Pole &pole_,int friendlyside) {
+void DoubleStrengthAgainstLeader(Position *position, Pole &pole_, int friendlyside) {
     std::vector<Hero *> heroes;
     heroes.resize(0);
     heroes.push_back(&(position->GetHero()));
-    Position *chosen_pos = pole_.GetPosition(1, 1, friendlyside ? 0:1);
+    Position *chosen_pos = pole_.GetPosition(1, 1, friendlyside ? 0 : 1);
     heroes.push_back(&(chosen_pos->GetHero()));
     position->GetHero().backLinePower(heroes);
     std::vector<Breed> request = ReturnRequest(pole_);
@@ -744,15 +757,15 @@ void DoubleStrengthAgainstLeader(Position *position, Pole &pole_,int friendlysid
     //Степе отправляется массив из 18 полей (в каждом поле хп и сила героя)
 }
 
-void HitFrontRowHeroes(Position *position, Pole &pole_,int friendlyside) {
+void HitFrontRowHeroes(Position *position, Pole &pole_, int friendlyside) {
     std::vector<Hero *> heroes;
     heroes.resize(0);
     heroes.push_back(&(position->GetHero()));
     std::vector<bool> ToAnalyse;
-    int enemyside = friendlyside ? 0:1;
-    ToAnalyse = AttackRequest(pole_,enemyside);
-    for(int i = (9*enemyside),j = 0; i < (9*enemyside)+9; i++,j++){
-        if(ToAnalyse[i] == true){
+    int enemyside = friendlyside ? 0 : 1;
+    ToAnalyse = AttackRequest(pole_, enemyside);
+    for (int i = (9 * enemyside), j = 0; i < (9 * enemyside) + 9; i++, j++) {
+        if (ToAnalyse[i] == true) {
             heroes.push_back(&(pole_.GetVector()[i]->GetHero()));
         }
     }
