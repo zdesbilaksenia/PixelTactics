@@ -20,8 +20,17 @@ void Castling(vector<Hero *> &heroes) {
     if (heroes.size() == 2) {
         if (!heroes[0]->IsDead() && !heroes[1]->IsDead()) {
             Hero temp = *heroes[0];
+            temp.frontLinePower = heroes[0]->frontLinePower;
+            temp.middleLinePower = heroes[0]->middleLinePower;
+            temp.backLinePower = heroes[0]->backLinePower;
             *heroes[0] = *heroes[1];
+            heroes[0]->frontLinePower=heroes[1]->frontLinePower;
+            heroes[0]->middleLinePower=heroes[1]->middleLinePower;
+            heroes[0]->backLinePower=heroes[1]->backLinePower;
             *heroes[1] = temp;
+            heroes[1]->frontLinePower=temp.frontLinePower;
+            heroes[1]->middleLinePower=temp.middleLinePower;
+            heroes[1]->backLinePower=temp.backLinePower;
         }
     }
 }
@@ -99,8 +108,17 @@ void CastlingWithDead(vector<Hero *> &heroes) {
     if (heroes.size() == 2) {
         if (!heroes[0]->IsDead() && heroes[1]->IsDead()) {
             Hero temp = *heroes[0];
+            temp.frontLinePower = heroes[0]->frontLinePower;
+            temp.middleLinePower = heroes[0]->middleLinePower;
+            temp.backLinePower = heroes[0]->backLinePower;
             *heroes[0] = *heroes[1];
+            heroes[0]->frontLinePower=heroes[1]->frontLinePower;
+            heroes[0]->middleLinePower=heroes[1]->middleLinePower;
+            heroes[0]->backLinePower=heroes[1]->backLinePower;
             *heroes[1] = temp;
+            heroes[1]->frontLinePower=temp.frontLinePower;
+            heroes[1]->middleLinePower=temp.middleLinePower;
+            heroes[1]->backLinePower=temp.backLinePower;
         }
     }
 }
