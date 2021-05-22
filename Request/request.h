@@ -45,23 +45,29 @@ void Resurrect(Position *friendPosition, Pole &pole, int friendlyside);
 
 void LeaderMakeDistantAttack(Position *position, Pole &pole_, int friendlyside);
 
-void PlusPowerInCloseAttack(Position *position,Pole &pole_, int friendlyside);
+void PlusPowerInCloseAttack(Position *position, Pole &pole_, int friendlyside);
 
-void ResAndGetDamage(Position *position,Pole &pole_, int friendlyside);
+void ResAndGetDamage(Position *position, Pole &pole_, int friendlyside);
 
-void KillWthDamage(Position *position,Pole &pole_, int friendlyside);
+void KillWthDamage(Position *position, Pole &pole_, int friendlyside);
 
-void HitAvangard(Position *position,Pole &pole_, int friendlyside);
+void HitAvangard(Position *position, Pole &pole_, int friendlyside);
 
-void CastlingWithDead(Position *position,Pole &pole_, int friendlyside);
+void CastlingWithDead(Position *position, Pole &pole_, int friendlyside);
 
-void PlusPowerByDead(Position *position,Pole &pole_, int friendlyside);
+void PlusPowerByDead(Position *position, Pole &pole_, int friendlyside);
 
-void DamageTwoRows(Position *position,Pole &pole_, int friendlyside);
+void DamageTwoRows(Position *position, Pole &pole_, int friendlyside);
 
-void FrontAndBackGetDamage(Position *position,Pole &pole_, int friendlyside);
+void FrontAndBackGetDamage(Position *position, Pole &pole_, int friendlyside);
 
-void MakeDistantAttack(Position *position,Pole &pole_, int friendlyside);
+void MakeDistantAttack(Position *position, Pole &pole_, int friendlyside);
+
+void SendAllAliveFriends(Position *position, Pole &pole_, int friendlySide, int type);
+
+void SendAllAliveEnemies(Position *position, Pole &pole_, int friendlySide, int type);
+
+void SendAllDeadFriends(Position *position, Pole &pole_, int friendlySide, int type);
 
 void SendAllAliveEnemies(Position *position,Pole &pole_, int friendlyside);
 
