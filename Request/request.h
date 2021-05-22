@@ -11,7 +11,7 @@ struct Breed {
 
 vector<Breed> ReturnRequest(Pole &pole_);
 
-vector<bool> AttackRequest(Pole &pole_, int &side);
+vector<bool> AttackRequest(Pole &pole_, int side);
 
 int AttackWasDone(int xAttack, int yAttack, int xAttacked, int yAttacked, int friendlyside, Pole &pole_);
 
@@ -62,5 +62,14 @@ void DamageTwoRows(Position *position,Pole &pole_, int friendlyside);
 void FrontAndBackGetDamage(Position *position,Pole &pole_, int friendlyside);
 
 void MakeDistantAttack(Position *position,Pole &pole_, int friendlyside);
+
+void SendAllAliveEnemies(Position *position,Pole &pole_, int friendlyside);
+
+void SendAllAliveFriends(Position *position,Pole &pole_, int friendlyside);
+
+void DoubleStrengthAgainstLeader(Position *position,Pole &pole_, int friendlyside);
+
+void HitFrontRowHeroes(Position *position,Pole &pole_, int friendlyside);
+
 
 

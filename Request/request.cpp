@@ -13,7 +13,7 @@ vector<Breed> ReturnRequest(Pole &pole_) {
     return request;
 }
 
-vector<bool> AttackRequest(Pole &pole_, int &side) {
+vector<bool> AttackRequest(Pole &pole_, int side) {
     return pole_.CanBeMeleeAttackedRequest(side);
 }
 
@@ -190,20 +190,20 @@ void MiddleRequest(Position *friendPosition, Pole &pole, int friendlyside) {
 void BackRequest(Position *friendPosition, Pole &pole, int friendlyside) {
 switch (friendPosition->GetHero().GetID()) {
         case (2, 3, 5,9): {
-            //SendAllAliveEnemies(friendPosition, pole, friendlyside);
+            SendAllAliveEnemies(friendPosition, pole, friendlyside);
             break;
         }
         case (4, 6, 7):
         {
-            //SendAllAliveFriends(friendPosition, pole, friendlyside);
+            SendAllAliveFriends(friendPosition, pole, friendlyside);
             break;
         }
         case(1):
         {
-            //DoubleStrengthAgainstLeader(friendPosition, pole, friendlyside);
+            DoubleStrengthAgainstLeader(friendPosition, pole, friendlyside);
         }
         case(8):{
-            //HitFrontRowHeroes(friendPosition, pole, friendlyside);
+            HitFrontRowHeroes(friendPosition, pole, friendlyside);
         }
         case(10):{
             MakeDistantAttack(friendPosition, pole, friendlyside);
@@ -682,7 +682,28 @@ void DamageTwoRows(Position *position, Pole &pole_, int friendlyside) {
 
 }
 
-void SendAllAlliveEnemies(Position *position, Pole &pole_) {
+void SendAllAliveEnemies(Position *position, Pole &pole_, int friendlyside) {
+    std::vector<Hero *> heroes;
+    heroes.resize(0);
+    heroes.push_back(&(position->GetHero()));
+    std::vector<bool> HeroesAliveEnemies;
+    HeroesAliveEnemies.resize(0);
+    int count = 0;
+    for (int i = 0; i < pole_.GetVector().size(); i++) {
+        if (!(pole_.GetVector()[i]->GetHero().IsDead()) && (!pole_.GetVector()[i]->isEmpty()) &&
+            (pole_.GetVector()[i]->GetSide() != friendlyside)) {
+            HeroesAliveEnemies.push_back(true);
+        } else {
+            HeroesAliveEnemies.push_back(false);
+        }
+    }
+    int xCoord = 0;
+    int yCoord = 0;
+    std::cin >> xCoord >> yCoord;
+    Position *chosen_pos = pole_.GetPosition(xCoord, yCoord, friendlyside);
+    heroes.push_back(&(chosen_pos->GetHero()));
+    position->GetHero().backLinePower(heroes);
+    std::vector<Breed> request = ReturnRequest(pole_);
     //отправить Степе массив bool, среди которых 1 живые персонажи на поле противника
     //СТепа вернет координаты выбранного персонажа
     //в вектор vector<Hero*> heroes добавить 0)персонажа, чью спсобность используем
@@ -691,7 +712,28 @@ void SendAllAlliveEnemies(Position *position, Pole &pole_) {
     //Степе отправляется массив из 18 полей (в каждом поле хп и сила героя)
 }
 
-void SendAllAlliveFriends(Position *position, Pole &pole_) {
+void SendAllAliveFriends(Position *position, Pole &pole_, int friendlyside) {
+    std::vector<Hero *> heroes;
+    heroes.resize(0);
+    heroes.push_back(&(position->GetHero()));
+    std::vector<bool> HeroesAliveEnemies;
+    HeroesAliveEnemies.resize(0);
+    int count = 0;
+    for (int i = 0; i < pole_.GetVector().size(); i++) {
+        if (!(pole_.GetVector()[i]->GetHero().IsDead()) && (!pole_.GetVector()[i]->isEmpty()) &&
+            (pole_.GetVector()[i]->GetSide() == friendlyside)) {
+            HeroesAliveEnemies.push_back(true);
+        } else {
+            HeroesAliveEnemies.push_back(false);
+        }
+    }
+    int xCoord = 0;
+    int yCoord = 0;
+    std::cin >> xCoord >> yCoord;
+    Position *chosen_pos = pole_.GetPosition(xCoord, yCoord, friendlyside);
+    heroes.push_back(&(chosen_pos->GetHero()));
+    position->GetHero().backLinePower(heroes);
+    std::vector<Breed> request = ReturnRequest(pole_);
     //отправить Степе массив bool, среди которых 1 живые персонажи на своем поле
     //СТепа вернет координаты выбранного персонажа
     //в вектор vector<Hero*> heroes добавить 0)персонажа, чью спсобность используем
@@ -700,13 +742,33 @@ void SendAllAlliveFriends(Position *position, Pole &pole_) {
     //Степе отправляется массив из 18 полей (в каждом поле хп и сила героя)
 }
 
-void DoubleStrengthAgainstLeader(Position *position, Pole &pole_) {
+void DoubleStrengthAgainstLeader(Position *position, Pole &pole_,int friendlyside) {
+    std::vector<Hero *> heroes;
+    heroes.resize(0);
+    heroes.push_back(&(position->GetHero()));
+    Position *chosen_pos = pole_.GetPosition(1, 1, friendlyside ? 0:1);
+    heroes.push_back(&(chosen_pos->GetHero()));
+    position->GetHero().backLinePower(heroes);
+    std::vector<Breed> request = ReturnRequest(pole_);
     //в вектор vector<Hero*> heroes добавить 0)персонажа, чью спсобность используем 1)лидера противника
     //персонаж_чью_способность_используем->middleLinePower(heroes);
     //Степе отправляется массив из 18 полей (в каждом поле хп и сила героя)
 }
 
-void HitFrontRowHeroes(Position *position, Pole &pole_) {
+void HitFrontRowHeroes(Position *position, Pole &pole_,int friendlyside) {
+    std::vector<Hero *> heroes;
+    heroes.resize(0);
+    heroes.push_back(&(position->GetHero()));
+    std::vector<bool> ToAnalyse;
+    int enemyside = friendlyside ? 0:1;
+    ToAnalyse = AttackRequest(pole_,enemyside);
+    for(int i = (9*enemyside),j = 0; i < (9*enemyside)+9; i++,j++){
+        if(ToAnalyse[i] == true){
+            heroes.push_back(&(pole_.GetVector()[i]->GetHero()));
+        }
+    }
+    position->GetHero().backLinePower(heroes);
+    std::vector<Breed> request = ReturnRequest(pole_);
     //в вектор vector<Hero*> heroes добавить 0)персонажа, чью спсобность используем 1-4)всех героев в ближнем бою
     //персонаж_чью_способность_используем->middleLinePower(heroes);
     //Степе отправляется массив из 18 полей (в каждом поле хп и сила героя)
