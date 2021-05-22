@@ -3,6 +3,7 @@
 #include "../lib/pole.h"
 #include "../lib/player.h"
 #include "../DataBase/MySQL.h"
+#include "request.h"
 
 
 int main(){
@@ -39,8 +40,9 @@ int main(){
     int choice;
     std::cin >> choice;
     FirstPlayerLeader.SetHero(FirstLeaderCards.GetVector()[choice]);
-    FirstPlayerLeader.GetHero()->MakeLeader();
-    pole.SetPosition(FirstPlayerLeader);
+    FirstPlayerLeader.GetHero().MakeLeader();
+    pole.SetPosition(&(FirstPlayerLeader));
+
 
     std::cout << "Выбери лидера Второй игрок" << std::endl;
     for(int i = 0; i < SecondLeaderCards.GetVector().size(); i++){
@@ -48,10 +50,10 @@ int main(){
     }
     std::cin >> choice;
     SecondPlayerLeader.SetHero(SecondLeaderCards.GetVector()[choice]);
-    SecondPlayerLeader.GetHero()->MakeLeader();
-    pole.SetPosition(SecondPlayerLeader);
+    SecondPlayerLeader.GetHero().MakeLeader();
+    pole.SetPosition(&(SecondPlayerLeader));
 
-    pole.Show();
+    //pole.Show();
     std::cout << "//////////////////////////" << std::endl;
 
     Player FirstPlayer(FirstPlayerDeck,0);
@@ -64,6 +66,7 @@ int main(){
     int currentside = 0;
     Player CurrentPlayer = FirstPlayer;
     int MovesAmount = 2;
+    int Phase = 0;
 
     while(pole.CheckLeader()){
         if(MovesAmount == 0){
@@ -75,6 +78,10 @@ int main(){
                 std::cout << "Ход переходит ко первому игроку" << std::endl;
                 currentside = 0;
                 CurrentPlayer = FirstPlayer;
+                Phase++;
+            }
+            if(Phase == 3){
+                Phase = 0;
             }
             MovesAmount = 2;
         }
@@ -82,6 +89,20 @@ int main(){
             std::cout << "Ход Первого игрока" <<std::endl;
         else
             std::cout << "Ход Второго игрока" <<std::endl;
+        switch(Phase){
+            case(0):{
+                std::cout << "Стадия Авангарда" <<std::endl;
+                break;
+            }
+            case(1):{
+                std::cout <<"Стадия Фланга"<<std::endl;
+                break;
+            }
+            case(2):{
+                std::cout <<"Стадия тыла" <<std::endl;
+                break;
+            }
+        }
 
         std::cout << "//////////////////////////" << std::endl;
         std::cout <<"Взять карту(1)" << std::endl;
@@ -112,8 +133,8 @@ int main(){
                 int side = 0;
 
                 std::cin >> cell >> line >> side;
-                Position kletka = pole.GetPosition(cell,line,side);
-                kletka.InfoPosition();
+                Position* kletka = pole.GetPosition(cell,line,side);
+                kletka->InfoPosition();
                 std::cout << "//////////////////////////" << std::endl;
                 break;
             }
@@ -123,7 +144,7 @@ int main(){
                 int cell = 0;
 
                 std::cin >> cell >> line;
-                Position YourHero = pole.GetPosition(cell,line,CurrentPlayer.GetSide());
+                Position* YourHero = pole.GetPosition(cell,line,CurrentPlayer.GetSide());
 
                 std::cout << "Введите клетку и линию вражеского героя"  << std::endl;
                 std::cin >> cell >> line;
@@ -133,11 +154,10 @@ int main(){
                 }else{
                     EnemySide = 0;
                 }
-                Position EnemyHero = pole.GetPosition(cell,line,EnemySide);
+                Position* EnemyHero = pole.GetPosition(cell,line,EnemySide);
 
                 if(CurrentPlayer.MeleeAttackCheck(EnemyHero,pole)){
-                //CurrentPlayer.Attack(YourHero,EnemyHero);
-                YourHero.GetHero()->Attack(*EnemyHero.GetHero(), EnemyHero.GetHero()->GetCurStrength());
+                YourHero->GetHero().Attack(EnemyHero->GetHero(), YourHero->GetHero().GetCurStrength());
                 pole.SetPosition(EnemyHero);
                 MovesAmount--;
                 } else {
@@ -164,11 +184,14 @@ int main(){
                 int cell = 0;
                 std::cin >> cell >> line;
 
-                Position kletka = pole.GetPosition(cell,line,CurrentPlayer.GetSide());
-                kletka.SetHero(ChosenCard);
+                Position* kletka = pole.GetPosition(cell,line,CurrentPlayer.GetSide());
+                kletka->SetHero(ChosenCard);
                 pole.SetPosition(kletka);
                 MovesAmount --;
                 break;
+            }
+            case(7):{
+
             }
             default:{
                 break;

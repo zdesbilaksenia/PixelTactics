@@ -11,14 +11,14 @@ class Pole{
 public:
     Pole();
     void Show();
-    std::vector <Position>& GetVector();
-    Position& GetPosition(int cell, int line, int side);
-    void SetPosition(Position& position);
-    void InfoPosition(Position& position);
+    std::vector <Position*>& GetVector();
+    Position* GetPosition(int cell, int line, int side);
+    void SetPosition(Position* position);
+    void InfoPosition(Position* position);
     bool CheckLeader();
     std::vector<bool> CanBeMeleeAttackedRequest(int side);
 private:
-    std::vector<Position> pole_;
+    std::vector<Position*> pole_;
 };
 
 

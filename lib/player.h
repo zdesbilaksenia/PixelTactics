@@ -38,7 +38,7 @@ public:
     void StartingHand();
     Deck& GetHand();
     void Attack(Position& FriendlyHero, Position& EnemyHero);
-    bool MeleeAttackCheck(Position& EnemyHero, Pole& pole);
+    bool MeleeAttackCheck(Position* EnemyHero, Pole& pole);
 
 private:
     //Рука Карт
