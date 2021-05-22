@@ -6,26 +6,27 @@ using namespace sf;
 class DrawableBox
 {
 public:
-    DrawableBox(RenderWindow& _window);
+    DrawableBox(RenderWindow &_window);
     void setFillColor(Color _color);
-    void setTexture(Texture* _tx);
-    virtual void setSize(const int& _width, const int& _height);
-    virtual void setPosition(const int& _posX, const int& _posY);
+    void setTexture(Texture *_tx);
+    virtual void setSize(const int &_width, const int &_height);
+    virtual void setPosition(const int &_posX, const int &_posY);
 
-    const int& getPosX();
-    const int& getPosY();
-    const int& getWidth();
-    const int& getHeight();
+    //Мб не const ibnt&, а просто int
+    const int &getPosX();
+    const int &getPosY();
+    const int &getWidth();
+    const int &getHeight();
 
     virtual void draw() = 0;
     ~DrawableBox();
 
-//Пока сделал protected
+    //Пока сделал protected
 protected:
     int posX;
     int posY;
     int width;
     int height;
-    RenderWindow& window;
+    RenderWindow &window;
     RectangleShape rect;
 };

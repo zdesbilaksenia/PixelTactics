@@ -25,16 +25,31 @@ class ButtonsManager
 public:
     ButtonsManager();
 
-    void setButtons(vector<Button* > _buttons);
+    void setButtons(vector<Button *> _buttons);
     void updateFocus();
     void mouseIsPressed();
     void mouseIsReleased();
     void draw();
+    
+    void disable()
+    {
+        for (auto button : buttons)
+        {
+            button->disable();
+        }
+    }
+
+    void enable()
+    {
+        for (auto button : buttons)
+        {
+            button->enable();
+        }
+    }
 
     ~ButtonsManager();
 
 private:
     //Потом заменить указатели на умные указатели
-    vector<Button*> buttons;
-
+    vector<Button *> buttons;
 };

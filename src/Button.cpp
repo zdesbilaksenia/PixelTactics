@@ -5,7 +5,7 @@
 #include <iostream>
 using namespace std;
 
-Button::Button(RenderWindow &_window, Mouse &_mouse, Command *_command) : Clickable(_window, _mouse, _command) 
+Button::Button(RenderWindow &_window, Mouse &_mouse, Command *_command) : Clickable(_window, _mouse, _command)
 {
     this->setSize(buttonWidth, buttonHeight);
 }

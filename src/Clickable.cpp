@@ -31,6 +31,10 @@ bool Clickable::hasFocus()
 
 void Clickable::updateFocus()
 {
+    if(enabled == false)
+    {
+        return;
+    }
     isInFocus = this->hasFocus();
     if (isInFocus)
     {
@@ -56,22 +60,25 @@ void Clickable::release()
 
 //Потом удалить!!!
 
-void Clickable::setColors(Color _basicColor, Color _focusedColor, Color _clickedColor)
+void Clickable::setColors(Color _basicColor, Color _focusedColor, Color _clickedColor, Color _disabledColor)
 {
     basicColor = _basicColor;
     focusedColor = _focusedColor;
     clickedColor = _clickedColor;
+    disabledColor = _disabledColor;
     this->setFillColor(this->basicColor);
 }
 
-void Clickable::Enable()
+void Clickable::enable()
 {
     enabled = true;
+    this->setFillColor(basicColor);
 }
 
-void Clickable::Disable()
+void Clickable::disable()
 {
     enabled = false;
+    this->setFillColor(disabledColor);
 }
 
 bool Clickable::isEnabled()

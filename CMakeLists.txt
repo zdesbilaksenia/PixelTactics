@@ -23,6 +23,7 @@ include_directories(lib/)
 #Скопировал с какого-то сайта
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wall -pedantic")
 
+#Чтобы не перечислять всё, можно написать "src/*.cpp"
 set(LIB_SOURCE_FILES 
     src/DrawableBox.cpp 
     src/Clickable.cpp 
@@ -31,6 +32,8 @@ set(LIB_SOURCE_FILES
     src/Card.cpp 
     src/Tile.cpp 
     src/Unit.cpp 
+    src/Background.cpp
+    src/GameManager.cpp
     src/Commands/CommandAttack.cpp 
     src/Commands/CommandTakeCard.cpp)
 

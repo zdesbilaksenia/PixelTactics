@@ -17,7 +17,7 @@ void Tile::setUnit(Unit &_unit)
     this->status = TileStatus::statusHasUnit;
     unit->setPosition(this->rect.getPosition().x, this->rect.getPosition().y);
     ////////////////////////////////////////////////////////////////////////////////////////COUT
-    cout << "Tile::setUnit === " << unit.get() << " ===" << endl;
+    cout << "Tile::setUnit() : " << unit.get() << " ===" << endl;
 }
 
 void Tile::setStatus(TileStatus _status)
@@ -50,7 +50,7 @@ Tile::~Tile()
 TilesManager::TilesManager(RenderWindow &_window, Mouse &_mouse, const Side &_side) : side(_side)
 {
     status = TilesManagerStatus::statusNothingHappens;
-    stage = Stage::stageAvangard;
+    round = RoundType::roundAvangard;
     unitBuffer = nullptr;
 
     if (side == Side::sidePlayer)
@@ -114,7 +114,7 @@ TilesManager::TilesManager(RenderWindow &_window, Mouse &_mouse, const Side &_si
         }
 
         //УДАЛИТЬ, ЗАГЛУШКА!!!
-        for(auto tile : tiles)
+        for (auto tile : tiles)
         {
             tile->setStatus(TileStatus::statusHasUnit);
         }
@@ -126,7 +126,7 @@ void TilesManager::setStatus(const TilesManagerStatus &_status)
     this->status = _status;
     switch (status)
     {
-    case TilesManagerStatus::statusReleasingUnit:
+    case TilesManagerStatus::statusReleasingCard:
     {
         for (auto tile : tiles)
         {
@@ -160,9 +160,10 @@ auto pressTileOnStage{
             {
                 cout << "TilesManager::mouseIsPressed(): tile was clicked!" << endl;
                 _tileManager.setTileBuffer((*_tiles)[i].get());
+                return true;
             }
         }
-        return;
+        return false;
     }};
 
 auto focusTileOnStage{
@@ -181,14 +182,46 @@ auto focusTileOnStage{
         return;
     }};
 
-void TilesManager::mouseIsPressed()
+bool TilesManager::mouseIsPressed()
 {
+    isPressed = false;
     switch (status)
     {
     case TilesManagerStatus::statusNothingHappens:
     {
+        return false;
     }
     break;
+    case TilesManagerStatus::statusGameStarting:
+    {
+        return false;
+    }
+    case TilesManagerStatus::statusGameStartingReleasingCard:
+    {
+        if (unitBuffer == nullptr)
+        {
+            ////////////////////////////////////////////////////////////////////////////////////////COUT
+            cout << "TilesManager::mouseIsPressed:: ERROR! statusReleasingCard : unitBuffer is nullptr" << endl;
+            return false;
+        }
+        for (auto tile : tiles)
+        {
+            tile->setFillColor(colorDisabled);
+        }
+        if (tilesFlank[1]->hasFocus())
+        {
+            ////////////////////////////////////////////////////////////////////////////////////////COUT
+            cout << "TilesManager::mouseIsPressed::GameStarts RELEASING CARD!!!" << endl;
+
+            tilesFlank[1]->setUnit(*unitBuffer);
+            this->setNormalColors();
+            //Эту информацию сразу отлавливает CardsManager
+            this->status = TilesManagerStatus::statusCardWasJustReleased;
+            unitBuffer = nullptr;
+            return true;
+        }
+        break;
+    }
     case TilesManagerStatus::statusWaitingForAttack:
         for (auto tile : tiles)
         {
@@ -200,52 +233,60 @@ void TilesManager::mouseIsPressed()
                 cout << "TilesManager::mouseIsPressed(): Tile was attacked!" << endl;
                 this->setStatus(TilesManagerStatus::statusNothingHappens);
                 this->updateFocus();
-                return;
+                isPressed = true;
+                return true;
             }
         }
         break;
-    case TilesManagerStatus::statusReleasingUnit:
+    case TilesManagerStatus::statusReleasingCard:
     {
         if (unitBuffer == nullptr)
         {
             ////////////////////////////////////////////////////////////////////////////////////////COUT
-            cout << "TilesManager::mouseIsPressed:: ERROR! statusReleasingUnit : unitBuffer is nullptr" << endl;
-            return;
+            cout << "TilesManager::mouseIsPressed:: ERROR! statusReleasingCard : unitBuffer is nullptr" << endl;
+            return false;
         }
         for (auto tile : tiles)
         {
             if (tile->hasFocus() && tile->getStatus() == TileStatus::statusIsEmpty)
             {
                 ////////////////////////////////////////////////////////////////////////////////////////COUT
-                cout << "TilesManager::mouseIsPressed:: RELEASING UNIT!!!" << endl;
+                cout << "TilesManager::mouseIsPressed::statusReleasingCard : RELEASING CARD!!!" << endl;
 
                 tile->setUnit(*unitBuffer);
                 this->setNormalColors();
                 //Эту информацию сразу отлавливает CardsManager
                 this->status = TilesManagerStatus::statusCardWasJustReleased;
                 unitBuffer = nullptr;
-                return;
+                return true;
             }
         }
     }
     break;
     case TilesManagerStatus::statusAttackingUnit:
     {
-        switch (stage)
+        switch (round)
         {
-        case Stage::stageAvangard:
+        case RoundType::roundAvangard:
         {
-            pressTileOnStage(&tilesAvangard, *this);
+            //return pressTileOnStage(&tilesAvangard, *this);
+            isPressed = pressTileOnStage(&tilesAvangard, *this);
+            return false;
         }
         break;
-        case Stage::stageFlank:
+        case RoundType::roundFlank:
         {
-            pressTileOnStage(&tilesFlank, *this);
+            //return pressTileOnStage(&tilesFlank, *this);
+            isPressed = pressTileOnStage(&tilesFlank, *this);
+            return false;
+
         }
         break;
-        case Stage::stageRear:
+        case RoundType::roundRear:
         {
-            pressTileOnStage(&tilesRear, *this);
+            //return pressTileOnStage(&tilesRear, *this);
+            isPressed = pressTileOnStage(&tilesRear, *this);
+            return false;
         }
         break;
         }
@@ -283,6 +324,33 @@ void TilesManager::updateFocus()
             }
         }
         break;
+    case TilesManagerStatus::statusGameStarting:
+        for (auto tile : tiles)
+        {
+            if (tile->hasFocus())
+            {
+                tile->setFillColor(colorInFocus);
+            }
+            else
+            {
+                tile->setFillColor(colorBasic);
+            }
+        }
+        break;
+    case TilesManagerStatus::statusGameStartingReleasingCard:
+        for (auto tile : tiles)
+        {
+            tile->setFillColor(colorDisabled);
+        }
+        if (tilesFlank[1]->hasFocus())
+        {
+            tilesFlank[1]->setFillColor(colorInFocus);
+        }
+        else
+        {
+            tilesFlank[1]->setFillColor(colorBasic);
+        }
+        break;
     case TilesManagerStatus::statusWaitingForAttack:
         for (auto tile : tiles)
         {
@@ -300,7 +368,7 @@ void TilesManager::updateFocus()
             }
         }
         break;
-    case TilesManagerStatus::statusReleasingUnit:
+    case TilesManagerStatus::statusReleasingCard:
         for (auto tile : tiles)
         {
             if (tile->hasFocus() && tile->getStatus() == TileStatus::statusIsEmpty)
@@ -321,15 +389,15 @@ void TilesManager::updateFocus()
         {
             tile->setFillColor(colorWhenCantAttack);
         }
-        switch (stage)
+        switch (round)
         {
-        case Stage::stageAvangard:
+        case RoundType::roundAvangard:
             focusTileOnStage(&tilesAvangard, colorWhenCanAttack, colorInFocus);
             break;
-        case Stage::stageFlank:
+        case RoundType::roundFlank:
             focusTileOnStage(&tilesFlank, colorWhenCanAttack, colorInFocus);
             break;
-        case Stage::stageRear:
+        case RoundType::roundRear:
             focusTileOnStage(&tilesRear, colorWhenCanAttack, colorInFocus);
             break;
         default:
@@ -343,9 +411,9 @@ void TilesManager::updateFocus()
     }
 }
 
-void TilesManager::setStage(Stage _stage)
+void TilesManager::setRound(RoundType& _round)
 {
-    stage = _stage;
+    round = _round;
 }
 
 void TilesManager::draw()

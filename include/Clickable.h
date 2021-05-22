@@ -23,11 +23,11 @@ public:
     ~Clickable();
 
     //Потом удалить!!
-    void setColors(Color _basicColor, Color _focusedColor, Color _clickedColor);
+    void setColors(Color _basicColor, Color _focusedColor, Color _clickedColor, Color _disabledColor = Color::White);
 
     //Потом доделать
-    void Disable();
-    void Enable();
+    void disable();
+    void enable();
     bool isEnabled();
 
 protected:
@@ -42,6 +42,7 @@ protected:
     Color basicColor;
     Color focusedColor;
     Color clickedColor;
+    Color disabledColor;
 
 //Это потом применить надо (типа чтобы кнопка не нажималась)
     bool enabled;

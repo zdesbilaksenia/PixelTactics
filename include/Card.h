@@ -10,8 +10,6 @@ using std::stack;
 using std::unique_ptr;
 using std::vector;
 
-const int maxNumberOfCardsInHand = 7;
-
 enum class CardStatus
 {
     statusNothingHappens,
@@ -49,37 +47,47 @@ enum class CardsManagerStatus
     statusNothingHappens,
     //Кладём карту
     statusReleasingCard,
+    //Начало игры
+    statusGameStarting,
+    //Начало игры, реализуем главного героя
+    statusGameStartingReleasingCard
 };
 
 class CardsManager
 {
 public:
-    CardsManager(RenderWindow& _window, stack<Card *> _cardsInStack);
+    CardsManager(RenderWindow &_window, stack<Card *> _cardsInStack);
 
     //Сделать потом константную ссылку
     void setTilesManager(TilesManager *_tileManager);
     void updateFocus();
-    void mouseIsPressed();
+    bool mouseIsPressed();
     void draw();
     bool takeCard();
     void updateHand();
-    void setCardShirtTexture(Texture* _texture);
+    void setCardShirtTexture(Texture *_texture);
+    void setStatus(CardsManagerStatus _status)
+    {
+        status = _status;
+    }
 
-    void setUnitBuffer(Unit* _unit)
+    void setUnitBuffer(Unit *_unit)
     {
         unitBuffer = _unit;
     };
 
-    Unit& getUnitBuffer()
+    Unit &getUnitBuffer()
     {
         return *unitBuffer;
     };
 
+    bool canTakeCard();
+
     ~CardsManager();
 
 private:
-    Unit* unitBuffer;
-    RenderWindow& window;
+    Unit *unitBuffer;
+    RenderWindow &window;
     CardsManagerStatus status;
     //Заменить на умные указатели!
     vector<Card *> cardsInHand;

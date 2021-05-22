@@ -59,8 +59,14 @@ enum class TilesManagerStatus
 {
     //Когда ничего не происходит
     statusNothingHappens,
+
+    //Начинаем игру
+    statusGameStarting,
+    //Реализуем карту в начале игры
+    statusGameStartingReleasingCard,
+
     //Готовы выложить карту
-    statusReleasingUnit,
+    statusReleasingCard,
     //Готовы атаковать юнита противника
     statusAttackingUnit,
     //Только что реализовали карту, статус нужен для CardManager
@@ -68,7 +74,7 @@ enum class TilesManagerStatus
     //Когда атакуем тайлы противника
     statusWaitingForAttack,
     //Когда используем силу на тайлы противника
-    statusWaitngForPower
+    statusWaitngForPower,
 };
 
 enum class Side
@@ -77,11 +83,12 @@ enum class Side
     sideOpponent
 };
 
-enum class Stage
+enum class RoundType
 {
-    stageAvangard,
-    stageFlank,
-    stageRear
+    roundNoType,
+    roundAvangard,
+    roundFlank,
+    roundRear
 };
 
 class TilesManager
@@ -100,12 +107,12 @@ public:
     {
         return tileBuffer;
     };
-    void mouseIsPressed();
+    bool mouseIsPressed();
     void updateFocus();
     void draw();
     void setTexture(Texture *_texture);
     bool hasEmptyTiles();
-    void setStage(Stage _stage);
+    void setRound(RoundType& _round);
     void setButtons(Button *_btn1, Button *_btn2)
     {
         for (auto tile : tiles)
@@ -114,6 +121,29 @@ public:
         }
     }
     TilesManagerStatus getStatus();
+
+    void enable()
+    {
+        for (auto tile : tiles)
+        {
+            tile->setFillColor(colorBasic);
+            tile->enable();
+        }
+    }
+
+    void disable()
+    {
+        for (auto tile : tiles)
+        {
+            tile->setFillColor(colorDisabled);
+            tile->disable();
+        }
+    }
+
+    bool getPressed()
+    {
+        return isPressed;
+    }
 
     ~TilesManager();
 
@@ -138,11 +168,14 @@ private:
 
     //Статус
     TilesManagerStatus status;
-    //Стадия игры
-    Stage stage;
+    //Тип раунда
+    RoundType round;
+
+    bool isPressed;
 
     //Цвета для всех случаев
     const Color colorBasic = Color::White;
+    const Color colorDisabled = Color(150, 150, 150);
     const Color colorInFocus = Color(65, 105, 225);
     const Color colorForReleasingUnit = Color::Yellow;
     const Color colorWhenCantReleaseUnit = Color::Black;
