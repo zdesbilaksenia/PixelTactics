@@ -56,7 +56,7 @@ void Game::StartGame(){
                   << SecondLeaderCards.GetVector()[i].strength << std::endl;
     }
     lobby->incoming().wait();
-    auto msg = lobby->incoming().popFront().msg;
+    msg = lobby->incoming().popFront().msg;
     if (msg.header.id == GameMsgTypes::GameLeaderChoice) {
         msg >> choice;
     } else {
@@ -131,7 +131,14 @@ void Game::StartGame(){
         std::cout << "//////////////////////////" << std::endl;
 
         choice = 0;
-        std::cin >> choice;
+        lobby->incoming().wait();
+        msg = lobby->incoming().popFront().msg;
+        if (msg.header.id == GameMsgTypes::GamePlayerOptionChoice) {
+            msg >> choice;
+        } else {
+            std::cout << "Error in option choice!\n";
+            return;
+        }
         switch (choice) {
             case (1): {
                 CurrentPlayer.DrawCard();
@@ -148,7 +155,14 @@ void Game::StartGame(){
                 int line = 0;
                 int cell = 0;
                 int side = 0;
-
+                lobby->incoming().wait();
+                msg = lobby->incoming().popFront().msg;
+                    if (msg.header.id == GameMsgTypes::GameFullCoordinates) {
+                    msg >> line >> cell >> side;
+                } else {
+                    std::cout << "Error in Full Coordinates!\n";
+                    return;
+                }
                 std::cin >> cell >> line >> side;
                 Position *kletka = pole.GetPosition(cell, line, side);
                 kletka->InfoPosition();
@@ -160,11 +174,26 @@ void Game::StartGame(){
                 int line = 0;
                 int cell = 0;
 
-                std::cin >> cell >> line;
+                lobby->incoming().wait();
+                msg = lobby->incoming().popFront().msg;
+                if (msg.header.id == GameMsgTypes::GameShortCoordinates) {
+                    msg >> line >> cell;
+                } else {
+                    std::cout << "Error in Short Coordinates!\n";
+                    return;
+                }
+
                 Position *YourHero = pole.GetPosition(cell, line, CurrentPlayer.GetSide());
 
                 std::cout << "Введите клетку и линию вражеского героя" << std::endl;
-                std::cin >> cell >> line;
+                lobby->incoming().wait();
+                msg = lobby->incoming().popFront().msg;
+                if (msg.header.id == GameMsgTypes::GameShortCoordinates) {
+                    msg >> line >> cell;
+                } else {
+                    std::cout << "Error in Short Coordinates!\n";
+                    return;
+                }
                 int EnemySide;
                 if (CurrentPlayer.GetSide() == 0) {
                     EnemySide = 1;
@@ -193,7 +222,14 @@ void Game::StartGame(){
             }
             case (6): {
                 std::cout << "Выберете карту" << std::endl;
-                std::cin >> choice;
+                lobby->incoming().wait();
+                msg = lobby->incoming().popFront().msg;
+                if (msg.header.id == GameMsgTypes::GameLeaderChoice) {
+                    msg >> choice;
+                } else {
+                    std::cout << "Error in leader choice!\n";
+                    return;
+                }
                 Card ChosenCard = CurrentPlayer.ChooseCard(choice);
 
                 std::cout << "Введите клетку и линию" << std::endl;

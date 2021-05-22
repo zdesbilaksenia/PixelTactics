@@ -16,7 +16,10 @@ enum class GameMsgTypes : uint32_t {
     GetHeroesStats,
     HeroesStats,
 
-    GameLeaderChoice
+    GameLeaderChoice,
+    GamePlayerOptionChoice,
+    GameFullCoordinates,
+    GameShortCoordinates,
 
 
 };

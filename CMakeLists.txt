@@ -46,7 +46,7 @@ add_library(player src/player.cpp)
 add_library(study_std_lib STATIC ${LIB_SOURCE_FILES})
 add_library(request Request/request.cpp)
 add_library(powers Mapper/PowerMapper.cpp src/Powers.cpp)
-add_library(NETWORK_LIB STATIC
+add_library(network STATIC
     lib/Message.cpp
     lib/OwnedMessage.cpp
     lib/TsQueue.cpp
@@ -73,8 +73,8 @@ target_link_libraries(main DataBase_lib mysqlclient)
 target_link_libraries(prog study_std_lib)
 target_link_libraries(main request)
 target_link_libraries(main powers)
-target_link_libraries(cl PUBLIC NETWORK_LIB ${USED_LIBS})
-target_link_libraries(serv PUBLIC NETWORK_LIB ${USED_LIBS})
+target_link_libraries(cl PUBLIC network ${USED_LIBS})
+target_link_libraries(serv PUBLIC network game position pole deck hero player DataBase_lib mysqlclient request powers ${USED_LIBS})
 
 
 if(SFML_FOUND)

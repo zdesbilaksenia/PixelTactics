@@ -14,6 +14,7 @@
 
 class Game {
 public:
+    
     Game(Lobby* lobby_):lobby(lobby_){}
     void StartGame();
     

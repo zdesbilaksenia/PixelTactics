@@ -2,7 +2,7 @@
 
 
 int main() {
-    Game PixelTactics;
-    PixelTactics.StartGame();
+    //Game PixelTactics;
+    //PixelTactics.StartGame();
     return 0;
 }

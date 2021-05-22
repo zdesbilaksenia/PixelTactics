@@ -5,7 +5,7 @@
 
 int main()
 {
-    GameTcpServer s("10.147.17.33");
+    GameTcpServer s("10.147.17.200");
     s.start();
     while(1) {
         s.update(-1, true);
