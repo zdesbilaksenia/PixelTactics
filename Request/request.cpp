@@ -69,7 +69,7 @@ void FrontRequest(Position* friendPosition,Pole& pole,int friendlyside){
             break;
         }
         case(6):{
-            AttackDamageToHP(friendPosition,pole,friendlyside);
+            TransferDamage(friendPosition,pole,friendlyside);
             break;
         }
         case(7):{
@@ -81,7 +81,7 @@ void FrontRequest(Position* friendPosition,Pole& pole,int friendlyside){
             break;
         }
         case(9):{
-            InterceptionPlusPower(friendPosition,pole);
+            PlusStrMinusHP(friendPosition,pole);
         }
         case(10):{
             Interception(friendPosition,pole);
@@ -574,6 +574,13 @@ void DamageTwoRows(Position* position,Pole& pole_,int friendlyside) {
             HeroesAliveEnemies.push_back(false);
         }
     }
+    for(int i = 0; i < pole_.GetVector().size(); i++){
+        if(!(pole_.GetVector()[i]->isEmpty()) && (!(pole_.GetVector()[i]->GetHero().IsDead())) && (pole_.GetVector()[i]->GetLine() == position->GetLine())){
+            heroes.push_back(&(pole_.GetVector()[i]->GetHero()));
+        }
+    }
+    position->GetHero().middleLinePower(heroes);
+    std::vector<Breed> request = ReturnRequest(pole_);
     //отправить Степе массив bool, среди которых 1 живые персонажи на поле противника
     //СТепа вернет координаты выбранного персонажа
     //в вектор vector<Hero*> heroes добавить 0)персонажа, чью спсобность используем

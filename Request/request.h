@@ -24,3 +24,23 @@ void MiddleRequest(Position* friendPosition,Pole& pole, int friendlyside);
 void BackRequest(int ID);
 
 void Interception(Position* position,Pole& pole_);
+
+void HPFromDead(Position* position,Pole& pole_);
+
+void PlusPower(Position* friendPosition,Pole& pole, int friendlyside);
+
+void InterceptionPlusPower(Position* friendPosition,Pole& pole);
+
+void AttackDamageToHP(Position* friendPosition,Pole& pole,int friendlyside);
+
+void TransferDamage(Position* friendPosition,Pole& pole,int friendlyside);
+
+void Resurrect(Position* friendPosition,Pole& pole,int friendlyside);
+
+void Castling(Position* friendPosition,Pole& pole,int friendlyside);
+
+void PlusStrMinusHP(Position* friendPosition,Pole& pole);
+
+void Resurrect(Position* friendPosition,Pole& pole,int friendlyside);
+
+
