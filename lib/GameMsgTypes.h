@@ -15,11 +15,13 @@ enum class GameMsgTypes : uint32_t {
     LobbyFull,
     LobbyGameStart,
     LobbyGameOver,
-    GameLeaderChoice,
+    HeroesStats,
     LobbyPlayerDisconnected,
     LobbyLeave,
     GetHeroesStats,
-    HeroesStats,
+    GameLeaderChoice,
     GameHelloToPlayer,
+    GameString,
+    GameStr
 };
 

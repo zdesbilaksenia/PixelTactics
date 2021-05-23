@@ -5,12 +5,12 @@
 #include <vector>
 #include <cstring>
 
+#include "Card.h"
+
 template <typename T>
 struct MessageHeader {
     T id{};
-    uint32_t size = 0;
-    MessageHeader() = default;
-    MessageHeader(const T& id_);
+    uint32_t size = 0; MessageHeader() = default; MessageHeader(const T& id_);
 };
 
 template <typename T>
@@ -51,6 +51,71 @@ struct Message {
         msg.header.size = msg.size();
 
         return msg;
+    }
+
+    template <typename U, typename DT>
+    friend Message<U>& operator << (Message<U>& msg, const std::vector<DT>& data) {
+        for (int i = data.size() - 1; i >= 0; --i) {
+            DT elem = data[i];
+            msg << elem;
+        }
+        msg << data.size();
+    }
+
+    template <typename U, typename DT>
+    friend Message<U>& operator >> (Message<U>& msg, std::vector<DT>& data) {
+        std::cout << "v vectore?\n";
+        size_t len = 0;
+        msg >> len;
+        for (size_t i = 0; i < len; ++i) {
+            DT elem;
+            std::cout << "zaxodim?\n";
+            msg >> elem;
+            data.push_back(elem);
+        }
+    }
+
+    template <typename U>
+    friend Message<U>& operator << (Message<U>& msg, const std::string& data) {
+        for (int i = data.length(); i >= 0; --i) {
+            char elem = data[i];
+            msg << elem;
+        }
+        msg << size_t(data.length() + 1);
+    }
+
+    template <typename U>
+    friend Message<U>& operator >> (Message<U>& msg, std::string& data) {
+        size_t len = 0;
+        msg >> len;
+        for (size_t i = 0; i < len; ++i) {
+            char elem = 0;
+            msg >> elem;
+            data.push_back(elem);
+        }
+    }
+
+    template <typename U>
+    friend Message<U>& operator << (Message<U>& msg, const Card& data) {
+        msg << data.backLinePower;
+        msg << data.middleLinePower;
+        msg << data.frontLinePower;
+        msg << data.strength;
+        msg << data.HP;
+        msg << data.name;
+        msg << data.ID;
+    }
+
+    template <typename U>
+    friend Message<U>& operator >> (Message<U>& msg, Card& data) {
+        std::cout << "tyt owibka\n";
+        msg >> data.ID;
+        msg >> data.name;
+        msg >> data.HP;
+        msg >> data.strength;
+        msg >> data.frontLinePower;
+        msg >> data.middleLinePower;
+        msg >> data.backLinePower;
     }
 };
 

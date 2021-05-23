@@ -43,7 +43,7 @@ TsQueue<OwnedMessage<GameMsgTypes>>& Lobby::incoming() {
     return qMsgIn;
 }
 
-void Lobby::sendToPlayer(int playerId, const Message<GameMsgTypes>& msg) const {
+void Lobby::sendToPlayer(int playerId, const Message<GameMsgTypes>& msg) {
     messageToPlayer(lobby[playerId]->shared_from_this(), msg);
 }
 
@@ -72,6 +72,24 @@ void Lobby::gameStart() {
                     case GameMsgTypes::LobbyGameOver: {
                         messageAllPlayers(msg);
                         gameRuns = false;
+                        break;
+                    }
+                    case GameMsgTypes::GameString: {
+                        std::cout << "Gotta send str!\n";
+                        Message<GameMsgTypes> outMsg(GameMsgTypes::GameStr);
+                        // std::string str = "Lalala";
+                        // outMsg << str;
+                        int mas[5];
+                        outMsg << mas;
+                        messageToPlayer(player, outMsg);
+                        break;
+                    }
+                    case GameMsgTypes::GameStr: {
+                        std::cout << "Gotta send str!\n";
+                        Message<GameMsgTypes> outMsg(GameMsgTypes::GameStr);
+                        std::string str = "BLablabla";
+                        outMsg << str;
+                        messageToPlayer(player, outMsg);
                         break;
                     }
                 }
@@ -130,7 +148,7 @@ void Lobby::messageAllPlayers(const Message<GameMsgTypes>& msg, boost::shared_pt
     bool invalidPlayerExists = false;
     std::cout << "lobby size: " << lobby.size() << std::endl;
     for (auto it = lobby.begin(); it != lobby.end();it++) {
-        if ((*it) && (*it)->isConnected()) {
+        if ((*it) && (*it)->isConnected() && (*it) != ignoredPlayer) {
             server->messageToClient((*it)->shared_from_this(), msg);
         }
     }

@@ -34,7 +34,7 @@ public:
     void addMessage(const OwnedMessage<GameMsgTypes>& msg);
 
     TsQueue<OwnedMessage<GameMsgTypes>>& incoming();
-    void sendToPlayer(int playerId, const Message<GameMsgTypes>& msg) const;
+    void sendToPlayer(int playerId, const Message<GameMsgTypes>& msg);
 private:
     void messageToServer(const Message<GameMsgTypes>& msg, boost::shared_ptr<TcpConnection<GameMsgTypes>> player = nullptr);
     void messageToPlayer(boost::shared_ptr<TcpConnection<GameMsgTypes>> player, const Message<GameMsgTypes>& msg);
