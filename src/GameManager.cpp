@@ -4,7 +4,7 @@
 GameManager::GameManager(RenderWindow &_window,
                          Mouse &_mouse,
                          Event &_event,
-                         GameTcpClient *client,
+                         GameTcpClient &client,
                          ButtonsManager &_buttonsM,
                          TilesManager &_playerTM,
                          TilesManager &_opponentTM,
@@ -20,6 +20,44 @@ GameManager::GameManager(RenderWindow &_window,
                                                     background(_background),
                                                     stage(GameStage::stageStart),
                                                     round(RoundType::roundAvangard) {}
+
+void GameManager::setAttackButton(Button &_btnAttack)
+{
+    btnAttack = make_unique<Button>(_btnAttack);
+}
+
+void GameManager::setPowerButton(Button &_btnPower)
+{
+    btnPower = make_unique<Button>(_btnPower);
+}
+
+void GameManager::setCancelButton(Button &_btnCancel)
+{
+    btnCancel = make_unique<Button>(_btnCancel);
+}
+
+void GameManager::setTakeCardButton(Button &_btnTakeCard)
+{
+    btnTakeCard = make_unique<Button>(_btnTakeCard);
+}
+
+void GameManager::setRemoveBodyButton(Button &_btnRemoveBody)
+{
+    btnRemoveBody = make_unique<Button>(_btnRemoveBody);
+}
+
+void GameManager::draw()
+{
+    window.clear();
+
+    background.draw();
+    buttonsManager.draw();
+    playerTilesManager.draw();
+    opponentTilesManager.draw();
+    cardsManager.draw();
+
+    window.display();
+}
 
 void GameManager::play()
 {
@@ -59,7 +97,7 @@ void GameManager::gameStart()
 
 void GameManager::opponentsTurn()
 {
-    cout << "GameManager::opponentsTurn(): Started!" << endl;
+    BOOST_LOG_TRIVIAL(info) << "GameManager::opponentsTurn(): Started!";
 
     playerTilesManager.disable();
     buttonsManager.disable();
@@ -72,7 +110,7 @@ void GameManager::playersTurn()
     playerTilesManager.setTileBuffer(nullptr);
     opponentTilesManager.setTileBuffer(nullptr);
 
-    cout << "GameManager::playRound(): Started!" << endl;
+    BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn(): Started!";
 
     playerTilesManager.setRound(round);
     playerTilesManager.setStatus(TilesManagerStatus::statusAttackingUnit);

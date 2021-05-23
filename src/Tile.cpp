@@ -68,6 +68,26 @@ Tile::~Tile()
 //===============TilesManager================
 //===========================================
 
+auto initializeTilesLayer{
+    [](RenderWindow &window, Mouse &mouse, vector<unique_ptr<Tile>> &tilesVector, vector<Tile *> &tiles, int round, Side side) {
+        for (size_t i = 0; i < 3; ++i)
+        {
+            tilesVector.push_back(make_unique<Tile>(window, mouse));
+            tilesVector[i]->setSize(tileWidth, tileHeight);
+            tilesVector[i]->setStatus(TileStatus::statusIsEmpty);
+            tilesVector[i]->setCoordinates(round, i);
+            if (side == Side::sidePlayer)
+            {
+                tilesVector[i]->setPosition(150 * (3 - round) - 80, 100 * i + 200);
+            }
+            else
+            {
+                tilesVector[i]->setPosition(150 * (round + 1) + windowWidth - 520 - tileWidth, 100 * i + 200);
+            }
+            tiles.push_back(tilesVector[i].get());
+        }
+    }};
+
 TilesManager::TilesManager(RenderWindow &_window, Mouse &_mouse, const Side &side, GameTcpClient &_client) : client(_client)
 {
     status = TilesManagerStatus::statusNothingHappens;
@@ -76,70 +96,16 @@ TilesManager::TilesManager(RenderWindow &_window, Mouse &_mouse, const Side &sid
 
     if (side == Side::sidePlayer)
     {
-        //Тайлы авангарда
-        for (int i = 0; i < 3; ++i)
-        {
-            tilesAvangard.push_back(make_unique<Tile>(_window, _mouse));
-            tilesAvangard[i]->setSize(tileWidth, tileHeight);
-            tilesAvangard[i]->setPosition(150 * 3 - 80, 100 * i + 200);
-            tilesAvangard[i]->setStatus(TileStatus::statusIsEmpty);
-            tilesAvangard[i]->setCoordinates(0, i);
-            tiles.push_back(tilesAvangard[i].get());
-        }
-        //Тайлы фланга
-        for (int i = 0; i < 3; ++i)
-        {
-            tilesFlank.push_back(make_unique<Tile>(_window, _mouse));
-            tilesFlank[i]->setSize(tileWidth, tileHeight);
-            tilesFlank[i]->setPosition(150 * 2 - 80, 100 * i + 200);
-            tilesFlank[i]->setStatus(TileStatus::statusIsEmpty);
-            tilesFlank[i]->setCoordinates(1, i);
-            tiles.push_back(tilesFlank[i].get());
-        }
-        //Тайлы тыла
-        for (int i = 0; i < 3; ++i)
-        {
-            tilesRear.push_back(make_unique<Tile>(_window, _mouse));
-            tilesRear[i]->setSize(tileWidth, tileHeight);
-            tilesRear[i]->setPosition(150 * 1 - 80, 100 * i + 200);
-            tilesRear[i]->setStatus(TileStatus::statusIsEmpty);
-            tilesRear[i]->setCoordinates(2, i);
-            tiles.push_back(tilesRear[i].get());
-        }
+        initializeTilesLayer(_window, _mouse, tilesAvangard, tiles, 0, Side::sidePlayer);
+        initializeTilesLayer(_window, _mouse, tilesFlank, tiles, 1, Side::sidePlayer);
+        initializeTilesLayer(_window, _mouse, tilesRear, tiles, 2, Side::sidePlayer);
     }
     else if (side == Side::sideOpponent)
     {
         //Тайлы авангарда
-        for (int i = 0; i < 3; ++i)
-        {
-            tilesAvangard.push_back(make_unique<Tile>(_window, _mouse));
-            tilesAvangard[i]->setSize(tileWidth, tileHeight);
-            tilesAvangard[i]->setPosition(150 * 1 + windowWidth - 520 - tileWidth, 100 * i + 200);
-            tilesAvangard[i]->setStatus(TileStatus::statusIsEmpty);
-            //Здесь, по логике, должно бытть (0, i), но, почему-то, это не работает
-            tilesAvangard[i]->setCoordinates(2, i);
-            tiles.push_back(tilesAvangard[i].get());
-        }
-        //Тайлы фланга
-        for (int i = 0; i < 3; ++i)
-        {
-            tilesFlank.push_back(make_unique<Tile>(_window, _mouse));
-            tilesFlank[i]->setSize(tileWidth, tileHeight);
-            tilesFlank[i]->setPosition(150 * 2 + windowWidth - 520 - tileWidth, 100 * i + 200);
-            tilesFlank[i]->setStatus(TileStatus::statusIsEmpty);
-            tilesAvangard[i]->setCoordinates(1, i);
-            tiles.push_back(tilesFlank[i].get());
-        }
-        //Тайлы тыла
-        for (int i = 0; i < 3; ++i)
-        {
-            tilesRear.push_back(make_unique<Tile>(_window, _mouse));
-            tilesRear[i]->setSize(tileWidth, tileHeight);
-            tilesRear[i]->setPosition(150 * 3 + windowWidth - 520 - tileWidth, 100 * i + 200);
-            tilesRear[i]->setStatus(TileStatus::statusIsEmpty);
-            tilesAvangard[i]->setCoordinates(0, i);
-            tiles.push_back(tilesRear[i].get());
-        }
+        initializeTilesLayer(_window, _mouse, tilesAvangard, tiles, 0, Side::sideOpponent);
+        initializeTilesLayer(_window, _mouse, tilesFlank, tiles, 1, Side::sideOpponent);
+        initializeTilesLayer(_window, _mouse, tilesRear, tiles, 2, Side::sideOpponent);
 
         //УДАЛИТЬ, ЗАГЛУШКА!!!
         for (auto tile : tiles)

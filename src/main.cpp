@@ -394,13 +394,13 @@ int main()
 
     //BOOST_LOG_TRIVIAL(fatal) << "WTF";
 
-    GameManager gm(window, mouse, event, &client, buttonsManager, playerTilesManager, opponentTilesManager, cardsManager, background);
+    GameManager gm(window, mouse, event, client, buttonsManager, playerTilesManager, opponentTilesManager, cardsManager, background);
 
-    gm.setAttackButton(&attackButton);
-    gm.setPowerButton(&powerButton);
-    gm.setTakeCardButton(&buttonTakeCard);
-    gm.setCancelButton(&cancelButton);
-    gm.setRemoveBodyButton(&removeBodyButton);
+    gm.setAttackButton(attackButton);
+    gm.setPowerButton(powerButton);
+    gm.setTakeCardButton(buttonTakeCard);
+    gm.setCancelButton(cancelButton);
+    gm.setRemoveBodyButton(removeBodyButton);
 
     gm.play();
     return 0;

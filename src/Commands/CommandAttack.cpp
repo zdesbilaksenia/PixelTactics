@@ -15,12 +15,12 @@ void CommandAttack::execute()
 {
         if (playerTilesManager.getTileBuffer() == nullptr)
         {
-                cout << "CommandAttack::execute(): ERROR playerTileBuffer is empty!" << endl;
+                BOOST_LOG_TRIVIAL(error) << "CommandAttack::execute(): ERROR playerTileBuffer is empty!";
                 return;
         }
         else
         {
-                cout << "CommandAttack::execute(): Attacking!" << endl;
+                BOOST_LOG_TRIVIAL(info) << "CommandAttack::execute(): Attacking!";
                 //Сама обработка запроса будет происходить уже в buttonIsPressed в объекте opponentTilesManager.
                 opponentTilesManager.setTileBuffer(playerTilesManager.getTileBuffer());
                 opponentTilesManager.setStatus(TilesManagerStatus::statusWaitingForAttack);
@@ -37,7 +37,7 @@ void CommandAttack::execute()
                 opponentTilesManager.setActiveTiles(opponentActiveTiles);
                 opponentTilesManager.updateFocus();
 
-                                                 playerTilesManager.setTileBuffer(nullptr);
+                playerTilesManager.setTileBuffer(nullptr);
                 playerTilesManager.setStatus(TilesManagerStatus::statusNothingHappens);
                 playerTilesManager.updateFocus();
         }

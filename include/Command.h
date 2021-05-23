@@ -1,10 +1,9 @@
 #pragma once
 
-//#include "../CommandManager/CommandManager.h"
-//#include "../DrawableEntities/Tile.h"
 #include<string>
 using std::string;
-//#include "Tile.h"
+#include <boost/log/trivial.hpp>
+using namespace boost::log;
 
 
 class Command
@@ -27,6 +26,8 @@ class CommandTest : public Command
         ~CommandTest();
 };
 
+
+//Тестовая команда
 class CommandStringTest : public Command
 {
     public:

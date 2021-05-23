@@ -7,6 +7,9 @@
 #include "GameMsgTypes.h"
 using namespace std;
 
+#include <boost/log/trivial.hpp>
+using namespace boost::log;
+
 #include <SFML/Graphics.hpp>
 using namespace sf;
 
@@ -21,37 +24,18 @@ public:
     GameManager(RenderWindow &_window,
                 Mouse &_mouse,
                 Event &_event,
-                GameTcpClient *client,
+                GameTcpClient &client,
                 ButtonsManager &_buttonsM,
                 TilesManager &_playerTM,
                 TilesManager &_opponentTM,
                 CardsManager &_cardsM,
                 Background &_background);
 
-    void setAttackButton(Button *_btnAttack)
-    {
-        btnAttack = _btnAttack;
-    }
-
-    void setPowerButton(Button *_btnPower)
-    {
-        btnPower = _btnPower;
-    }
-
-    void setCancelButton(Button *_btnCancel)
-    {
-        btnCancel = _btnCancel;
-    }
-
-    void setTakeCardButton(Button *_btnTakeCard)
-    {
-        btnTakeCard = _btnTakeCard;
-    }
-
-    void setRemoveBodyButton(Button *_btnRemoveBody)
-    {
-        btnRemoveBody = _btnRemoveBody;
-    }
+    void setAttackButton(Button &_btnAttack);
+    void setPowerButton(Button &_btnPower);
+    void setCancelButton(Button &_btnCancel);
+    void setTakeCardButton(Button &_btnTakeCard);
+    void setRemoveBodyButton(Button &_btnRemoveBody);
 
     void play();
 
@@ -59,7 +43,7 @@ private:
     RenderWindow &window;
     Mouse &mouse;
     Event &event;
-    GameTcpClient *client;
+    GameTcpClient &client;
     ButtonsManager &buttonsManager;
     TilesManager &playerTilesManager;
     TilesManager &opponentTilesManager;
@@ -67,11 +51,19 @@ private:
     Background &background;
     //Нужно сделать класс "Label", который будет рисовать текст
 
+    /*
     Button *btnAttack;
     Button *btnPower;
     Button *btnCancel;
     Button *btnTakeCard;
     Button *btnRemoveBody;
+    */
+
+    unique_ptr<Button> btnAttack;
+    unique_ptr<Button> btnPower;
+    unique_ptr<Button> btnCancel;
+    unique_ptr<Button> btnTakeCard;
+    unique_ptr<Button> btnRemoveBody;
 
     enum class GameStage
     {
@@ -87,19 +79,7 @@ private:
     GameStage stage;
     RoundType round;
 
-    void draw()
-    {
-        window.clear();
-
-        background.draw();
-        buttonsManager.draw();
-        playerTilesManager.draw();
-        opponentTilesManager.draw();
-        cardsManager.draw();
-
-        window.display();
-    }
-
+    void draw();
     void gameStart();
     void playersTurn();
     void opponentsTurn();
@@ -162,7 +142,7 @@ private:
                 {
                     if (playerTilesManager.mouseIsPressed())
                     {
-                        cout << "GameManager::gameStart(): Card was successufully released!!!" << endl;
+                        BOOST_LOG_TRIVIAL(info) << "GameManager::gameStart(): Card was successufully released!";
                         firstCardIsReleased = true;
                     }
                     cardsManager.mouseIsPressed();
@@ -220,7 +200,7 @@ private:
                         playerTilesManager.updateFocus();
                         buttonsManager.updateFocus();
                         stage = GameStage::stagePlayersTurn;
-                        cout << "GameManager::opponentsTurn(): Ended!" << endl;
+                        BOOST_LOG_TRIVIAL(info) << "GameManager::opponentsTurn(): Ended!";
                         return;
                     }
                     break;
@@ -274,16 +254,16 @@ private:
                     buttonsManager.mouseIsPressed();
                     if (btnTakeCard->isEnabled() && btnTakeCard->hasFocus())
                     {
-                        cout << "GameManager::playRound() : Card was taken!!" << endl;
+                        BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Card was taken!";
                         movesCount++;
-                        cout << "GameManager::playRound() : Moves count = " << movesCount << endl;
+                        BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Moves count = " << movesCount;
                     }
                     //Если реализовали карту
                     if (playerTilesManager.mouseIsPressed())
                     {
-                        cout << "GameManager::playRound() : Card was released!!" << endl;
+                        BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Card was released!";
                         movesCount++;
-                        cout << "GameManager::playRound() : Moves count = " << movesCount << endl;
+                        BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Moves count = " << movesCount;
                         //Это должно быть в этой строчке, поскольку функция отлавливает факт того, что карта была выложена на стол.
                         cardsManager.mouseIsPressed();
                         //Чтобы отрисовывались только те тайлы, которыми мы можем управлять.
@@ -305,9 +285,9 @@ private:
                     //Если атаковали
                     if (opponentTilesManager.mouseIsPressed())
                     {
-                        cout << "GameManager::playRound() : Opponent's unit was attacked!!" << endl;
+                        BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Opponent's unit was attacked!";
                         movesCount++;
-                        cout << "GameManager::playRound() : Moves count = " << movesCount << endl;
+                        BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Moves count = " << movesCount;
                         playerTilesManager.setStatus(TilesManagerStatus::statusAttackingUnit);
                         playerTilesManager.updateFocus();
                     }
@@ -337,7 +317,7 @@ private:
 
             if (movesCount == 2)
             {
-                cout << "GameManager::roundTurn() : Ended!!!" << endl;
+                BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn(): Ended!";
                 stage = GameStage::stageOpponentsTurn;
                 return;
             }
