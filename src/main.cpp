@@ -3,7 +3,9 @@
 #include <fstream>
 #include "GameTcpClient.h"
 #include "GameMsgTypes.h"
+#include <boost/log/trivial.hpp>
 using namespace std;
+using namespace boost::log;
 
 #include <SFML/Graphics.hpp>
 using namespace sf;
@@ -17,43 +19,7 @@ using namespace sf;
 #include "Background.h"
 #include "configurations.cpp"
 #include "GameManager.h"
-
-class CommandMakeLobby : public Command
-{
-public:
-    CommandMakeLobby(GameTcpClient *_client, bool &_lobbyWasCreated) : lobbyWasCreated(_lobbyWasCreated), client(_client) {}
-    void execute() override
-    {
-        if (client->isConnected())
-        {
-            cout << "CommandMakeLobby::execute() : client is connected!!" << endl;
-            client->makeLobby();
-            client->incoming().wait();
-            auto msg = client->incoming().popFront().msg;
-            cout << msg << endl;
-            if (msg.header.id == GameMsgTypes::LobbyWaitingForPlayer)
-            {
-                cout << "CommandMakeLobby::execute() : Lobby waiting for player" << endl;
-                client->incoming().wait();
-                msg = client->incoming().popFront().msg;
-                if (msg.header.id == GameMsgTypes::LobbyGameStart)
-                {
-                    cout << "Lobby Game started!!!" << endl;
-                }
-            }
-            else
-            {
-                cout << "Didn't recieve LobbyWaitingForPlayer" << endl;
-            }
-        }
-    }
-
-    ~CommandMakeLobby() { client = nullptr; }
-
-private:
-    bool lobbyWasCreated;
-    GameTcpClient *client;
-};
+#include "Commands/CommandMakeLobby.h"
 
 //Чтобы визуально сжать код
 #define GAME_ELEMENTS 1
@@ -201,7 +167,7 @@ int main()
     powerButtonTx.loadFromFile("../img/power.png");
     Texture cancelButtonTx;
 
-    CommandAttack cmdattack(&playerTilesManager, &opponentTilesManager);
+    CommandAttack cmdattack(playerTilesManager, opponentTilesManager);
     Button attackButton(window, mouse, &cmdattack);
     attackButton.setColors(Color::White, Color(240, 200, 150), Color(190, 70, 80), Color(200, 200, 200));
     attackButton.setPosition(50, 80);
@@ -223,8 +189,6 @@ int main()
     removeBodyButton.setColors(Color::White, Color(240, 200, 150), Color(190, 70, 80), Color(200, 200, 200));
     removeBodyButton.setPosition(500, 130);
 
-    playerTilesManager.setButtons(&attackButton, &powerButton);
-
     vector<Button *> buttons = {&buttonTakeCard, &attackButton, &powerButton, &cancelButton, &removeBodyButton};
     ButtonsManager buttonsManager;
     buttonsManager.setButtons(buttons);
@@ -239,6 +203,8 @@ int main()
     background.setTextures(&backgroundTx, &lowerPanelTx);
 
 #endif //GAME_ELEMENTS
+
+    //BOOST_LOG_TRIVIAL(fatal) << "WTF";
 
     GameManager gm(window, mouse, event, client, buttonsManager, playerTilesManager, opponentTilesManager, cardsManager, background);
 

@@ -47,6 +47,7 @@ Tile::~Tile()
 //===========================================
 //===============TilesManager================
 //===========================================
+
 TilesManager::TilesManager(RenderWindow &_window, Mouse &_mouse, const Side &_side) : side(_side)
 {
     status = TilesManagerStatus::statusNothingHappens;
@@ -62,6 +63,7 @@ TilesManager::TilesManager(RenderWindow &_window, Mouse &_mouse, const Side &_si
             tilesAvangard[i]->setSize(tileWidth, tileHeight);
             tilesAvangard[i]->setPosition(150 * 3 - 80, 100 * i + 200);
             tilesAvangard[i]->setStatus(TileStatus::statusIsEmpty);
+            tilesAvangard[i]->setCoordinates(0, i);
             tiles.push_back(tilesAvangard[i].get());
         }
         //Тайлы фланга
@@ -71,6 +73,7 @@ TilesManager::TilesManager(RenderWindow &_window, Mouse &_mouse, const Side &_si
             tilesFlank[i]->setSize(tileWidth, tileHeight);
             tilesFlank[i]->setPosition(150 * 2 - 80, 100 * i + 200);
             tilesFlank[i]->setStatus(TileStatus::statusIsEmpty);
+            tilesFlank[i]->setCoordinates(1, i);
             tiles.push_back(tilesFlank[i].get());
         }
         //Тайлы тыла
@@ -80,6 +83,7 @@ TilesManager::TilesManager(RenderWindow &_window, Mouse &_mouse, const Side &_si
             tilesRear[i]->setSize(tileWidth, tileHeight);
             tilesRear[i]->setPosition(150 * 1 - 80, 100 * i + 200);
             tilesRear[i]->setStatus(TileStatus::statusIsEmpty);
+            tilesRear[i]->setCoordinates(2, i);
             tiles.push_back(tilesRear[i].get());
         }
     }
@@ -92,6 +96,7 @@ TilesManager::TilesManager(RenderWindow &_window, Mouse &_mouse, const Side &_si
             tilesAvangard[i]->setSize(tileWidth, tileHeight);
             tilesAvangard[i]->setPosition(150 * 1 + windowWidth - 520 - tileWidth, 100 * i + 200);
             tilesAvangard[i]->setStatus(TileStatus::statusIsEmpty);
+            tilesAvangard[i]->setCoordinates(0, i);
             tiles.push_back(tilesAvangard[i].get());
         }
         //Тайлы фланга
@@ -101,6 +106,7 @@ TilesManager::TilesManager(RenderWindow &_window, Mouse &_mouse, const Side &_si
             tilesFlank[i]->setSize(tileWidth, tileHeight);
             tilesFlank[i]->setPosition(150 * 2 + windowWidth - 520 - tileWidth, 100 * i + 200);
             tilesFlank[i]->setStatus(TileStatus::statusIsEmpty);
+            tilesAvangard[i]->setCoordinates(1, i);
             tiles.push_back(tilesFlank[i].get());
         }
         //Тайлы тыла
@@ -110,6 +116,7 @@ TilesManager::TilesManager(RenderWindow &_window, Mouse &_mouse, const Side &_si
             tilesRear[i]->setSize(tileWidth, tileHeight);
             tilesRear[i]->setPosition(150 * 3 + windowWidth - 520 - tileWidth, 100 * i + 200);
             tilesRear[i]->setStatus(TileStatus::statusIsEmpty);
+            tilesAvangard[i]->setCoordinates(2, i);
             tiles.push_back(tilesRear[i].get());
         }
 
@@ -228,7 +235,14 @@ bool TilesManager::mouseIsPressed()
             if (tile->hasFocus() && tile->getStatus() == TileStatus::statusHasUnit)
             {
                 //Потом надо заменить на отдачу информации серверу
+
+                //Посылаем клиенту сообщения с координатами.
+                //client.sent(Action::AttackWasDone, this->tileBuffer->getCoordX(), this->tileBuffer->getCoordY(), tile->getCoordX(), tile->getCoordY());
+                //В функции clientUpdate будет отлавливаться сообщение с обновленным массивом.
+                //clientUpdate();
+
                 tile->setStatus(TileStatus::statusHasDeadBody);
+                //this->setTileBuffer(tile);
 
                 cout << "TilesManager::mouseIsPressed(): Tile was attacked!" << endl;
                 this->setStatus(TilesManagerStatus::statusNothingHappens);
@@ -279,7 +293,6 @@ bool TilesManager::mouseIsPressed()
             //return pressTileOnStage(&tilesFlank, *this);
             isPressed = pressTileOnStage(&tilesFlank, *this);
             return false;
-
         }
         break;
         case RoundType::roundRear:
@@ -411,7 +424,7 @@ void TilesManager::updateFocus()
     }
 }
 
-void TilesManager::setRound(RoundType& _round)
+void TilesManager::setRound(RoundType &_round)
 {
     round = _round;
 }

@@ -12,7 +12,8 @@ find_library(PTHREAD_LIBRARY pthread)
 include_directories(${PROJECT_SOURCE_DIR}/lib)
 find_library(NETWORK_LIB NETWORK_LIB "${PROJECT_SOURCE_DIR}/lib")
 
-SET(Boost_USE_STATIC_LIBS OFF)
+SET(Boost_USE_STATIC_LIBS ON)
+FIND_PACKAGE(Boost 1.75.0 COMPONENTS log REQUIRED)
 SET(Boost_USE_MULTITHREAD ON)
 FIND_PACKAGE(Boost 1.75.0 REQUIRED)
 
@@ -35,7 +36,8 @@ set(LIB_SOURCE_FILES
     src/Background.cpp
     src/GameManager.cpp
     src/Commands/CommandAttack.cpp 
-    src/Commands/CommandTakeCard.cpp)
+    src/Commands/CommandTakeCard.cpp
+    src/Commands/CommandMakeLobby.cpp)
 
 # Что бы не было относительных ссылок на файлы
 include_directories(include)
@@ -43,7 +45,7 @@ include_directories(include)
 add_library(study_std_lib STATIC ${LIB_SOURCE_FILES})
 
 add_executable(prog src/main.cpp)
-target_link_libraries(prog study_std_lib ${NETWORK_LIB} ${USED_LIBS})
+target_link_libraries(prog study_std_lib ${NETWORK_LIB} ${USED_LIBS} Boost::log)
 
 find_package(SFML 2 COMPONENTS network audio graphics window system)
 if(SFML_FOUND)

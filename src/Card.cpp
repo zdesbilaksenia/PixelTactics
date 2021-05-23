@@ -233,6 +233,7 @@ bool CardsManager::mouseIsPressed()
         }
     }
     }
+    return false;
 }
 
 void CardsManager::draw()

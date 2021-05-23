@@ -28,27 +28,46 @@ public:
     void setStatus(TileStatus _status);
     void draw() override;
 
-    void setButtons(Button *_btnAttack, Button *_btnPower)
-    {
-        buttonAttack = _btnAttack;
-        buttonPower = _btnPower;
-    };
     Unit *getUnit()
     {
         return unit.get();
+    }
+
+    int getCoordX()
+    {
+        return coordX;
+    }
+
+    int getCoordY()
+    {
+        return coordY;
+    }
+
+    //coordX - столбец
+    //coordY - строка
+    void setCoordinates(const int& _x, const int& _y)
+    {
+        coordX = _x;
+        coordY = _y;
     }
 
     TileStatus getStatus();
     ~Tile();
 
 private:
-    Button *buttonAttack;
-    Button *buttonPower;
+    //Button *buttonAttack;
+    //Button *buttonPower;
+
+    int coordX;
+    int coordY;
 
     unique_ptr<Unit> unit;
     //Unit *unit;
     TileStatus status;
     const Color colorForAttack = Color(255, 111, 0);
+
+    //Метод для 
+    bool sendAttackMessage(int coordX1, int coordY1, int coordX2, int coordY2);
 };
 
 //Например, игрок нажал на кнопку "Аттаковать"
@@ -112,14 +131,7 @@ public:
     void draw();
     void setTexture(Texture *_texture);
     bool hasEmptyTiles();
-    void setRound(RoundType& _round);
-    void setButtons(Button *_btn1, Button *_btn2)
-    {
-        for (auto tile : tiles)
-        {
-            tile->setButtons(_btn1, _btn2);
-        }
-    }
+    void setRound(RoundType &_round);
     TilesManagerStatus getStatus();
 
     void enable()
@@ -143,6 +155,28 @@ public:
     bool getPressed()
     {
         return isPressed;
+    }
+
+    void setActiveTiles(bool _activeTiles[3][3])
+    {
+        for (int i = 0; i < 3; ++i)
+        {
+            for (int j = 0; j < 3; ++j)
+            {
+                activeTiles[i][j] = _activeTiles[i][j];
+            }
+        }
+    }
+
+    void resetActiveTiles()
+    {
+        for (int i = 0; i < 3; ++i)
+        {
+            for (int j = 0; j < 3; ++j)
+            {
+                activeTiles[i][j] = 0;
+            }
+        }
     }
 
     ~TilesManager();
@@ -184,4 +218,6 @@ private:
     const Color colorWhenCantAttack = Color(30, 30, 30);
     const Color colorWhenCanAttack = Color(255, 162, 50);
     const Color colorWaitingForAttack = Color(200, 40, 240);
+
+    bool activeTiles[3][3];
 };
