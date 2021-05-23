@@ -11,6 +11,8 @@
 using std::make_unique;
 using std::unique_ptr;
 using std::vector;
+#include <boost/log/trivial.hpp>
+using namespace boost::log;
 
 enum class TileStatus
 {
@@ -29,30 +31,13 @@ public:
     void setUnit(Unit &_unit);
     void setStatus(TileStatus _status);
     void draw() override;
-
-    Unit *getUnit()
-    {
-        return unit.get();
-    }
-
-    int getCoordX()
-    {
-        return coordX;
-    }
-
-    int getCoordY()
-    {
-        return coordY;
-    }
+    Unit *getUnit();
+    int getCoordX();
+    int getCoordY();
 
     //coordX - столбец
     //coordY - строка
-    void setCoordinates(const int &_x, const int &_y)
-    {
-        coordX = _x;
-        coordY = _y;
-    }
-
+    void setCoordinates(const int &_x, const int &_y);
     TileStatus getStatus();
     ~Tile();
 
@@ -119,15 +104,8 @@ public:
 
     void setStatus(const TilesManagerStatus &_status);
     void setUnitBuffer(Unit &_unit);
-    Unit *getUnitBuffer();
-    void setTileBuffer(Tile *_tile)
-    {
-        tileBuffer = _tile;
-    };
-    Tile *getTileBuffer()
-    {
-        return tileBuffer;
-    };
+    void setTileBuffer(Tile *_tile);
+    Tile *getTileBuffer();
     bool mouseIsPressed();
     void updateFocus();
     void draw();
@@ -135,57 +113,16 @@ public:
     bool hasEmptyTiles();
     void setRound(RoundType &_round);
     TilesManagerStatus getStatus();
-
-    void enable()
-    {
-        for (auto tile : tiles)
-        {
-            tile->setFillColor(colorBasic);
-            tile->enable();
-        }
-    }
-
-    void disable()
-    {
-        for (auto tile : tiles)
-        {
-            tile->setFillColor(colorDisabled);
-            tile->disable();
-        }
-    }
-
-    bool getPressed()
-    {
-        return isPressed;
-    }
-
-    void setActiveTiles(bool _activeTiles[3][3])
-    {
-        for (int i = 0; i < 3; ++i)
-        {
-            for (int j = 0; j < 3; ++j)
-            {
-                activeTiles[i][j] = _activeTiles[i][j];
-            }
-        }
-    }
-
-    void resetActiveTiles()
-    {
-        for (int i = 0; i < 3; ++i)
-        {
-            for (int j = 0; j < 3; ++j)
-            {
-                activeTiles[i][j] = 0;
-            }
-        }
-    }
+    void enable();
+    void disable();
+    bool getPressed();
+    void setActiveTiles(bool _activeTiles[3][3]);
+    void resetActiveTiles();
 
     ~TilesManager();
 
 private:
     GameTcpClient &client;
-    Side side;
     vector<Tile *> tiles;
     //Тайлы авангарда
     vector<unique_ptr<Tile>> tilesAvangard;

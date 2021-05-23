@@ -5,8 +5,8 @@
 #include "GameTcpClient.h"
 #include "GameMsgTypes.h"
 #include <boost/log/trivial.hpp>
-using namespace std;
 using namespace boost::log;
+using namespace std;
 
 #include <SFML/Graphics.hpp>
 using namespace sf;
@@ -25,7 +25,7 @@ using namespace sf;
 //Чтобы визуально сжать код
 #define GAME_ELEMENTS 1
 
-#define SERVER_CONNECTING 1
+#define SERVER_CONNECTING 0
 
 void setData(GameTcpClient &client, vector<Unit> &units, vector<Card> &cards, Texture textures[numberOfUnits])
 {
@@ -90,6 +90,15 @@ void setData(GameTcpClient &client, vector<Unit> &units, vector<Card> &cards, Te
 
 #endif // SERVER_CONNECTING
 
+#if SERVER_CONNECTING == 0
+
+    for (size_t i = 0; i < units.size(); ++i)
+    {
+        units[i].setTexture(&textures[i % numberOfUnits]);
+    }
+
+#endif //SERVER_CONNECTING
+
     for (size_t i = 0; i < cards.size(); ++i)
     {
         cards[i].setUnit(&units[i]);
@@ -135,7 +144,7 @@ private:
 bool menu(RenderWindow &window,
           Mouse &mouse,
           Event &event,
-          GameTcpClient *client)
+          GameTcpClient& client)
 {
     Texture backgroundTx;
     backgroundTx.loadFromFile("../img/low_panel.png");
@@ -148,7 +157,7 @@ bool menu(RenderWindow &window,
     bool lobbyWasCreated = false;
     CommandMakeLobby cmdMakeLobby(client, lobbyWasCreated);
     //CommandStringTest cmdMakeLobby("Connecting to lobby");
-    CommandJoinLobby cmdJoinLobby(*client);
+    CommandJoinLobby cmdJoinLobby(client);
 
     Texture txMakeLobby;
     txMakeLobby.loadFromFile("../img/make_lobby.png");
@@ -247,7 +256,7 @@ int main()
     Mouse mouse;
     Event event;
 
-    if (menu(window, mouse, event, &client) == false)
+    if (menu(window, mouse, event, client) == false)
     {
         BOOST_LOG_TRIVIAL(fatal) << "main() : Can't create lobby!";
         return 0;

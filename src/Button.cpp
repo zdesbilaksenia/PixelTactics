@@ -34,10 +34,15 @@ ButtonsManager::ButtonsManager()
 {
 }
 
-void ButtonsManager::setButtons(vector<Button *> _buttons)
+void ButtonsManager::setButtons(vector<Button *> &_buttons)
 {
     for (auto _button : _buttons)
     {
+        if (_button == nullptr)
+        {
+            BOOST_LOG_TRIVIAL(error) << "ButtonsManager::setButtons() : ERROR! _button from _buttons is nullptr!";
+            return;
+        }
         buttons.push_back(_button);
     }
 }
@@ -80,6 +85,22 @@ void ButtonsManager::draw()
     for (auto button : buttons)
     {
         button->draw();
+    }
+}
+
+void ButtonsManager::disable()
+{
+    for (auto button : buttons)
+    {
+        button->disable();
+    }
+}
+
+void ButtonsManager::enable()
+{
+    for (auto button : buttons)
+    {
+        button->enable();
     }
 }
 

@@ -129,10 +129,14 @@ private:
                 case (RoundType::roundRear):
                     round = RoundType::roundAvangard;
                     break;
+                default:
+                    break;
                 }
                 stage = GameStage::stageOpponentsTurn;
                 break;
             }
+            default:
+                break;
             }
         }
     }
@@ -339,5 +343,4 @@ private:
             }
         }
     }
-
 };

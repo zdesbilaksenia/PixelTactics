@@ -8,12 +8,12 @@ using namespace boost::log;
 class CommandMakeLobby : public Command
 {
 public:
-    CommandMakeLobby(GameTcpClient *_client, bool &_lobbyWasCreated);
+    CommandMakeLobby(GameTcpClient& _client, bool &_lobbyWasCreated);
     void execute() override;
 
     ~CommandMakeLobby();
 
 private:
     bool& lobbyWasCreated;
-    GameTcpClient *client;
+    GameTcpClient& client;
 };

@@ -24,6 +24,27 @@ void Tile::setStatus(TileStatus _status)
     this->status = _status;
 }
 
+Unit *Tile::getUnit()
+{
+    return unit.get();
+}
+
+int Tile::getCoordX()
+{
+    return coordX;
+}
+
+int Tile::getCoordY()
+{
+    return coordY;
+}
+
+void Tile::setCoordinates(const int &_x, const int &_y)
+{
+    coordX = _x;
+    coordY = _y;
+}
+
 TileStatus Tile::getStatus()
 {
     return status;
@@ -47,7 +68,7 @@ Tile::~Tile()
 //===============TilesManager================
 //===========================================
 
-TilesManager::TilesManager(RenderWindow &_window, Mouse &_mouse, const Side &_side, GameTcpClient& _client) : side(_side), client(_client)
+TilesManager::TilesManager(RenderWindow &_window, Mouse &_mouse, const Side &side, GameTcpClient &_client) : client(_client)
 {
     status = TilesManagerStatus::statusNothingHappens;
     round = RoundType::roundAvangard;
@@ -151,6 +172,61 @@ void TilesManager::setStatus(const TilesManagerStatus &_status)
     {
         break;
     }
+    }
+}
+
+void TilesManager::setTileBuffer(Tile *_tile)
+{
+    tileBuffer = _tile;
+}
+
+Tile *TilesManager::getTileBuffer()
+{
+    return tileBuffer;
+}
+
+void TilesManager::enable()
+{
+    for (auto tile : tiles)
+    {
+        tile->setFillColor(colorBasic);
+        tile->enable();
+    }
+}
+
+void TilesManager::disable()
+{
+    for (auto tile : tiles)
+    {
+        tile->setFillColor(colorDisabled);
+        tile->disable();
+    }
+}
+
+bool TilesManager::getPressed()
+{
+    return isPressed;
+}
+
+void TilesManager::setActiveTiles(bool _activeTiles[3][3])
+{
+    for (int i = 0; i < 3; ++i)
+    {
+        for (int j = 0; j < 3; ++j)
+        {
+            activeTiles[i][j] = _activeTiles[i][j];
+        }
+    }
+}
+
+void TilesManager::resetActiveTiles()
+{
+    for (int i = 0; i < 3; ++i)
+    {
+        for (int j = 0; j < 3; ++j)
+        {
+            activeTiles[i][j] = 0;
+        }
     }
 }
 
@@ -308,10 +384,14 @@ bool TilesManager::mouseIsPressed()
             return false;
         }
         break;
+        default:
+            break;
         }
     }
-    break;
+    default:
+        break;
     }
+    return false;
 }
 
 void TilesManager::setNormalColors()
@@ -582,11 +662,6 @@ void TilesManager::setTexture(Texture *_texture)
     {
         tile->setTexture(_texture);
     }
-}
-
-Unit *TilesManager::getUnitBuffer()
-{
-    return unitBuffer.get();
 }
 
 bool TilesManager::hasEmptyTiles()

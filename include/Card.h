@@ -71,14 +71,9 @@ public:
         status = _status;
     }
 
-    void setUnitBuffer(Unit *_unit)
+    void setUnitBuffer(Unit &_unit)
     {
-        unitBuffer = _unit;
-    };
-
-    Unit &getUnitBuffer()
-    {
-        return *unitBuffer;
+        unitBuffer = make_unique<Unit>(_unit);
     };
 
     bool canTakeCard();
@@ -86,7 +81,8 @@ public:
     ~CardsManager();
 
 private:
-    Unit *unitBuffer;
+    //Unit *unitBuffer;
+    unique_ptr<Unit> unitBuffer;
     RenderWindow &window;
     CardsManagerStatus status;
     //Заменить на умные указатели!

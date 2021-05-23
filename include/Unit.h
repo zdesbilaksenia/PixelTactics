@@ -2,6 +2,8 @@
 
 #include "DrawableBox.h"
 #include <string>
+#include <boost/log/trivial.hpp>
+using namespace boost::log;
 using std::string;
 
 class Unit : public DrawableBox
@@ -39,6 +41,4 @@ private:
     string description[3];
     int health;
     int attack;
-    //Label healthLabel;
-    //Label attackLabel;
 };
