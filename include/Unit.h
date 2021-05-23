@@ -23,7 +23,7 @@ public:
     //===========================================================================================================
     void setCharacter();
 
-    void setData(string _name, string _description[3], int _health, int _attack);
+    void setData(const int& Id, const string& _name, const string _description[3], const int& _health, const int& _attack);
 
     int getHealth();
     int getAttack();
@@ -34,6 +34,7 @@ public:
 
 private:
 
+    int Id;
     string name;
     string description[3];
     int health;

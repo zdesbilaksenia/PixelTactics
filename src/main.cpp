@@ -25,10 +25,12 @@ using namespace sf;
 //Чтобы визуально сжать код
 #define GAME_ELEMENTS 1
 
-#define SERVER_CONNECTING 0
+#define SERVER_CONNECTING 1
 
 void setData(GameTcpClient &client, vector<Unit> &units, vector<Card> &cards, Texture textures[numberOfUnits])
 {
+    BOOST_LOG_TRIVIAL(info) << "SetData() : Starting!";
+    /*
     enum unitNames
     {
         knight,
@@ -44,7 +46,7 @@ void setData(GameTcpClient &client, vector<Unit> &units, vector<Card> &cards, Te
         paladin
     };
 
-    map<string, int> names;
+    map<string, unitNames> names;
     names["Рыцарь"] = knight;
     names["Ведьма"] = witch;
     names["Алхимик"] = alchemist;
@@ -56,67 +58,187 @@ void setData(GameTcpClient &client, vector<Unit> &units, vector<Card> &cards, Te
     names["Зверолов"] = animaltrapper;
     names["Оракул"] = oracle;
     names["Паладин"] = paladin;
+    */
+
+    vector<CardInfo> cardsInfo;
+
+    //Считываем имя с сервера
+#if SERVER_CONNECTING == 1
+
+    client.incoming().wait();
+    auto msg = client.incoming().popFront().msg;
+    //Тип сообщения должен быть GameMsgTypes::GameHeroStats
+    if (msg.header.id == GameMsgTypes::GameDeck)
+    {
+        BOOST_LOG_TRIVIAL(info) << "SetData() : Trying to load cardsInfo!";
+        msg >> cardsInfo;
+        BOOST_LOG_TRIVIAL(info) << "SetData() : successfully loaded cardsInfo!";
+    }
 
     for (size_t i = 0; i < units.size(); ++i)
     {
-        string name;
-        //Считываем имя с сервера
-        //client.incoming().wait();
-        //auto msg = client.incoming().popFront().msg;
-        //Тип сообщения должен быть GameMsgTypes::GameHeroStats
-        //if (msg.header.id == GameMsgTypes::ServerAccept)
-        {
-            cout << "Server accepted!!" << endl;
-        }
-
-        units[i].setTexture(&textures[names[name]]);
+        cout << "name " << cardsInfo[i].name << " ID = " << cardsInfo[i].ID << endl;
+        units[i].setTexture(&textures[cardsInfo[i].ID - 1]);
 
         string description[3];
-        for (int i = 0; i < 3; ++i)
-        {
-            //считываем description[i]
-        }
+        description[0] = cardsInfo[i].frontLinePower;
+        description[1] = cardsInfo[i].middleLinePower;
+        description[2] = cardsInfo[i].backLinePower;
 
-        int health;
-        int attack;
-
-        //Считываем здоровье, атаку
-
-        
-
-        units[i].setData(name, description, health, attack);
+        units[i].setData(cardsInfo[i].ID, cardsInfo[i].name, description, cardsInfo[i].HP, cardsInfo[i].strength);
     }
+
+#endif // SERVER_CONNECTING
 
     for (size_t i = 0; i < cards.size(); ++i)
     {
         cards[i].setUnit(&units[i]);
         cards[i].setColors(Color::White, Color::Magenta, Color::Green);
     }
+
+    BOOST_LOG_TRIVIAL(info) << "SetData() : Ending!";
+    return;
+}
+
+class CommandJoinLobby : public Command
+{
+public:
+    CommandJoinLobby(GameTcpClient &_client) : client(_client)
+    {
+    }
+    void execute() override
+    {
+        client.joinLobby(1);
+        if (client.isConnected())
+        {
+            BOOST_LOG_TRIVIAL(info) << "CommandJoinLobby::execute() : Lobby waiting for player";
+            client.incoming().wait();
+            auto msg = client.incoming().popFront().msg;
+            if (msg.header.id == GameMsgTypes::LobbyGameStart)
+            {
+                BOOST_LOG_TRIVIAL(info) << "CommandJoinLobby::execute() : Lobby Game started!";
+                return;
+            }
+            else
+            {
+                BOOST_LOG_TRIVIAL(error) << "CommandJoinLobby::execute() : Didn't recieve LobbyWaitingForPlayer";
+            }
+        }
+    }
+
+    ~CommandJoinLobby() {}
+
+private:
+    GameTcpClient &client;
+};
+
+bool menu(RenderWindow &window,
+          Mouse &mouse,
+          Event &event,
+          GameTcpClient *client)
+{
+    Texture backgroundTx;
+    backgroundTx.loadFromFile("../img/low_panel.png");
+    RectangleShape backgroundRect;
+    backgroundRect.setSize(Vector2f(windowWidth, windowHeight));
+    backgroundRect.setTexture(&backgroundTx);
+    backgroundRect.setPosition(Vector2f(0, -100));
+    backgroundRect.setPosition(Vector2f(0, 0));
+
+    bool lobbyWasCreated = false;
+    CommandMakeLobby cmdMakeLobby(client, lobbyWasCreated);
+    //CommandStringTest cmdMakeLobby("Connecting to lobby");
+    CommandJoinLobby cmdJoinLobby(*client);
+
+    Texture txMakeLobby;
+    txMakeLobby.loadFromFile("../img/make_lobby.png");
+    Button btnMakeLobby(window, mouse, &cmdMakeLobby);
+    btnMakeLobby.setTexture(&txMakeLobby);
+
+    Button btnConnectToLobby(window, mouse, &cmdJoinLobby);
+
+    btnMakeLobby.setColors(Color::Blue, Color::Magenta, Color::Green);
+    btnConnectToLobby.setColors(Color::Blue, Color::Magenta, Color::Green);
+    btnMakeLobby.setPosition(100, 100);
+    btnConnectToLobby.setPosition(100, 200);
+
+    vector<Button *> buttons = {&btnMakeLobby, &btnConnectToLobby};
+    ButtonsManager buttonsManager;
+    buttonsManager.setButtons(buttons);
+
+    while (window.isOpen())
+    {
+        while (window.pollEvent(event))
+        {
+            switch (event.type)
+            {
+            //Если нажали на кнопку на мыши
+            case (Event::MouseButtonPressed):
+            {
+                buttonsManager.mouseIsPressed();
+                cout << "menu() : lobbyWasCreated = " << lobbyWasCreated << endl;
+                if (lobbyWasCreated)
+                {
+                    cout << "Lobby was created!!!" << endl;
+                    return 1;
+                }
+                break;
+            }
+            case (Event::MouseButtonReleased):
+            {
+                buttonsManager.mouseIsReleased();
+            }
+            case (Event::MouseMoved):
+            {
+                buttonsManager.updateFocus();
+                break;
+            }
+            //Закрытие окна
+            case (Event::Closed):
+            {
+                window.close();
+            }
+            default:
+                break;
+            }
+        }
+
+        window.clear();
+
+        window.draw(backgroundRect);
+        buttonsManager.draw();
+
+        window.display();
+    }
+    return 0;
 }
 
 int main()
 {
 
+    BOOST_LOG_TRIVIAL(info) << "main() : Starting!";
+
 #if SERVER_CONNECTING == 1
 
     GameTcpClient client;
-    if (client.connect("10.147.17.33") == false)
+    if (client.connect("10.147.17.200") == false)
     {
-        cout << "ERROR, CONNECTION FAILED!" << endl;
+        BOOST_LOG_TRIVIAL(fatal) << "main() : Connection failed!";
         return 0;
     }
     else
     {
         //!!!!!!!!!!!!!!!!!!!!!!!!РАСКОММЕНТИТЬ!!!!!!!!!!!!!!
-        //client.incoming().wait();
+        client.incoming().wait();
         auto msg = client.incoming().popFront().msg;
         if (msg.header.id == GameMsgTypes::ServerAccept)
         {
-            cout << "Server accepted!!" << endl;
+            BOOST_LOG_TRIVIAL(info) << "main() : Server accepted!";
         }
         else
         {
-            cout << "Server didn't accept" << endl;
+            BOOST_LOG_TRIVIAL(fatal) << "main() : Server didn't accept!";
+            return 0;
         }
     }
 
@@ -127,8 +249,12 @@ int main()
 
     if (menu(window, mouse, event, &client) == false)
     {
-        cout << "Can't create lobby!" << endl;
+        BOOST_LOG_TRIVIAL(fatal) << "main() : Can't create lobby!";
         return 0;
+    }
+    else
+    {
+        BOOST_LOG_TRIVIAL(info) << "main() : Game Created!";
     }
 
 #endif //SERVER_CONNECTING
@@ -147,8 +273,8 @@ int main()
 
 #if GAME_ELEMENTS == 1
 
-    TilesManager playerTilesManager(window, mouse, Side::sidePlayer);
-    TilesManager opponentTilesManager(window, mouse, Side::sideOpponent);
+    TilesManager playerTilesManager(window, mouse, Side::sidePlayer, client);
+    TilesManager opponentTilesManager(window, mouse, Side::sideOpponent, client);
 
     //Текстура для союзных тайлов
     Texture playerTileTx;
@@ -195,7 +321,7 @@ int main()
 
     stack<Card *> cardsStack;
 
-    for (int i = 0; i < numberOfUnits; ++i)
+    for (int i = 0; i < numberOfCards; ++i)
     {
         cardsStack.push(&cards[i]);
     }

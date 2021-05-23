@@ -21,6 +21,7 @@ public:
 
     TsQueue<OwnedMessage<T>>& incoming();
     void send(const Message<T>& msg) const;
+    bool waitForMessageOnTime(int sec);
 
 protected:
     boost::asio::io_context ioContext;

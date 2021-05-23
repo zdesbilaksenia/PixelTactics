@@ -24,6 +24,8 @@ public:
 
     virtual void waitForConnection();
 
+    void removeDisconnectedClients();
+
     void messageToClient(boost::shared_ptr<TcpConnection<T>> client, const Message<T>& msg);
 
     void messageAllClients(const Message<T>& msg, boost::shared_ptr<TcpConnection<T>> ignoredClient = nullptr);

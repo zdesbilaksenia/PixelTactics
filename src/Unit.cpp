@@ -4,8 +4,9 @@ Unit::Unit(RenderWindow &_window) : DrawableBox(_window) {}
 
 void Unit::setCharacter() {}
 
-void Unit::setData(string _name, string _description[3], int _health, int _attack)
+void Unit::setData(const int& _Id, const string& _name, const string _description[3], const int& _health, const int& _attack)
 {
+    this->Id = _Id;
     this->name = _name;
     this->description[0] = _description[0];
     this->description[1] = _description[1];

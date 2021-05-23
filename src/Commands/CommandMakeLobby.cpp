@@ -20,7 +20,10 @@ void CommandMakeLobby::execute()
             msg = client->incoming().popFront().msg;
             if (msg.header.id == GameMsgTypes::LobbyGameStart)
             {
+                lobbyWasCreated = true;
+                cout << "CommandMakeLobby::execute() : lobbyWasCreated = " << lobbyWasCreated << endl;
                 BOOST_LOG_TRIVIAL(info) << "CommandMakeLobby::execute() : Lobby Game started!";
+                return;
             }
         }
         else

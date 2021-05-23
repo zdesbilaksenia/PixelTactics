@@ -16,7 +16,6 @@ void Tile::setUnit(Unit &_unit)
     this->unit = make_unique<Unit>(_unit);
     this->status = TileStatus::statusHasUnit;
     unit->setPosition(this->rect.getPosition().x, this->rect.getPosition().y);
-    ////////////////////////////////////////////////////////////////////////////////////////COUT
     cout << "Tile::setUnit() : " << unit.get() << " ===" << endl;
 }
 
@@ -48,7 +47,7 @@ Tile::~Tile()
 //===============TilesManager================
 //===========================================
 
-TilesManager::TilesManager(RenderWindow &_window, Mouse &_mouse, const Side &_side) : side(_side)
+TilesManager::TilesManager(RenderWindow &_window, Mouse &_mouse, const Side &_side, GameTcpClient& _client) : side(_side), client(_client)
 {
     status = TilesManagerStatus::statusNothingHappens;
     round = RoundType::roundAvangard;
@@ -222,6 +221,7 @@ bool TilesManager::mouseIsPressed()
             tilesFlank[1]->setUnit(*unitBuffer);
             this->setNormalColors();
             //Эту информацию сразу отлавливает CardsManager
+            client.sendCardReleased(19, unitBuffer->getPosX(), unitBuffer->getPosY());
             this->status = TilesManagerStatus::statusCardWasJustReleased;
             unitBuffer = nullptr;
             return true;
@@ -236,9 +236,10 @@ bool TilesManager::mouseIsPressed()
                 //Потом надо заменить на отдачу информации серверу
 
                 //Посылаем клиенту сообщения с координатами.
-                //client.sent(Action::AttackWasDone, this->tileBuffer->getCoordX(), this->tileBuffer->getCoordY(), tile->getCoordX(), tile->getCoordY());
+                //client.send(Action::AttackWasDone, this->tileBuffer->getCoordX(), this->tileBuffer->getCoordY(), tile->getCoordX(), tile->getCoordY());
                 //В функции clientUpdate будет отлавливаться сообщение с обновленным массивом.
                 //clientUpdate();
+
                 cout << "Attacker: " << this->tileBuffer->getCoordX() << " " << this->tileBuffer->getCoordY() << endl;
                 cout << "Attacked: " << tile->getCoordX() << " " << tile->getCoordY() << endl;
 
@@ -321,7 +322,7 @@ void TilesManager::setNormalColors()
     }
 }
 
-#define FOCUS 1
+#define FOCUS 0
 
 #if FOCUS == 0
 

@@ -14,6 +14,6 @@ public:
     ~CommandMakeLobby();
 
 private:
-    bool lobbyWasCreated;
+    bool& lobbyWasCreated;
     GameTcpClient *client;
 };

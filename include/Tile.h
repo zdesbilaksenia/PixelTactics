@@ -6,6 +6,8 @@
 #include "Button.h"
 #include <vector>
 #include <memory>
+#include "GameTcpClient.h"
+#include "GameMsgTypes.h"
 using std::make_unique;
 using std::unique_ptr;
 using std::vector;
@@ -45,7 +47,7 @@ public:
 
     //coordX - столбец
     //coordY - строка
-    void setCoordinates(const int& _x, const int& _y)
+    void setCoordinates(const int &_x, const int &_y)
     {
         coordX = _x;
         coordY = _y;
@@ -66,7 +68,7 @@ private:
     TileStatus status;
     const Color colorForAttack = Color(255, 111, 0);
 
-    //Метод для 
+    //Метод для
     bool sendAttackMessage(int coordX1, int coordY1, int coordX2, int coordY2);
 };
 
@@ -113,7 +115,7 @@ enum class RoundType
 class TilesManager
 {
 public:
-    TilesManager(RenderWindow &_window, Mouse &_mouse, const Side &_side);
+    TilesManager(RenderWindow &_window, Mouse &_mouse, const Side &_side, GameTcpClient &_client);
 
     void setStatus(const TilesManagerStatus &_status);
     void setUnitBuffer(Unit &_unit);
@@ -182,6 +184,7 @@ public:
     ~TilesManager();
 
 private:
+    GameTcpClient &client;
     Side side;
     vector<Tile *> tiles;
     //Тайлы авангарда
