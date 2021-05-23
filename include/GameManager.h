@@ -289,6 +289,7 @@ private:
                     //Если нажали на тайл (Чтобы атаковать)
                     if (playerTilesManager.getPressed())
                     {
+                        //Здесь баг, кнопка активируется, если нажмём в другом месте
                         btnRemoveBody->disable();
                         btnTakeCard->disable();
                     }
@@ -338,4 +339,5 @@ private:
             }
         }
     }
+
 };

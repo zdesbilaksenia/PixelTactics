@@ -1,6 +1,8 @@
 #pragma once
 
 #include "DrawableBox.h"
+#include <string>
+using std::string;
 
 class Unit : public DrawableBox
 {
@@ -21,8 +23,8 @@ public:
     //===========================================================================================================
     void setCharacter();
 
-    //Для комманды атаки
-    void setHealth(int _health);
+    void setData(string _name, string _description[3], int _health, int _attack);
+
     int getHealth();
     int getAttack();
 
@@ -32,6 +34,8 @@ public:
 
 private:
 
+    string name;
+    string description[3];
     int health;
     int attack;
     //Label healthLabel;

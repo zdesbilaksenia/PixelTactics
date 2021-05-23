@@ -218,7 +218,6 @@ bool CardsManager::mouseIsPressed()
                 tilesManager->setStatus(TilesManagerStatus::statusGameStartingReleasingCard);
                 status = CardsManagerStatus::statusGameStartingReleasingCard;
                 tilesManager->updateFocus();
-                //return true;
             }
         }
 

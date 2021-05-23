@@ -96,7 +96,8 @@ TilesManager::TilesManager(RenderWindow &_window, Mouse &_mouse, const Side &_si
             tilesAvangard[i]->setSize(tileWidth, tileHeight);
             tilesAvangard[i]->setPosition(150 * 1 + windowWidth - 520 - tileWidth, 100 * i + 200);
             tilesAvangard[i]->setStatus(TileStatus::statusIsEmpty);
-            tilesAvangard[i]->setCoordinates(0, i);
+            //Здесь, по логике, должно бытть (0, i), но, почему-то, это не работает
+            tilesAvangard[i]->setCoordinates(2, i);
             tiles.push_back(tilesAvangard[i].get());
         }
         //Тайлы фланга
@@ -116,7 +117,7 @@ TilesManager::TilesManager(RenderWindow &_window, Mouse &_mouse, const Side &_si
             tilesRear[i]->setSize(tileWidth, tileHeight);
             tilesRear[i]->setPosition(150 * 3 + windowWidth - 520 - tileWidth, 100 * i + 200);
             tilesRear[i]->setStatus(TileStatus::statusIsEmpty);
-            tilesAvangard[i]->setCoordinates(2, i);
+            tilesAvangard[i]->setCoordinates(0, i);
             tiles.push_back(tilesRear[i].get());
         }
 
@@ -207,7 +208,6 @@ bool TilesManager::mouseIsPressed()
     {
         if (unitBuffer == nullptr)
         {
-            ////////////////////////////////////////////////////////////////////////////////////////COUT
             cout << "TilesManager::mouseIsPressed:: ERROR! statusReleasingCard : unitBuffer is nullptr" << endl;
             return false;
         }
@@ -217,7 +217,6 @@ bool TilesManager::mouseIsPressed()
         }
         if (tilesFlank[1]->hasFocus())
         {
-            ////////////////////////////////////////////////////////////////////////////////////////COUT
             cout << "TilesManager::mouseIsPressed::GameStarts RELEASING CARD!!!" << endl;
 
             tilesFlank[1]->setUnit(*unitBuffer);
@@ -240,6 +239,8 @@ bool TilesManager::mouseIsPressed()
                 //client.sent(Action::AttackWasDone, this->tileBuffer->getCoordX(), this->tileBuffer->getCoordY(), tile->getCoordX(), tile->getCoordY());
                 //В функции clientUpdate будет отлавливаться сообщение с обновленным массивом.
                 //clientUpdate();
+                cout << "Attacker: " << this->tileBuffer->getCoordX() << " " << this->tileBuffer->getCoordY() << endl;
+                cout << "Attacked: " << tile->getCoordX() << " " << tile->getCoordY() << endl;
 
                 tile->setStatus(TileStatus::statusHasDeadBody);
                 //this->setTileBuffer(tile);
@@ -269,6 +270,10 @@ bool TilesManager::mouseIsPressed()
 
                 tile->setUnit(*unitBuffer);
                 this->setNormalColors();
+
+                //Отсылаем инфу серверу!!!
+                //client.sendMessage(ReleasedCard, unitBuffer.getId(), tile->getCoordX(), tile->getCoordX());
+
                 //Эту информацию сразу отлавливает CardsManager
                 this->status = TilesManagerStatus::statusCardWasJustReleased;
                 unitBuffer = nullptr;
@@ -316,6 +321,13 @@ void TilesManager::setNormalColors()
     }
 }
 
+#define FOCUS 1
+
+#if FOCUS == 0
+
+//==================
+//Старый updateFocus
+//==================
 void TilesManager::updateFocus()
 {
     switch (status)
@@ -423,6 +435,127 @@ void TilesManager::updateFocus()
         break;
     }
 }
+
+#endif
+
+#if FOCUS == 1
+
+void TilesManager::updateFocus()
+{
+    switch (status)
+    {
+    case TilesManagerStatus::statusNothingHappens:
+        for (auto tile : tiles)
+        {
+            if (tile->hasFocus())
+            {
+                tile->setFillColor(colorInFocus);
+            }
+            else if (tile->getStatus() == TileStatus::statusHasDeadBody)
+            {
+                tile->setFillColor(colorForDeadBody);
+            }
+            else
+            {
+                tile->setFillColor(colorBasic);
+            }
+        }
+        break;
+    case TilesManagerStatus::statusGameStarting:
+        for (auto tile : tiles)
+        {
+            if (tile->hasFocus())
+            {
+                tile->setFillColor(colorInFocus);
+            }
+            else
+            {
+                tile->setFillColor(colorBasic);
+            }
+        }
+        break;
+    case TilesManagerStatus::statusGameStartingReleasingCard:
+        for (auto tile : tiles)
+        {
+            tile->setFillColor(colorDisabled);
+        }
+        if (tilesFlank[1]->hasFocus())
+        {
+            tilesFlank[1]->setFillColor(colorInFocus);
+        }
+        else
+        {
+            tilesFlank[1]->setFillColor(colorBasic);
+        }
+        break;
+    case TilesManagerStatus::statusWaitingForAttack:
+        for (auto tile : tiles)
+        {
+            if (activeTiles[tile->getCoordX()][tile->getCoordY()])
+            {
+                if (tile->hasFocus())
+                {
+                    tile->setFillColor(colorInFocus);
+                }
+                else
+                {
+                    tile->setFillColor(colorWaitingForAttack);
+                }
+            }
+            else
+            {
+                tile->setFillColor(colorDisabled);
+            }
+        }
+        break;
+    case TilesManagerStatus::statusReleasingCard:
+        for (auto tile : tiles)
+        {
+            if (activeTiles[tile->getCoordX()][tile->getCoordY()])
+            {
+                if (tile->hasFocus())
+                {
+                    tile->setFillColor(colorInFocus);
+                }
+                else
+                {
+                    tile->setFillColor(colorForReleasingUnit);
+                }
+            }
+            else
+            {
+                tile->setFillColor(colorDisabled);
+            }
+        }
+        break;
+    case TilesManagerStatus::statusAttackingUnit:
+        for (auto tile : tiles)
+        {
+            tile->setFillColor(colorDisabled);
+        }
+        switch (round)
+        {
+        case RoundType::roundAvangard:
+            focusTileOnStage(&tilesAvangard, colorWhenCanAttack, colorInFocus);
+            break;
+        case RoundType::roundFlank:
+            focusTileOnStage(&tilesFlank, colorWhenCanAttack, colorInFocus);
+            break;
+        case RoundType::roundRear:
+            focusTileOnStage(&tilesRear, colorWhenCanAttack, colorInFocus);
+            break;
+        default:
+            break;
+        }
+        break;
+
+    //Добавить другие случаи
+    default:
+        break;
+    }
+}
+
+#endif // FOCUS == 1
 
 void TilesManager::setRound(RoundType &_round)
 {

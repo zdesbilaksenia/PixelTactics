@@ -35,7 +35,5 @@ const int stageTextPosX = (windowWidth - 400) / 2;
 const int stageTextPosY = 50;
 
 //Game
-//const int numberOfCards = 20;
-//const int numberOfUnits = 12;
-const int numberOfCards = 9;
-const int numberOfUnits = 9;
+const int numberOfCards = 20;
+const int numberOfUnits = 11;

@@ -69,6 +69,9 @@ void GameManager::opponentsTurn()
 
 void GameManager::playersTurn()
 {
+    playerTilesManager.setTileBuffer(nullptr);
+    opponentTilesManager.setTileBuffer(nullptr);
+
     cout << "GameManager::playRound(): Started!" << endl;
 
     playerTilesManager.setRound(round);
