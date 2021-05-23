@@ -9,10 +9,13 @@
 
 class GameTcpClient : public TcpClient<GameMsgTypes> {
 public:
-    void getHeroesStats();
-    void joinLobby(uint16_t lobbyID);
-    void makeLobby();
-    void pingServer();
-    void messageAll();
+    GameTcpClient();
+    void getHeroesStats() const;
+    void joinLobby(uint16_t lobbyID) const;
+    void makeLobby() const;
+    void pingServer() const;
+    void messageAll() const;
+
+    void setLobbyID(uint16_t lobbyID_);
 };
 

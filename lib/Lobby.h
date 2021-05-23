@@ -14,6 +14,11 @@
 
 class Lobby {
 public:
+    enum class status {
+        empty,
+        incomplete,
+        full
+    };
     Lobby() = default;
     Lobby(uint8_t lobbyID_,TsQueue<OwnedMessage<GameMsgTypes>>* pQMsgServer_, TcpServer<GameMsgTypes>* server_);
     Lobby(const Lobby& other);
@@ -25,10 +30,13 @@ public:
     void gameOver();
 
     void addPlayer(boost::shared_ptr<TcpConnection<GameMsgTypes>> connection);
-    TsQueue<OwnedMessage<GameMsgTypes>>& incoming();
 
+    void addMessage(const OwnedMessage<GameMsgTypes>& msg);
+
+    TsQueue<OwnedMessage<GameMsgTypes>>& incoming();
+    void sendToPlayer(int playerId, const Message<GameMsgTypes>& msg);
 private:
-    void messageToServer(const Message<GameMsgTypes>& msg);
+    void messageToServer(const Message<GameMsgTypes>& msg, boost::shared_ptr<TcpConnection<GameMsgTypes>> player = nullptr);
     void messageToPlayer(boost::shared_ptr<TcpConnection<GameMsgTypes>> player, const Message<GameMsgTypes>& msg);
     void messageAllPlayers(const Message<GameMsgTypes>& msg, boost::shared_ptr<TcpConnection<GameMsgTypes>> ignoredPlayer = nullptr);
 
@@ -43,6 +51,7 @@ private:
     void clearLobby();
 
     uint16_t lobbyID;
+    status statusType;
     TsQueue<OwnedMessage<GameMsgTypes>>* pQMsgServer; // Have to make it pointer, because map for lobbies needs default constructor
     TsQueue<OwnedMessage<GameMsgTypes>> qMsgIn;
     std::vector<boost::shared_ptr<TcpConnection<GameMsgTypes>>> lobby;

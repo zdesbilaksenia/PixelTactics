@@ -14,9 +14,6 @@ typedef struct Card {
     std::string frontLinePower;
     std::string middleLinePower;
     std::string backLinePower;
-    std::string leaderPower;
-
-    Card() {};
 } Card;
 
 #endif

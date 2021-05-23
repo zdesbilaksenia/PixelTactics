@@ -1,16 +1,16 @@
 #include "request.h"
 #include "pole.h"
 
-vector<Breed> ReturnRequest(Pole &pole_) {
-    std::vector<Breed> request;
-    request.resize(0);
+std::vector<Breed> ReturnRequest(Pole &pole_) {
+    std::vector<Breed> allStats;
+    allStats.resize(0);
     for (int i = 0; i < pole_.GetVector().size(); i++) {
         Breed stats;
         stats.HP = pole_.GetVector()[i]->GetHero().GetCurHealth();
         stats.Strength = pole_.GetVector()[i]->GetHero().GetCurStrength();
-        request.push_back(stats);
+        allStats[i] = stats;
     }
-    return request;
+    return allStats;
 }
 
 vector<bool> AttackRequest(Pole &pole_, int side) {

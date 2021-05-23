@@ -14,7 +14,7 @@ struct Breed {
     int Strength;
 };
 
-vector<Breed> ReturnRequest(Pole &pole_);
+std::vector<Breed> ReturnRequest(Pole &pole_);
 
 vector<bool> AttackRequest(Pole &pole_, int side);
 

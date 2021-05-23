@@ -45,6 +45,7 @@ build/
 .idea
 .vscode
 
-=======
 /build
->>>>>>> cd41b14ecf5c2c71bd971cde34aab56e76d2d0c2
+
+lib*.a
+

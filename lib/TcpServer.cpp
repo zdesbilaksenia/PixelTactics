@@ -1,5 +1,6 @@
 #include "TcpServer.h"
 
+#include <thread>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/thread/thread.hpp>
@@ -68,11 +69,33 @@ void TcpServer<T>::waitForConnection() {
             waitForConnection();
         });
 }
+
+template <typename T>
+void TcpServer<T>::removeDisconnectedClients() {
+    bool invalidClientExists = false;
+
+    for (auto& client : deqConnections) {
+        if (!client || !client->isConnected()) {
+            std::cout << "in ondisc\n";
+            onClientDisconnect(client);
+            std::cout << "not in ondisc\n";
+            client.reset();
+
+            invalidClientExists = true;
+        }
+    }
+
+    if (invalidClientExists) {
+        deqConnections.erase(std::remove(deqConnections.begin(), deqConnections.end(), nullptr), deqConnections.end());
+    }
+}
+
 template <typename T>
 void TcpServer<T>::messageToClient(boost::shared_ptr<TcpConnection<T>> client, const Message<T>& msg) {
     if (client && client->isConnected()) {
         client->send(msg);
     } else {
+        std::cout << "disc\n";
         onClientDisconnect(client);
         client.reset();
         deqConnections.erase(std::remove(deqConnections.begin(), deqConnections.end(), client), deqConnections.end());

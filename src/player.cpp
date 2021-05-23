@@ -12,14 +12,14 @@ Deck& Player::GetHand(){
 }
 
 void Player::StartingHand(){
-    for(int i = 0; i < 4; i++){
+    for(int i = 0; i < 2; i++){
         DrawCard();
     }
 }
 
 void Player::DrawCard(){
     int size = deck_.GetVector().size();
-    hand_.push_back(deck_.GetVector()[size-1]);
+    hand_.push_back(deck_.GetVector().back());
     deck_.GetVector().pop_back();
 }
 

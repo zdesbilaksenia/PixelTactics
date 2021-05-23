@@ -1,12 +1,14 @@
 #include "TcpClient.h"
 
 #include <iostream>
+#include <thread>
 #include <boost/shared_ptr.hpp>
 #include <boost/move/unique_ptr.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/move/make_unique.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/asio.hpp>
 
 #include "TcpConnection.h"
@@ -67,6 +69,28 @@ void TcpClient<T>::send(const Message<T>& msg) const {
     if (isConnected()) {
         connection->send(msg);
     }
+}
+
+template <typename T>
+bool TcpClient<T>::waitForMessageOnTime(int sec) {
+    bool wait = true;
+    boost::asio::io_service io;
+    boost::asio::deadline_timer timer(io, boost::posix_time::seconds(sec));
+    timer.async_wait(
+            [&](const boost::system::error_code& ec) {
+                if (!ec) {
+                    wait = false;
+                } else {
+                    std::cerr << "Timer fails in waitForMessageOnTime\n";
+                }
+            });
+
+    std::thread thr = std::thread([&]() { io.run(); });
+    while (qMsgIn.empty() && wait) {
+    }
+    io.stop();
+    thr.join();
+    return wait;
 }
 
 template class TcpClient<GameMsgTypes>;
