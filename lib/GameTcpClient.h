@@ -6,8 +6,8 @@
 #include "TcpClient.h"
 #include "GameMsgTypes.h"
 
-
-class GameTcpClient : public TcpClient<GameMsgTypes> {
+class GameTcpClient : public TcpClient<GameMsgTypes>
+{
 public:
     GameTcpClient();
     void getHeroesStats() const;
@@ -21,5 +21,10 @@ public:
     //
 
     void setLobbyID(uint16_t lobbyID_);
-};
+    void setSide(bool isFirst);
 
+private:
+    //0 - первый игрок
+    //1 - второй
+    int side;
+};

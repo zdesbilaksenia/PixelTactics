@@ -29,7 +29,8 @@ public:
                 TilesManager &_playerTM,
                 TilesManager &_opponentTM,
                 CardsManager &_cardsM,
-                Background &_background);
+                Background &_background,
+                const vector<Texture>& _textures);
 
     void setAttackButton(Button &_btnAttack);
     void setPowerButton(Button &_btnPower);
@@ -40,6 +41,12 @@ public:
     void play();
 
 private:
+
+    //Текстуры для отрисовки противника
+    const vector<Texture>& unitTextures;
+    //Юниты противника
+    vector<Unit> opponentUnits;
+
     RenderWindow &window;
     Mouse &mouse;
     Event &event;
@@ -50,14 +57,6 @@ private:
     CardsManager &cardsManager;
     Background &background;
     //Нужно сделать класс "Label", который будет рисовать текст
-
-    /*
-    Button *btnAttack;
-    Button *btnPower;
-    Button *btnCancel;
-    Button *btnTakeCard;
-    Button *btnRemoveBody;
-    */
 
     unique_ptr<Button> btnAttack;
     unique_ptr<Button> btnPower;
@@ -323,4 +322,5 @@ private:
             }
         }
     }
+
 };

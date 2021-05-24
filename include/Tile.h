@@ -119,6 +119,45 @@ public:
     void setActiveTiles(bool _activeTiles[3][3]);
     void resetActiveTiles();
 
+
+    unique_ptr<Tile> get(unsigned int x, unsigned int y)
+    {
+        if(x < 0 || x > 2 || y < 0 || y > 2)
+        {
+            BOOST_LOG_TRIVIAL(error) << "";
+            return nullptr;
+        }
+        switch(x)
+        {
+            
+            //case 0:
+                //return copy_unique(tilesAvangard[y]);
+        }
+    }
+    
+
+    //В том случае, если TilesManager - для отрисовки тайлов оппонента
+    void setUnit(Unit &unit, RoundType round, int coordY)
+    {
+        switch (round)
+        {
+        case (RoundType::roundAvangard):
+        {
+            tilesAvangard[coordY]->setUnit(unit);
+        }
+        case (RoundType::roundFlank):
+        {
+            tilesFlank[coordY]->setUnit(unit);
+        }
+        case (RoundType::roundRear):
+        {
+            tilesRear[coordY]->setUnit(unit);
+        }
+        default:
+            break;
+        }
+    }
+
     ~TilesManager();
 
 private:

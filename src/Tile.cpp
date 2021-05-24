@@ -262,8 +262,9 @@ bool TilesManager::mouseIsPressed()
 
             tilesFlank[1]->setUnit(*unitBuffer);
             this->setNormalColors();
-            //Эту информацию сразу отлавливает CardsManager
-            client.sendCardReleased(19, unitBuffer->getPosX(), unitBuffer->getPosY());
+            cout << "TilesManager::mouseIsPressed::GameStarts ID = " << unitBuffer->getId() << endl;
+            client.sendCardReleased(unitBuffer->getId(), unitBuffer->getPosX(), unitBuffer->getPosY());
+            //Эту информацию сразу отлавливает CardsManager (Он расположен в обработчике нажатии кнопки снизу от tilesManager)
             this->status = TilesManagerStatus::statusCardWasJustReleased;
             unitBuffer = nullptr;
             return true;

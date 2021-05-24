@@ -25,41 +25,11 @@ using namespace sf;
 //Чтобы визуально сжать код
 #define GAME_ELEMENTS 1
 
-#define SERVER_CONNECTING 0
+#define SERVER_CONNECTING 1
 
-void setData(GameTcpClient &client, vector<Unit> &units, vector<Card> &cards, Texture textures[numberOfUnits])
+void setData(GameTcpClient &client, vector<Unit> &units, vector<Card> &cards, vector<Texture> &textures)
 {
     BOOST_LOG_TRIVIAL(info) << "SetData() : Starting!";
-    /*
-    enum unitNames
-    {
-        knight,
-        witch,
-        alchemist,
-        berserk,
-        fighter,
-        vampire,
-        priestess,
-        dragonmage,
-        animaltrapper,
-        oracle,
-        paladin
-    };
-
-    map<string, unitNames> names;
-    names["Рыцарь"] = knight;
-    names["Ведьма"] = witch;
-    names["Алхимик"] = alchemist;
-    names["Берсерк"] = berserk;
-    names["Боец"] = fighter;
-    names["Вампир"] = vampire;
-    names["Жрица"] = priestess;
-    names["Маг-дракон"] = dragonmage;
-    names["Зверолов"] = animaltrapper;
-    names["Оракул"] = oracle;
-    names["Паладин"] = paladin;
-    */
-
     vector<CardInfo> cardsInfo;
 
     //Считываем имя с сервера
@@ -75,10 +45,11 @@ void setData(GameTcpClient &client, vector<Unit> &units, vector<Card> &cards, Te
         BOOST_LOG_TRIVIAL(info) << "SetData() : successfully loaded cardsInfo!";
     }
 
+    BOOST_LOG_TRIVIAL(info) << "SetData() : loaded cards : " << endl;
     for (size_t i = 0; i < units.size(); ++i)
     {
-        cout << "name " << cardsInfo[i].name << " ID = " << cardsInfo[i].ID << endl;
-        units[i].setTexture(&textures[cardsInfo[i].ID - 1]);
+        BOOST_LOG_TRIVIAL(info) << "||\tname: " << cardsInfo[i].name << " ID: " << cardsInfo[i].ID;
+        units[i].setTexture(&textures[cardsInfo[i].textureId - 1]);
 
         string description[3];
         description[0] = cardsInfo[i].frontLinePower;
@@ -112,9 +83,10 @@ void setData(GameTcpClient &client, vector<Unit> &units, vector<Card> &cards, Te
 class CommandJoinLobby : public Command
 {
 public:
-    CommandJoinLobby(GameTcpClient &_client) : client(_client)
+    CommandJoinLobby(GameTcpClient &_client, bool &_joinedLobby) : client(_client), joinedLobby(_joinedLobby)
     {
     }
+
     void execute() override
     {
         client.joinLobby(1);
@@ -126,6 +98,7 @@ public:
             if (msg.header.id == GameMsgTypes::LobbyGameStart)
             {
                 BOOST_LOG_TRIVIAL(info) << "CommandJoinLobby::execute() : Lobby Game started!";
+                joinedLobby = true;
                 return;
             }
             else
@@ -138,13 +111,14 @@ public:
     ~CommandJoinLobby() {}
 
 private:
+    bool &joinedLobby;
     GameTcpClient &client;
 };
 
 bool menu(RenderWindow &window,
           Mouse &mouse,
           Event &event,
-          GameTcpClient& client)
+          GameTcpClient &client)
 {
     Texture backgroundTx;
     backgroundTx.loadFromFile("../img/low_panel.png");
@@ -155,9 +129,10 @@ bool menu(RenderWindow &window,
     backgroundRect.setPosition(Vector2f(0, 0));
 
     bool lobbyWasCreated = false;
+    bool joinedLobby = false;
     CommandMakeLobby cmdMakeLobby(client, lobbyWasCreated);
     //CommandStringTest cmdMakeLobby("Connecting to lobby");
-    CommandJoinLobby cmdJoinLobby(client);
+    CommandJoinLobby cmdJoinLobby(client, joinedLobby);
 
     Texture txMakeLobby;
     txMakeLobby.loadFromFile("../img/make_lobby.png");
@@ -186,9 +161,17 @@ bool menu(RenderWindow &window,
             {
                 buttonsManager.mouseIsPressed();
                 cout << "menu() : lobbyWasCreated = " << lobbyWasCreated << endl;
+                cout << "menu() : joinedLobby = " << joinedLobby << endl;
                 if (lobbyWasCreated)
                 {
+                    client.setSide(0);
                     cout << "Lobby was created!!!" << endl;
+                    return 1;
+                }
+                if (joinedLobby)
+                {
+                    client.setSide(1);
+                    cout << "Joined lobby!!!" << endl;
                     return 1;
                 }
                 break;
@@ -230,14 +213,13 @@ int main()
 #if SERVER_CONNECTING == 1
 
     GameTcpClient client;
-    if (client.connect("10.147.17.200") == false)
+    if (client.connect("10.147.17.71") == false)
     {
         BOOST_LOG_TRIVIAL(fatal) << "main() : Connection failed!";
         return 0;
     }
     else
     {
-        //!!!!!!!!!!!!!!!!!!!!!!!!РАСКОММЕНТИТЬ!!!!!!!!!!!!!!
         client.incoming().wait();
         auto msg = client.incoming().popFront().msg;
         if (msg.header.id == GameMsgTypes::ServerAccept)
@@ -294,7 +276,7 @@ int main()
     opponentTileTx.loadFromFile("../img/tx_1.png");
     opponentTilesManager.setTexture(&opponentTileTx);
 
-    Texture texturesForUnits[numberOfUnits];
+    vector<Texture> texturesForUnits(numberOfUnits);
     texturesForUnits[0].loadFromFile("../img/units/knight.png");
     texturesForUnits[1].loadFromFile("../img/units/witch.png");
     texturesForUnits[2].loadFromFile("../img/units/alchemist.png");
@@ -394,7 +376,7 @@ int main()
 
     //BOOST_LOG_TRIVIAL(fatal) << "WTF";
 
-    GameManager gm(window, mouse, event, client, buttonsManager, playerTilesManager, opponentTilesManager, cardsManager, background);
+    GameManager gm(window, mouse, event, client, buttonsManager, playerTilesManager, opponentTilesManager, cardsManager, background, texturesForUnits);
 
     gm.setAttackButton(attackButton);
     gm.setPowerButton(powerButton);

@@ -9,17 +9,21 @@ GameManager::GameManager(RenderWindow &_window,
                          TilesManager &_playerTM,
                          TilesManager &_opponentTM,
                          CardsManager &_cardsM,
-                         Background &_background) : window(_window),
-                                                    mouse(_mouse),
-                                                    event(_event),
-                                                    client(client),
-                                                    buttonsManager(_buttonsM),
-                                                    playerTilesManager(_playerTM),
-                                                    opponentTilesManager(_opponentTM),
-                                                    cardsManager(_cardsM),
-                                                    background(_background),
-                                                    stage(GameStage::stageStart),
-                                                    round(RoundType::roundAvangard) {}
+                         Background &_background,
+                         const vector<Texture> &_textures) : window(_window),
+                                                               mouse(_mouse),
+                                                               event(_event),
+                                                               client(client),
+                                                               buttonsManager(_buttonsM),
+                                                               playerTilesManager(_playerTM),
+                                                               opponentTilesManager(_opponentTM),
+                                                               cardsManager(_cardsM),
+                                                               background(_background),
+                                                               stage(GameStage::stageStart),
+                                                               round(RoundType::roundAvangard),
+                                                               unitTextures(_textures)
+{
+}
 
 void GameManager::setAttackButton(Button &_btnAttack)
 {

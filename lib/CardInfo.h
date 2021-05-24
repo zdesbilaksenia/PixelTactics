@@ -5,6 +5,7 @@
 
 struct CardInfo {
     int ID;
+    int textureId;
     std::string name;
     int HP;
     int strength;
@@ -12,4 +13,3 @@ struct CardInfo {
     std::string middleLinePower;
     std::string backLinePower;
 };
-

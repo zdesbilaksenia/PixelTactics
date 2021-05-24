@@ -31,6 +31,11 @@ public:
     int getAttack();
 
     void draw() override;
+    int getId()
+    {
+        return Id;
+    }
+
 
     ~Unit();
 
