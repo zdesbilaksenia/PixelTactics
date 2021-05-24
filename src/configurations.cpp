@@ -37,3 +37,8 @@ const int stageTextPosY = 50;
 //Game
 const int numberOfCards = 20;
 const int numberOfUnits = 11;
+
+//Чтобы визуально сжать код
+#define GAME_ELEMENTS 1
+
+#define SERVER_CONNECTING 1

@@ -13,3 +13,10 @@ struct CardInfo {
     std::string middleLinePower;
     std::string backLinePower;
 };
+
+struct Breed
+{
+    int HP;
+    int strength;
+    int texture;
+};

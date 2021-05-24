@@ -30,7 +30,8 @@ public:
                 TilesManager &_opponentTM,
                 CardsManager &_cardsM,
                 Background &_background,
-                const vector<Texture>& _textures);
+                vector<Unit> &_opponentUnits,
+                const vector<Texture> &_textures);
 
     void setAttackButton(Button &_btnAttack);
     void setPowerButton(Button &_btnPower);
@@ -41,11 +42,10 @@ public:
     void play();
 
 private:
-
     //Текстуры для отрисовки противника
-    const vector<Texture>& unitTextures;
+    const vector<Texture> &unitTextures;
     //Юниты противника
-    vector<Unit> opponentUnits;
+    vector<Unit> &opponentUnits;
 
     RenderWindow &window;
     Mouse &mouse;
@@ -167,6 +167,28 @@ private:
                 buttonsManager.enable();
                 opponentTilesManager.updateFocus();
                 buttonsManager.updateFocus();
+
+                BOOST_LOG_TRIVIAL(info) << "GameManager::ForGamesStart() : Waiting for opponent!";
+                client.incoming().wait();
+                auto msg = client.incoming().popFront().msg;
+                vector<Breed> breed;
+                if (msg.header.id == GameMsgTypes::GameHeroesStats)
+                {
+                    BOOST_LOG_TRIVIAL(info) << "GameManager::ForGamesStart() : Trying to load breed!";
+                    msg >> breed;
+                    BOOST_LOG_TRIVIAL(info) << "GameManager::ForGamesStart() : breed loaded!";
+                }
+                cout << "======================" << endl;
+                for (int i = 0; i < 9; ++i)
+                {
+                    cout << "Texture = " << breed[i].texture << " strength = " << breed[i].strength << " HP = " << breed[i].HP << endl;
+                }
+                cout << "======================" << endl;
+                for (int i = 9; i < 18; ++i)
+                {
+                    cout << "Texture = " << breed[i].texture << " strength = " << breed[i].strength << " HP = " << breed[i].HP << endl;
+                }
+
                 return;
             }
         }
@@ -322,5 +344,4 @@ private:
             }
         }
     }
-
 };

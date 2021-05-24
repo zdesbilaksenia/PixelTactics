@@ -15,199 +15,17 @@ using namespace sf;
 #include "Command.h"
 #include "Commands/CommandAttack.h"
 #include "Commands/CommandTakeCard.h"
+#include "Commands/CommandMakeLobby.h"
 #include "Card.h"
 #include "Tile.h"
 #include "Background.h"
 #include "configurations.cpp"
 #include "GameManager.h"
-#include "Commands/CommandMakeLobby.h"
-
-//Чтобы визуально сжать код
-#define GAME_ELEMENTS 1
-
-#define SERVER_CONNECTING 1
-
-void setData(GameTcpClient &client, vector<Unit> &units, vector<Card> &cards, vector<Texture> &textures)
-{
-    BOOST_LOG_TRIVIAL(info) << "SetData() : Starting!";
-    vector<CardInfo> cardsInfo;
-
-    //Считываем имя с сервера
-#if SERVER_CONNECTING == 1
-
-    client.incoming().wait();
-    auto msg = client.incoming().popFront().msg;
-    //Тип сообщения должен быть GameMsgTypes::GameHeroStats
-    if (msg.header.id == GameMsgTypes::GameDeck)
-    {
-        BOOST_LOG_TRIVIAL(info) << "SetData() : Trying to load cardsInfo!";
-        msg >> cardsInfo;
-        BOOST_LOG_TRIVIAL(info) << "SetData() : successfully loaded cardsInfo!";
-    }
-
-    BOOST_LOG_TRIVIAL(info) << "SetData() : loaded cards : " << endl;
-    for (size_t i = 0; i < units.size(); ++i)
-    {
-        BOOST_LOG_TRIVIAL(info) << "||\tname: " << cardsInfo[i].name << " ID: " << cardsInfo[i].ID;
-        units[i].setTexture(&textures[cardsInfo[i].textureId - 1]);
-
-        string description[3];
-        description[0] = cardsInfo[i].frontLinePower;
-        description[1] = cardsInfo[i].middleLinePower;
-        description[2] = cardsInfo[i].backLinePower;
-
-        units[i].setData(cardsInfo[i].ID, cardsInfo[i].name, description, cardsInfo[i].HP, cardsInfo[i].strength);
-    }
-
-#endif // SERVER_CONNECTING
-
-#if SERVER_CONNECTING == 0
-
-    for (size_t i = 0; i < units.size(); ++i)
-    {
-        units[i].setTexture(&textures[i % numberOfUnits]);
-    }
-
-#endif //SERVER_CONNECTING
-
-    for (size_t i = 0; i < cards.size(); ++i)
-    {
-        cards[i].setUnit(&units[i]);
-        cards[i].setColors(Color::White, Color::Magenta, Color::Green);
-    }
-
-    BOOST_LOG_TRIVIAL(info) << "SetData() : Ending!";
-    return;
-}
-
-class CommandJoinLobby : public Command
-{
-public:
-    CommandJoinLobby(GameTcpClient &_client, bool &_joinedLobby) : client(_client), joinedLobby(_joinedLobby)
-    {
-    }
-
-    void execute() override
-    {
-        client.joinLobby(1);
-        if (client.isConnected())
-        {
-            BOOST_LOG_TRIVIAL(info) << "CommandJoinLobby::execute() : Lobby waiting for player";
-            client.incoming().wait();
-            auto msg = client.incoming().popFront().msg;
-            if (msg.header.id == GameMsgTypes::LobbyGameStart)
-            {
-                BOOST_LOG_TRIVIAL(info) << "CommandJoinLobby::execute() : Lobby Game started!";
-                joinedLobby = true;
-                return;
-            }
-            else
-            {
-                BOOST_LOG_TRIVIAL(error) << "CommandJoinLobby::execute() : Didn't recieve LobbyWaitingForPlayer";
-            }
-        }
-    }
-
-    ~CommandJoinLobby() {}
-
-private:
-    bool &joinedLobby;
-    GameTcpClient &client;
-};
-
-bool menu(RenderWindow &window,
-          Mouse &mouse,
-          Event &event,
-          GameTcpClient &client)
-{
-    Texture backgroundTx;
-    backgroundTx.loadFromFile("../img/low_panel.png");
-    RectangleShape backgroundRect;
-    backgroundRect.setSize(Vector2f(windowWidth, windowHeight));
-    backgroundRect.setTexture(&backgroundTx);
-    backgroundRect.setPosition(Vector2f(0, -100));
-    backgroundRect.setPosition(Vector2f(0, 0));
-
-    bool lobbyWasCreated = false;
-    bool joinedLobby = false;
-    CommandMakeLobby cmdMakeLobby(client, lobbyWasCreated);
-    //CommandStringTest cmdMakeLobby("Connecting to lobby");
-    CommandJoinLobby cmdJoinLobby(client, joinedLobby);
-
-    Texture txMakeLobby;
-    txMakeLobby.loadFromFile("../img/make_lobby.png");
-    Button btnMakeLobby(window, mouse, &cmdMakeLobby);
-    btnMakeLobby.setTexture(&txMakeLobby);
-
-    Button btnConnectToLobby(window, mouse, &cmdJoinLobby);
-
-    btnMakeLobby.setColors(Color::Blue, Color::Magenta, Color::Green);
-    btnConnectToLobby.setColors(Color::Blue, Color::Magenta, Color::Green);
-    btnMakeLobby.setPosition(100, 100);
-    btnConnectToLobby.setPosition(100, 200);
-
-    vector<Button *> buttons = {&btnMakeLobby, &btnConnectToLobby};
-    ButtonsManager buttonsManager;
-    buttonsManager.setButtons(buttons);
-
-    while (window.isOpen())
-    {
-        while (window.pollEvent(event))
-        {
-            switch (event.type)
-            {
-            //Если нажали на кнопку на мыши
-            case (Event::MouseButtonPressed):
-            {
-                buttonsManager.mouseIsPressed();
-                cout << "menu() : lobbyWasCreated = " << lobbyWasCreated << endl;
-                cout << "menu() : joinedLobby = " << joinedLobby << endl;
-                if (lobbyWasCreated)
-                {
-                    client.setSide(0);
-                    cout << "Lobby was created!!!" << endl;
-                    return 1;
-                }
-                if (joinedLobby)
-                {
-                    client.setSide(1);
-                    cout << "Joined lobby!!!" << endl;
-                    return 1;
-                }
-                break;
-            }
-            case (Event::MouseButtonReleased):
-            {
-                buttonsManager.mouseIsReleased();
-            }
-            case (Event::MouseMoved):
-            {
-                buttonsManager.updateFocus();
-                break;
-            }
-            //Закрытие окна
-            case (Event::Closed):
-            {
-                window.close();
-            }
-            default:
-                break;
-            }
-        }
-
-        window.clear();
-
-        window.draw(backgroundRect);
-        buttonsManager.draw();
-
-        window.display();
-    }
-    return 0;
-}
+#include "Commands/CommandJoinLobby.h"
+#include "Functions.h"
 
 int main()
 {
-
     BOOST_LOG_TRIVIAL(info) << "main() : Starting!";
 
 #if SERVER_CONNECTING == 1
@@ -289,10 +107,16 @@ int main()
     texturesForUnits[9].loadFromFile("../img/units/oracle.png");
     texturesForUnits[10].loadFromFile("../img/units/paladin.png");
 
-    vector<Unit> units;
+    vector<Unit> playerUnits;
     for (int i = 0; i < numberOfCards; ++i)
     {
-        units.push_back(Unit(window));
+        playerUnits.push_back(Unit(window));
+    }
+
+    vector<Unit> opponentUnits;
+    for (int i = 0; i < numberOfCards; ++i)
+    {
+        opponentUnits.push_back(Unit(window));
     }
 
     vector<Card> cards;
@@ -301,7 +125,7 @@ int main()
         cards.push_back(Card(window, mouse));
     }
 
-    setData(client, units, cards, texturesForUnits);
+    setData(client, playerUnits, opponentUnits, cards, texturesForUnits);
 
     Texture cardTexture;
     cardTexture.loadFromFile("../img/card.png");
@@ -376,7 +200,17 @@ int main()
 
     //BOOST_LOG_TRIVIAL(fatal) << "WTF";
 
-    GameManager gm(window, mouse, event, client, buttonsManager, playerTilesManager, opponentTilesManager, cardsManager, background, texturesForUnits);
+    GameManager gm(window,
+                   mouse,
+                   event,
+                   client,
+                   buttonsManager,
+                   playerTilesManager,
+                   opponentTilesManager,
+                   cardsManager,
+                   background,
+                   opponentUnits,
+                   texturesForUnits);
 
     gm.setAttackButton(attackButton);
     gm.setPowerButton(powerButton);

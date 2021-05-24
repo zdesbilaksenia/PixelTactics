@@ -35,17 +35,19 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wall -pedantic")
 #Чтобы не перечислять всё, можно написать "src/*.cpp"
 set(LIB_SOURCE_FILES 
     src/DrawableBox.cpp 
-    src/Clickable.cpp 
-    src/Command.cpp 
-    src/Button.cpp 
-    src/Card.cpp 
-    src/Tile.cpp 
-    src/Unit.cpp 
+    src/Clickable.cpp
+    src/Command.cpp
+    src/Button.cpp
+    src/Card.cpp
+    src/Tile.cpp
+    src/Unit.cpp
     src/Background.cpp
     src/GameManager.cpp
-    src/Commands/CommandAttack.cpp 
+    src/Commands/CommandAttack.cpp
     src/Commands/CommandTakeCard.cpp
-    src/Commands/CommandMakeLobby.cpp)
+    src/Commands/CommandMakeLobby.cpp
+    src/Commands/CommandJoinLobby.cpp
+    src/Functions.cpp)
 
 # Что бы не было относительных ссылок на файлы
 include_directories(include)

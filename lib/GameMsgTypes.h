@@ -22,7 +22,7 @@ enum class GameMsgTypes : uint32_t
     HeroesStats,
 //////////////////////////
     GameDeck,
-    GameHeroStats,
+    GameHeroesStats,
     GameCanBeMeleeAttacked,
     GameLeaderChoice,
     GamePlayerOptionChoice,
