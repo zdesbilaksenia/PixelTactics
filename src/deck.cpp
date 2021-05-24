@@ -28,7 +28,7 @@ void Deck::push_back(Card card) {
 }
 
 int Deck::roll_card(int count) {
-    boost::random::uniform_int_distribution<> dist{1, 100};
+    boost::random::uniform_int_distribution<> dist{0, count - 1};
     return dist(gen);
 }
 
