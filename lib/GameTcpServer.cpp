@@ -49,11 +49,19 @@ void GameTcpServer::onMessage(boost::shared_ptr<TcpConnection<GameMsgTypes>> cli
         case GameMsgTypes::GetHeroesStats: {
             Message<GameMsgTypes> outMsg(GameMsgTypes::HeroesStats);
             std::cout << "[SERVER]: Got request for Stats from [" << client->getID() << "]\n";
-            uint8_t stats[36];
-            for (uint8_t i = 0; i < 36; ++i) {
-                stats[i] = i;
+            std::vector<Card> stats(3);
+            for (int i = 0; i < stats.size(); ++i) {
+                stats[i].ID = i;
+                stats[i].name = "lff";
+                stats[i].HP = i;
+                stats[i].strength = i + 1;
+                stats[i].frontLinePower = "front";
+                stats[i].middleLinePower = "mid";
+                stats[i].backLinePower = "back";
             }
+            std::cout << "before <<\n";
             outMsg << stats;
+            std::cout << "after <<\n";
             client->send(outMsg);
             break;
         }

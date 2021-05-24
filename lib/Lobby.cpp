@@ -44,6 +44,7 @@ TsQueue<OwnedMessage<GameMsgTypes>>& Lobby::incoming() {
     return qMsgIn;
 }
 
+
 void Lobby::gameStart() {
     msgLobbyGameStart();
     gameThr = std::thread(
@@ -109,7 +110,7 @@ void Lobby::messageAllPlayers(const Message<GameMsgTypes>& msg, boost::shared_pt
     bool invalidPlayerExists = false;
     std::cout << "lobby size: " << lobby.size() << std::endl;
     for (auto it = lobby.begin(); it != lobby.end();it++) {
-        if ((*it) && (*it)->isConnected()) {
+        if ((*it) && (*it)->isConnected() && (*it) != ignoredPlayer) {
             server->messageToClient((*it)->shared_from_this(), msg);
         }
     }

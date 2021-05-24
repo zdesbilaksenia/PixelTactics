@@ -29,6 +29,8 @@ enum class GameMsgTypes : uint32_t {
     GameShortCoordinates,
     GameHelloToPlayer,
     GameCardFromHandChoice,
+    GameStr,
+    GameString
 
 
 };

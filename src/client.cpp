@@ -5,11 +5,13 @@
 #include "GameTcpClient.h"
 #include "GameMsgTypes.h"
 
+#include "card.h"
+
 
 int main(int argc, char* argv[])
 {
     GameTcpClient c;
-    c.connect("10.147.17.33");
+    c.connect("10.147.17.200");
     c.incoming().wait();
     c.incoming().popFront();
 
@@ -56,17 +58,17 @@ int main(int argc, char* argv[])
             if (!c.incoming().empty()) {
                 auto msg = c.incoming().popFront().msg;
                 switch (msg.header.id) {
-                    case GameMsgTypes::HeroesStats:
+                    case GameMsgTypes::HeroesStats: {
                         std::cout << "Got stats:\n";
-                        uint8_t stats[36];
+                        std::vector<Card> stats;
                         msg >> stats;
-                        for (int i = 0; i < 36; ++i) {
-                            std::cout << int(stats[i]) << " ";
+                        for (int i = 0; i < stats.size(); ++i) {
+                            std::cout << "Card#" << i << "\nID: " << stats[i].ID << ", name: " << stats[i].name << ", backLP: " << stats[i].backLinePower << "\n\n";
                         }
                         break;
+                    }
                     case GameMsgTypes::ServerAccept:
-                        std::cout << "Server Accepted Connection\n";
-                        break;
+                        std::cout << "Server Accepted Connection\n"; break;
                     case GameMsgTypes::ServerPing:
                         int inc;
                         msg >> inc;
@@ -104,7 +106,7 @@ int main(int argc, char* argv[])
     // TIPA GAME
     bool gameRuns = true;
     while (gameRuns) {
-        std::cout << "GAME LOBBY))\n1: Greet ur opponent\n2: Choose Leader\n";
+        std::cout << "GAME LOBBY))\n1: Greet ur opponent\n2: Choose Leader\n3: Get some str\n4:Get another str\n";
         char choice = 0;
         std::cin >> choice;
         switch (choice) {
@@ -115,9 +117,36 @@ int main(int argc, char* argv[])
             }
             case '2': {
                 int choice = 0;
+                std::cout << "Enter leader Id: ";
                 std::cin >> choice;
                 Message<GameMsgTypes> msg(GameMsgTypes::GameLeaderChoice);
                 msg << choice;
+                c.send(msg);
+                c.incoming().wait();
+                auto inMsg = c.incoming().popFront().msg;
+                if (inMsg.header.id == GameMsgTypes::HeroesStats) {
+                    std::cout << "Got stats:\n";
+                    /*struct stat {
+                        int a;
+                        int b;
+                    };
+                    stat stats[18];*/
+                    std::vector<int> stats;
+                    msg >> stats;
+                    for (int i = 0; i < 18; ++i) {
+                        // std::cout << "a: " << stats[i].a << ", b: " << stats[i].b << "; ";
+                        std::cout << stats[i] << "; ";
+                    }
+                }
+                break;
+            }
+            case '3': {
+                Message<GameMsgTypes> msg(GameMsgTypes::GameString);
+                c.send(msg);
+                break;
+            }
+            case '4': {
+                Message<GameMsgTypes> msg(GameMsgTypes::GameStr);
                 c.send(msg);
                 break;
             }
@@ -133,6 +162,12 @@ int main(int argc, char* argv[])
                     case GameMsgTypes::LobbyGameOver: {
                         std::cout << "Game over!\n";
                         gameRuns = false;
+                        break;
+                    }
+                    case GameMsgTypes::GameStr: {
+                        std::cout << "Size of string: " << msg.header.size << std::endl;
+                        std::cout << "Size of std::string: " << sizeof(std::string) << std::endl;
+                        // std::cout << "Got string: " << str << std::endl;
                         break;
                     }
                 }

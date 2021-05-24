@@ -14,10 +14,15 @@ void Game::StartGame(){
     Deck SecondPlayerDeck(allCards.GetVector());
     Player FirstPlayer(FirstPlayerDeck, 0);
     Player SecondPlayer(SecondPlayerDeck, 1);
-    std::vector<Card> StepaAllCards = FirstPlayerDeck.GetVector();
+    std::vector<Card> StepaFirstAllCards = FirstPlayerDeck.GetVector();
     auto msg = Message<GameMsgTypes>(GameMsgTypes::GameDeck);
-    msg << StepaAllCards;
+    msg << StepaFirstAllCards;
     CallPechkin(0,msg);
+
+    std::vector<Card> StepaSecondAllCards = FirstPlayerDeck.GetVector();
+    msg = Message<GameMsgTypes>(GameMsgTypes::GameDeck);
+    msg << StepaSecondAllCards;
+    CallPechkin(1,msg);
 
     std::cout << "//////////////////////////" << std::endl;
     Deck FirstLeaderCards;
@@ -25,67 +30,85 @@ void Game::StartGame(){
 
     PowerMapper mapper;
 
-
-    for (size_t i = 0; i < 3; i++) {
-        int random = allCards.roll_card(FirstPlayerDeck.GetVector().size());
-        FirstPlayer.GetHand().push_back(FirstPlayerDeck.GetVector().back());
-        FirstPlayerDeck.GetVector().pop_back();
-    }
-
-    for (size_t i = 0; i < 3; i++) {
-        int random = allCards.roll_card(SecondPlayerDeck.GetVector().size());
-        SecondPlayer.GetHand().push_back(SecondPlayerDeck.GetVector().back());
-        SecondPlayerDeck.GetVector().pop_back();
-    }
-
     std::cout << "Выбери лидера Первый игрок" << std::endl;
-    for (int i = 0; i < FirstPlayer.GetHand().GetVector().size(); i++) {
-        std::cout << FirstPlayer.GetHand().GetVector()[i].name << " " << "Здоровье Героя:"
-                  << FirstPlayer.GetHand().GetVector()[i].HP << " " << "Атака Героя:"
-                  << FirstPlayer.GetHand().GetVector()[i].strength << std::endl;
+    for (int i = 17; i < FirstPlayerDeck.GetVector().size(); i++) {
+        std::cout << FirstPlayerDeck.GetVector()[i].name << " " << "Здоровье Героя:"
+                  << FirstPlayerDeck.GetVector()[i].HP << " " << "Атака Героя:"
+                  << FirstPlayerDeck.GetVector()[i].strength << std::endl;
     }
     int choice;
     std::cout << "////" << std::endl;
     lobby->incoming().wait();
     auto leadmsg = lobby->incoming().popFront().msg;
-    if (leadmsg.header.id == GameMsgTypes::GameLeaderChoice) {
+    if (leadmsg.header.id == GameMsgTypes::GameCardFromHandChoice) {
        leadmsg >> choice;
     } else {
         std::cout << "Error in leader choice!\n";
         return;
     }
-    FirstPlayerLeader.SetHero(FirstPlayer.ChooseCard(choice));
+    std::cout << choice << std::endl;
+    for (int i = 0; i < FirstPlayerDeck.GetVector().size(); i++) {
+        std::cout << FirstPlayerDeck.GetVector()[i].name << " " << "Здоровье Героя:"
+                  << FirstPlayerDeck.GetVector()[i].HP << " " << "Атака Героя:"
+                  << FirstPlayerDeck.GetVector()[i].strength << std::endl;
+    }
+    FirstPlayerLeader.SetHero(FirstPlayerDeck.GetVector()[choice]);
     mapper.MapPowers(FirstPlayerLeader.GetHero());
     FirstPlayerLeader.GetHero().MakeLeader();
     pole.SetPosition(&(FirstPlayerLeader));
+    FirstPlayerDeck.GetVector().erase(FirstPlayerDeck.GetVector().begin() + choice);
+    FirstPlayer.GetHand().push_back(FirstPlayerDeck.GetVector().back());
+    FirstPlayerDeck.GetVector().pop_back();
+    FirstPlayer.GetHand().push_back(FirstPlayerDeck.GetVector().back());
+    FirstPlayerDeck.GetVector().pop_back();
 
+    FirstPlayerLeader.InfoPosition();
+    for(int i = 0; i < FirstPlayer.GetHand().GetVector().size(); i++){
+        std::cout << FirstPlayer.GetHand().GetVector()[i].name << " " << "Здоровье Героя:"
+                  << FirstPlayer.GetHand().GetVector()[i].HP << " " << "Атака Героя:"
+                  << FirstPlayer.GetHand().GetVector()[i].strength << std::endl;
+    }
 
     std::cout << "Выбери лидера Второй игрок" << std::endl;
-    for (int i = 0; i < SecondPlayer.GetHand().GetVector().size(); i++) {
+    for (int i = 17; i < SecondPlayerDeck.GetVector().size(); i++) {
+        std::cout << SecondPlayerDeck.GetVector()[i].name << " " << "Здоровье Героя:"
+                  << SecondPlayerDeck.GetVector()[i].HP << " " << "Атака Героя:"
+                  << SecondPlayerDeck.GetVector()[i].strength << std::endl;
+    }
+
+    FirstPlayerLeader.InfoPosition();
+    for(int i = 0; i < SecondPlayer.GetHand().GetVector().size(); i++){
         std::cout << SecondPlayer.GetHand().GetVector()[i].name << " " << "Здоровье Героя:"
                   << SecondPlayer.GetHand().GetVector()[i].HP << " " << "Атака Героя:"
                   << SecondPlayer.GetHand().GetVector()[i].strength << std::endl;
     }
     lobby->incoming().wait();
     leadmsg = lobby->incoming().popFront().msg;
-    if (leadmsg.header.id == GameMsgTypes::GameLeaderChoice) {
+    if (leadmsg.header.id == GameMsgTypes::GameCardFromHandChoice) {
         leadmsg >> choice;
     } else {
         std::cout << "Error in leader choice!\n";
         return;
     }
-    SecondPlayerLeader.SetHero(SecondPlayer.ChooseCard(choice));
+    SecondPlayerLeader.SetHero(SecondPlayerDeck.GetVector()[choice]);
     mapper.MapPowers(SecondPlayerLeader.GetHero());
     SecondPlayerLeader.GetHero().MakeLeader();
     pole.SetPosition(&(SecondPlayerLeader));
+    SecondPlayerDeck.GetVector().erase(SecondPlayerDeck.GetVector().begin() + choice);
+    SecondPlayer.GetHand().push_back(SecondPlayerDeck.GetVector().back());
+    SecondPlayerDeck.GetVector().pop_back();
+    SecondPlayer.GetHand().push_back(SecondPlayerDeck.GetVector().back());
+    SecondPlayerDeck.GetVector().pop_back();
+
 
     // Breed allStats[pole.GetVector().size()];
-    Breed allStats[18];
+    std::vector<Breed> allStats;
+    allStats.resize(0);
     for (int i = 0; i < pole.GetVector().size(); i++) {
         Breed stats;
         stats.HP = pole.GetVector()[i]->GetHero().GetCurHealth();
         stats.Strength = pole.GetVector()[i]->GetHero().GetCurStrength();
-        allStats[i] = stats;
+        allStats.push_back(stats);
     }
     Message<GameMsgTypes> Inmsg(GameMsgTypes::HeroesStats);
     msg << allStats;
