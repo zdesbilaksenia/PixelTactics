@@ -5,13 +5,13 @@
 #include <boost/log/trivial.hpp>
 using namespace boost::log;
 
-class CommandMakeLobby : public Command
+class CommandConnectToLobby : public Command
 {
 public:
-    CommandMakeLobby(GameTcpClient& _client, bool &_lobbyWasCreated);
+    CommandConnectToLobby(GameTcpClient& _client, bool& _lobbyWasCreated);
     void execute() override;
 
-    ~CommandMakeLobby();
+    ~CommandConnectToLobby();
 
 private:
     bool& lobbyWasCreated;

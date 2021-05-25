@@ -15,13 +15,11 @@ using namespace sf;
 #include "Command.h"
 #include "Commands/CommandAttack.h"
 #include "Commands/CommandTakeCard.h"
-#include "Commands/CommandMakeLobby.h"
 #include "Card.h"
 #include "Tile.h"
 #include "Background.h"
 #include "configurations.cpp"
 #include "GameManager.h"
-#include "Commands/CommandJoinLobby.h"
 #include "Functions.h"
 
 int main()

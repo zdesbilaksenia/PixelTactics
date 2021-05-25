@@ -1,8 +1,7 @@
 #include "Functions.h"
 #include "configurations.cpp"
 #include "Button.h"
-#include "Commands/CommandMakeLobby.h"
-#include "Commands/CommandJoinLobby.h"
+#include "Commands/CommandConnectToLobby.h"
 
 bool connectToServer(GameTcpClient &client, const string &host)
 {
@@ -123,24 +122,16 @@ bool menu(RenderWindow &window,
     backgroundRect.setPosition(Vector2f(0, 0));
 
     bool lobbyWasCreated = false;
-    bool joinedLobby = false;
-    CommandMakeLobby cmdMakeLobby(client, lobbyWasCreated);
-    //CommandStringTest cmdMakeLobby("Connecting to lobby");
-    CommandJoinLobby cmdJoinLobby(client, joinedLobby);
+    CommandConnectToLobby cmdConnectToLobby(client, lobbyWasCreated);
 
     Texture txMakeLobby;
     txMakeLobby.loadFromFile("../img/make_lobby.png");
-    Button btnMakeLobby(window, mouse, &cmdMakeLobby);
-    btnMakeLobby.setTexture(&txMakeLobby);
-
-    Button btnConnectToLobby(window, mouse, &cmdJoinLobby);
-
-    btnMakeLobby.setColors(Color::Blue, Color::Magenta, Color::Green);
+    Button btnConnectToLobby(window, mouse, &cmdConnectToLobby);
+    btnConnectToLobby.setTexture(&txMakeLobby);
     btnConnectToLobby.setColors(Color::Blue, Color::Magenta, Color::Green);
-    btnMakeLobby.setPosition(100, 100);
-    btnConnectToLobby.setPosition(100, 200);
+    btnConnectToLobby.setPosition(100, 100);
 
-    vector<Button *> buttons = {&btnMakeLobby, &btnConnectToLobby};
+    vector<Button *> buttons = {&btnConnectToLobby};
     ButtonsManager buttonsManager;
     buttonsManager.setButtons(buttons);
 
@@ -154,18 +145,9 @@ bool menu(RenderWindow &window,
             case (Event::MouseButtonPressed):
             {
                 buttonsManager.mouseIsPressed();
-                cout << "menu() : lobbyWasCreated = " << lobbyWasCreated << endl;
-                cout << "menu() : joinedLobby = " << joinedLobby << endl;
-                if (lobbyWasCreated)
+                if (client.isConnected())
                 {
-                    client.setSide(0);
                     cout << "Lobby was created!!!" << endl;
-                    return 1;
-                }
-                if (joinedLobby)
-                {
-                    client.setSide(1);
-                    cout << "Joined lobby!!!" << endl;
                     return 1;
                 }
                 break;

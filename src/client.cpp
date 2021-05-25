@@ -21,21 +21,12 @@ int main(int argc, char* argv[])
     while (!quit) {
         char choice = 0;
 
-        std::cout << "0: Join Lobby\n1: Make Lobby\n2: Message All\n3: Get Heroes Stats\n4: Quit\n";
+        std::cout << "1: Play\n2: Message All\n3: Get Heroes Stats\n4: Quit\n";
         std::cin >> choice;
 
         switch (choice) {
-            case '0': {
-                uint16_t lobbyID = 0;
-                std::cout << "Type lobby ID: ";
-                std::cin >> lobbyID;
-                c.joinLobby(lobbyID);
-                std::cout << "Trying to join lobby#" << lobbyID << "\n";
-                break;
-            }
             case '1':
-                c.makeLobby();
-                std::cout << "Trying to make a lobby\n";
+                c.connectToLobby();
                 break;
             case '2':
                 c.messageAll();
@@ -58,15 +49,6 @@ int main(int argc, char* argv[])
             if (!c.incoming().empty()) {
                 auto msg = c.incoming().popFront().msg;
                 switch (msg.header.id) {
-                    case GameMsgTypes::HeroesStats: {
-                        std::cout << "Got stats:\n";
-                        std::vector<Card> stats;
-                        msg >> stats;
-                        for (int i = 0; i < stats.size(); ++i) {
-                            std::cout << "Card#" << i << "\nID: " << stats[i].ID << ", name: " << stats[i].name << ", backLP: " << stats[i].backLinePower << "\n\n";
-                        }
-                        break;
-                    }
                     case GameMsgTypes::ServerAccept:
                         std::cout << "Server Accepted Connection\n"; break;
                     case GameMsgTypes::ServerPing:
@@ -85,7 +67,7 @@ int main(int argc, char* argv[])
                         std::cout << "GameStarted!!!\n";
                         quit = true;
                         break;
-                    case GameMsgTypes::ErrorMessage: { // TODO errors not working yet!!
+                    case GameMsgTypes::ErrorMessage: {
                         std::string err;
                         msg >> err;
                         std::cout << "Error: " << err;
@@ -122,22 +104,6 @@ int main(int argc, char* argv[])
                 Message<GameMsgTypes> msg(GameMsgTypes::GameLeaderChoice);
                 msg << choice;
                 c.send(msg);
-                c.incoming().wait();
-                auto inMsg = c.incoming().popFront().msg;
-                if (inMsg.header.id == GameMsgTypes::HeroesStats) {
-                    std::cout << "Got stats:\n";
-                    /*struct stat {
-                        int a;
-                        int b;
-                    };
-                    stat stats[18];*/
-                    std::vector<int> stats;
-                    msg >> stats;
-                    for (int i = 0; i < 18; ++i) {
-                        // std::cout << "a: " << stats[i].a << ", b: " << stats[i].b << "; ";
-                        std::cout << stats[i] << "; ";
-                    }
-                }
                 break;
             }
             case '3': {

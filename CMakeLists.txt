@@ -48,8 +48,7 @@ set(LIB_SOURCE_FILES
     src/GameManager.cpp
     src/Commands/CommandAttack.cpp
     src/Commands/CommandTakeCard.cpp
-    src/Commands/CommandMakeLobby.cpp
-    src/Commands/CommandJoinLobby.cpp
+    src/Commands/CommandConnectToLobby.cpp
     src/Functions.cpp)
 
 # Что бы не было относительных ссылок на файлы
