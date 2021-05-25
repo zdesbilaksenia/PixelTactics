@@ -1,11 +1,11 @@
 #include "Game.h"
 #include "request.h"
 
-bool Game::WaitForMessage(){
+bool Game::WaitForMessage() {
     lobby->incoming().wait();
     if (lobby->incoming().front().msg.header.id == GameMsgTypes::LobbyLeave) {
         return false;
-    } 
+    }
     return true;
 }
 
@@ -106,7 +106,7 @@ void Game::StartGame() {
     int choice, playerside;
     int x, y;
     std::cout << "////" << std::endl;
-    if(!WaitForMessage()) return;
+    if (!WaitForMessage()) return;
     auto leadmsg = lobby->incoming().popFront().msg;
     if (leadmsg.header.id == GameMsgTypes::GameCardFromHandChoice) {
         leadmsg >> choice >> x >> y >> playerside;
@@ -117,7 +117,7 @@ void Game::StartGame() {
     std::cout << "CHOICE " << choice << " PLAYERSIDE " << playerside << std::endl;
     SetLeader(Players, playerside, choice, pole, mapper);
 
-    if(!WaitForMessage()) return;
+    if (!WaitForMessage()) return;
     leadmsg = lobby->incoming().popFront().msg;
     if (leadmsg.header.id == GameMsgTypes::GameCardFromHandChoice) {
         leadmsg >> choice >> x >> y >> playerside;
@@ -194,7 +194,7 @@ void Game::StartGame() {
          std::cout << "//////////////////////////" << std::endl;*/
 
         choice = 0;
-        if(!WaitForMessage()) return;
+        if (!WaitForMessage()) return;
         msg = lobby->incoming().popFront().msg;
         cout << "ПРИШЛО" << std::endl;
         switch (msg.header.id) {
@@ -254,10 +254,27 @@ void Game::StartGame() {
                 } else {
                     EnemySide = 0;
                 }
-                Position *EnemyHero = pole.GetPosition(cell, line, EnemySide);
-               // std::cout <<" Сила аттакующего " <<YourHero->GetHero().GetCurStrength() <<" Здоровье врага до атаки " << EnemyHero->GetHero().GetCurHealth()  << std::endl;
+
+                Position *EnemyHero;
+
+                if (!WaitForMessage()) return;
+
+                auto attackerMsg = lobby->incoming().popFront().msg;
+
+                if (msg.header.id == GameMsgTypes::GameAttackRequest) {
+                    attackerMsg >> line >> cell;
+                    EnemyHero = pole.GetPosition(cell, line, currentside ? 0 : 1);
+                    cout << "АТАКОВАННЫЙ " << line << " " << cell << " " << EnemyHero->GetHero().GetName() << std::endl;
+                }
+
                 if (CurrentPlayer.MeleeAttackCheck(EnemyHero, pole)) {
+                    cout << "ДО АТАКИ " << "ХП " << EnemyHero->GetHero().GetCurHealth() << " Сила атакующего "
+                         << YourHero->GetHero().GetCurStrength() << std::endl;
+                    
                     YourHero->GetHero().Attack(EnemyHero->GetHero(), YourHero->GetHero().GetCurStrength());
+
+                    cout << "ПОСЛЕ АТАКИ " << "ХП " << EnemyHero->GetHero().GetCurHealth() << " Сила атакующего "
+                         << YourHero->GetHero().GetCurStrength() << std::endl;
                     pole.SetPosition(EnemyHero);
                     MovesAmount--;
                     std::vector<Breed> Stats;
@@ -268,14 +285,6 @@ void Game::StartGame() {
                     CallPechkin(0, Attackmsg);
                 } else {
                     std::cout << "СПЕРЕДИ СТОИТ ДРУГОЙ ГЕРОЙ. НЕЛЬЗЯ АТАКОВАТЬ!!" << std::endl;
-                }
-                if(!WaitForMessage()) return;
-                auto attackerMsg = lobby->incoming().popFront().msg;
-                if (msg.header.id == GameMsgTypes::GameAttackRequest) {
-                    attackerMsg >> line >> cell;
-                    Position *EnemyHero = pole.GetPosition(cell, line, currentside ? 0 : 1);
-                    cout << "АТАКОВАННЫЙ " << line << " " << cell << " " << EnemyHero->GetHero().GetName() <<std::endl;
-                    //std::cout <<" Сила аттакющего " <<YourHero->GetHero().GetCurStrength() <<" Здоровье врага после атаки " << EnemyHero->GetHero().GetCurHealth() <<std::endl;
                 }
                 MovesAmount--;
                 break;
