@@ -262,6 +262,7 @@ void Game::StartGame() {
                     Position *EnemyHero = pole.GetPosition(cell, line, currentside ? 0 : 1);
                     cout << "АТАКОВАННЫЙ " << line << " " << cell << " " << EnemyHero->GetHero().GetName();
                 }
+                MovesAmount--;
                 break;
             }
                 /*case (5): {
