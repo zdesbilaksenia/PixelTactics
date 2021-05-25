@@ -4,11 +4,13 @@
 #include "Command.h"
 #include "Unit.h"
 #include "Tile.h"
+#include <boost/log/trivial.hpp>
 #include <vector>
 #include <stack>
 using std::stack;
 using std::unique_ptr;
 using std::vector;
+using namespace boost::log;
 
 enum class CardStatus
 {
@@ -56,26 +58,16 @@ enum class CardsManagerStatus
 class CardsManager
 {
 public:
-    CardsManager(RenderWindow &_window, stack<Card *> _cardsInStack);
+    CardsManager(RenderWindow &_window, TilesManager &_tilesManager, stack<Card *> _cardsInStack);
 
-    //Сделать потом константную ссылку
-    void setTilesManager(TilesManager *_tileManager);
     void updateFocus();
     bool mouseIsPressed();
     void draw();
     bool takeCard();
     void updateHand();
     void setCardShirtTexture(Texture *_texture);
-    void setStatus(CardsManagerStatus _status)
-    {
-        status = _status;
-    }
-
-    void setUnitBuffer(Unit &_unit)
-    {
-        unitBuffer = make_unique<Unit>(_unit);
-    };
-
+    void setStatus(CardsManagerStatus _status);
+    void setUnitBuffer(Unit &_unit);
     bool canTakeCard();
 
     ~CardsManager();
@@ -92,7 +84,7 @@ private:
     vector<Card *>::iterator cardToDeleteId;
 
     //В буфер tilesManager будем складывать юнита
-    TilesManager *tilesManager;
+    TilesManager &tilesManager;
     //unique_ptr
 
     RectangleShape cardShirtRect;

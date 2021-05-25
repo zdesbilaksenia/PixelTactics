@@ -67,7 +67,7 @@ void setData(GameTcpClient &client,
 
 #if SERVER_CONNECTING == 0
 
-    for (size_t i = 0; i < units.size(); ++i)
+    for (size_t i = 0; i < playerUnits.size(); ++i)
     {
         playerUnits[i].setTexture(&textures[i % numberOfUnits]);
     }

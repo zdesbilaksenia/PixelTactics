@@ -9,9 +9,9 @@ DrawableBox::DrawableBox(RenderWindow &_window) : window(_window)
     rect.setSize(Vector2f(100, 100));
     rect.setPosition(0, 0);
     rect.setFillColor(Color::White);
-};
+}
 
-void DrawableBox::setFillColor(Color _color)
+void DrawableBox::setFillColor(const Color& _color)
 {
     rect.setFillColor(_color);
 }

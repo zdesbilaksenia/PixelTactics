@@ -143,8 +143,7 @@ int main()
 
     Texture cardShirtTexture;
     cardShirtTexture.loadFromFile("../img/card_shirt.png");
-    CardsManager cardsManager(window, cardsStack);
-    cardsManager.setTilesManager(&playerTilesManager);
+    CardsManager cardsManager(window, playerTilesManager, cardsStack);
     cardsManager.setCardShirtTexture(&cardShirtTexture);
 
     Texture takeCardButtonTx;
@@ -161,7 +160,7 @@ int main()
     powerButtonTx.loadFromFile("../img/power.png");
     Texture cancelButtonTx;
 
-    CommandAttack cmdattack(playerTilesManager, opponentTilesManager);
+    CommandAttack cmdattack(playerTilesManager, opponentTilesManager, client);
     Button attackButton(window, mouse, &cmdattack);
     attackButton.setColors(Color::White, Color(240, 200, 150), Color(190, 70, 80), Color(200, 200, 200));
     attackButton.setPosition(50, 80);

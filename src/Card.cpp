@@ -22,15 +22,8 @@ void Card::setUnit(Unit *_unit)
 
 void Card::click()
 {
-
-    cout << "Card::click:: before command execution " << unit << endl;
-
     this->status = CardStatus::statusCardWasReleased;
     this->command->execute();
-
-    ////////////////////////////////////////////////////////////////COUT
-    cout << "Card::click:: after command execution " << unit << endl;
-    //this->unit = nullptr;
 }
 
 void Card::updateFocus()
@@ -69,7 +62,9 @@ Card::~Card()
 //===========CardsManager==============
 //=====================================
 
-CardsManager::CardsManager(RenderWindow &_window, stack<Card *> _cardsInStack) : window(_window), cardsInStack(_cardsInStack)
+CardsManager::CardsManager(RenderWindow &_window, TilesManager &_tilesManager, stack<Card *> _cardsInStack) : window(_window),
+                                                                                                              tilesManager(_tilesManager),
+                                                                                                              cardsInStack(_cardsInStack)
 {
     status = CardsManagerStatus::statusNothingHappens;
     cardShirtRect.setSize(Vector2f(cardWidth, cardHeight));
@@ -96,11 +91,6 @@ void CardsManager::updateHand()
         card->setPosition(cardsInHandPosX + i * 100, cardsInHandPosY);
         ++i;
     }
-}
-
-void CardsManager::setTilesManager(TilesManager *_tileManager)
-{
-    this->tilesManager = _tileManager;
 }
 
 void CardsManager::updateFocus()
@@ -143,43 +133,52 @@ bool CardsManager::mouseIsPressed()
     switch (status)
     {
     case CardsManagerStatus::statusGameStarting:
-        if (tilesManager->getStatus() == TilesManagerStatus::statusCardWasJustReleased)
+    {
+        if (tilesManager.getStatus() == TilesManagerStatus::statusCardWasJustReleased)
         {
-            cout << "CardsManager::mouseIsPressed() : Card was just released!!!" << endl;
-        }
-        for (auto cardId = cardsInHand.begin(); cardId != cardsInHand.end(); ++cardId)
-        {
-            if ((*cardId)->hasFocus())
-            {
-                cardToDeleteId = cardId;
-                tilesManager->setUnitBuffer(*(*cardId)->unit);
-                tilesManager->setStatus(TilesManagerStatus::statusGameStartingReleasingCard);
-                status = CardsManagerStatus::statusGameStartingReleasingCard;
-                tilesManager->updateFocus();
-                cout << "CardsManager::mouseIsPressed : statusGameStarting Card was clicked!!!" << endl;
-                return true;
-            }
-        }
-        break;
-    case CardsManagerStatus::statusNothingHappens:
-        //Если некуда ставить
-        if (tilesManager->hasEmptyTiles() == false)
-        {
+            BOOST_LOG_TRIVIAL(info) << "CardsManager::mouseIsPressed() : statusGameStarting Card was just released!";
             return true;
         }
         for (auto cardId = cardsInHand.begin(); cardId != cardsInHand.end(); ++cardId)
         {
             if ((*cardId)->hasFocus())
             {
-                cout << "CardsManager::mouseIsPressed : statusNothingHappens Card was clicked!!!" << endl;
                 cardToDeleteId = cardId;
-                tilesManager->setUnitBuffer(*(*cardId)->unit);
-                tilesManager->setStatus(TilesManagerStatus::statusReleasingCard);
-                status = CardsManagerStatus::statusReleasingCard;
+                //Верхняя строка - авангард
+                //Этот массив получаем от сервера!!!
+                vector<bool> activeTiles =
+                    {0, 0, 0,
+                     0, 1, 0,
+                     0, 0, 0};
+                tilesManager.setActiveTiles(activeTiles);
+                tilesManager.setUnitBuffer(*(*cardId)->unit);
+                BOOST_LOG_TRIVIAL(info) << "CardsManager::mouseIsPressed() : statusGameStarting Card was clicked!";
                 return true;
             }
         }
         break;
+    }
+
+    case CardsManagerStatus::statusNothingHappens:
+    {
+        //Если некуда ставить
+        if (tilesManager.hasEmptyTiles() == false)
+        {
+            return false;
+        }
+        for (auto cardId = cardsInHand.begin(); cardId != cardsInHand.end(); ++cardId)
+        {
+            if ((*cardId)->hasFocus())
+            {
+                BOOST_LOG_TRIVIAL(info) << "CardsManager::mouseIsPressed() : statusNothingHappens Card was clicked!";
+                cardToDeleteId = cardId;
+                tilesManager.setUnitBuffer(*(*cardId)->unit);
+                return true;
+            }
+        }
+        break;
+    }
+
     case CardsManagerStatus::statusReleasingCard:
     {
         //Если решили взять другую карту
@@ -188,24 +187,26 @@ bool CardsManager::mouseIsPressed()
             if ((*cardId)->hasFocus())
             {
                 cardToDeleteId = cardId;
-                tilesManager->setUnitBuffer(*(*cardId)->unit);
-                tilesManager->setStatus(TilesManagerStatus::statusReleasingCard);
+                tilesManager.setUnitBuffer(*(*cardId)->unit);
+                tilesManager.setStatus(TilesManagerStatus::statusReleasingCard);
                 status = CardsManagerStatus::statusReleasingCard;
-                tilesManager->updateFocus();
+                tilesManager.updateFocus();
             }
         }
 
-        if (tilesManager->getStatus() == TilesManagerStatus::statusCardWasJustReleased)
+        if (tilesManager.getStatus() == TilesManagerStatus::statusCardWasJustReleased)
         {
-            tilesManager->setStatus(TilesManagerStatus::statusNothingHappens);
-            ////////////////////////////////////////////////////////////////////////////////////////COUT
-            cout << "CardsManager::MouseIsPressed statusReleasingCard CARD WAS JUST RELEASED!!!" << endl;
+            tilesManager.setStatus(TilesManagerStatus::statusNothingHappens);
+            BOOST_LOG_TRIVIAL(info) << "CardsManager::mouseIsPressed() : statusReleasingCard card was just released, removing card from hand!";
             cardsInHand.erase(cardToDeleteId);
             this->updateHand();
             status = CardsManagerStatus::statusNothingHappens;
         }
+
+        return false;
         break;
     }
+
     case CardsManagerStatus::statusGameStartingReleasingCard:
     {
         //Если решили взять другую карту
@@ -214,22 +215,23 @@ bool CardsManager::mouseIsPressed()
             if ((*cardId)->hasFocus())
             {
                 cardToDeleteId = cardId;
-                tilesManager->setUnitBuffer(*(*cardId)->unit);
-                tilesManager->setStatus(TilesManagerStatus::statusGameStartingReleasingCard);
+                tilesManager.setUnitBuffer(*(*cardId)->unit);
+                tilesManager.setStatus(TilesManagerStatus::statusGameStartingReleasingCard);
                 status = CardsManagerStatus::statusGameStartingReleasingCard;
-                tilesManager->updateFocus();
+                tilesManager.updateFocus();
             }
         }
 
-        if (tilesManager->getStatus() == TilesManagerStatus::statusCardWasJustReleased)
+        if (tilesManager.getStatus() == TilesManagerStatus::statusCardWasJustReleased)
         {
-            tilesManager->setStatus(TilesManagerStatus::statusNothingHappens);
-            ////////////////////////////////////////////////////////////////////////////////////////COUT
-            cout << "CardsManager::MouseIsPressed statusGameStartingReleasingCard CARD WAS JUST RELEASED!!!" << endl;
+            tilesManager.setStatus(TilesManagerStatus::statusNothingHappens);
+            BOOST_LOG_TRIVIAL(info) << "CardsManager::mouseIsPressed() : statusGameStartingReleasingCard card was just released!";
             cardsInHand.erase(cardToDeleteId);
             this->updateHand();
             status = CardsManagerStatus::statusNothingHappens;
         }
+        return false;
+        break;
     }
     }
     return false;
@@ -259,7 +261,14 @@ bool CardsManager::canTakeCard()
     return (cardsInHand.size() < maxNumberOfCardsInHand) && (cardsInStack.size() > 0);
 }
 
-CardsManager::~CardsManager()
+void CardsManager::setStatus(CardsManagerStatus _status)
 {
-    tilesManager = nullptr;
+    status = _status;
 }
+
+void CardsManager::setUnitBuffer(Unit &_unit)
+{
+    unitBuffer = make_unique<Unit>(_unit);
+}
+
+CardsManager::~CardsManager() {}

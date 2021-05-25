@@ -35,8 +35,7 @@ public:
     {
         return Id;
     }
-
-
+    
     ~Unit();
 
 private:

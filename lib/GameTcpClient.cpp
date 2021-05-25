@@ -38,11 +38,25 @@ void GameTcpClient::messageAll() const
     Message<GameMsgTypes> msg(GameMsgTypes::MessageAll);
     send(msg);
 }
+
 void GameTcpClient::sendCardReleased(const int unitId, const int posX, const int posY) const
 {
-    cout << "side = " << side << endl;
     Message<GameMsgTypes> msg(GameMsgTypes::GameCardFromHandChoice);
     msg << side << posY << posX << unitId;
+    send(msg);
+}
+
+void GameTcpClient::sendAttackerPos(const int posX, const int posY) const
+{
+    Message<GameMsgTypes> msg(GameMsgTypes::GameAttackRequest);
+    msg << posY << posX;
+    send(msg);
+}
+
+void GameTcpClient::sendAttackedPos(const int posX, const int posY) const
+{
+    Message<GameMsgTypes> msg(GameMsgTypes::GameAttackRequest);
+    msg << posY << posX;
     send(msg);
 }
 

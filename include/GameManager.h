@@ -83,6 +83,7 @@ private:
     void playersTurn();
     void opponentsTurn();
 
+    int side;
     //Вывел циклы для удобства
 
     void _whileForPlay()
@@ -141,10 +142,18 @@ private:
                 {
                     if (playerTilesManager.mouseIsPressed())
                     {
+                        //В начале игры мы можем только выложить карту на стол.
                         BOOST_LOG_TRIVIAL(info) << "GameManager::gameStart(): Card was successufully released!";
                         firstCardIsReleased = true;
+                        //Эту информацию сразу отлавливает CardsManager
+                        playerTilesManager.setStatus(TilesManagerStatus::statusCardWasJustReleased);
                     }
-                    cardsManager.mouseIsPressed();
+                    if (cardsManager.mouseIsPressed())
+                    {
+                        playerTilesManager.setStatus(TilesManagerStatus::statusGameStartingReleasingCard);
+                        cardsManager.setStatus(CardsManagerStatus::statusGameStartingReleasingCard);
+                        playerTilesManager.updateFocus();
+                    }
                     break;
                 }
                 //Закрытие окна
@@ -168,6 +177,8 @@ private:
                 opponentTilesManager.updateFocus();
                 buttonsManager.updateFocus();
 
+//#if SERVER_CONNECTING == 1
+
                 BOOST_LOG_TRIVIAL(info) << "GameManager::ForGamesStart() : Waiting for opponent!";
                 client.incoming().wait();
                 auto msg = client.incoming().popFront().msg;
@@ -179,15 +190,21 @@ private:
                     BOOST_LOG_TRIVIAL(info) << "GameManager::ForGamesStart() : breed loaded!";
                 }
                 cout << "======================" << endl;
-                for (int i = 0; i < 9; ++i)
+
+                //1-му игроку - от 9 до 18, второму - наоборот
+                int id = 0;
+                for (int i = 0 + 9 * (1 - side); i < 9 + 9 * (1 - side); ++i)
                 {
-                    cout << "Texture = " << breed[i].texture << " strength = " << breed[i].strength << " HP = " << breed[i].HP << endl;
+                    if (breed[i].cardID != -1)
+                    {
+                        id = breed[i].cardID;
+                    }
+                    cout << "cardID = " << breed[i].cardID << " strength = " << breed[i].strength << " HP = " << breed[i].HP << endl;
                 }
-                cout << "======================" << endl;
-                for (int i = 9; i < 18; ++i)
-                {
-                    cout << "Texture = " << breed[i].texture << " strength = " << breed[i].strength << " HP = " << breed[i].HP << endl;
-                }
+
+                opponentTilesManager.setUnit(opponentUnits[id], RoundType::roundFlank, 1);
+                opponentTilesManager.draw();
+//#endif
 
                 return;
             }
@@ -205,13 +222,13 @@ private:
                 //Если двигаем мышкой
                 case (Event::MouseMoved):
                 {
+                    opponentTilesManager.updateFocus();
                     cardsManager.updateFocus();
                     break;
                 }
 
                 //ИСПРАВИТЬ!!!
                 //Необходимо ждать ответ от сервера
-                //И у всей функции, наверное, стоит сделать bool
                 case (Event::KeyPressed):
                 {
                     if (Keyboard::isKeyPressed(Keyboard::A))
@@ -226,7 +243,6 @@ private:
                     }
                     break;
                 }
-                //
 
                 //Закрытие окна
                 case (Event::Closed):
@@ -285,6 +301,8 @@ private:
                         BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Card was released!";
                         movesCount++;
                         BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Moves count = " << movesCount;
+                        //Перенёс строчку из TilesManager::mouseIsPressed() case TilesManagerStatus::statusWaitingForAttack
+                        playerTilesManager.setStatus(TilesManagerStatus::statusCardWasJustReleased);
                         //Это должно быть в этой строчке, поскольку функция отлавливает факт того, что карта была выложена на стол.
                         cardsManager.mouseIsPressed();
                         //Чтобы отрисовывались только те тайлы, которыми мы можем управлять.
@@ -303,16 +321,22 @@ private:
                         btnRemoveBody->enable();
                         btnTakeCard->enable();
                     }
-                    //Если атаковали
+                    //Если атаковали противника
                     if (opponentTilesManager.mouseIsPressed())
                     {
-                        BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Opponent's unit was attacked!";
+                        BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Opponent's tile was attacked succesfully!";
                         movesCount++;
                         BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Moves count = " << movesCount;
+                        opponentTilesManager.setStatus(TilesManagerStatus::statusNothingHappens);
+                        opponentTilesManager.updateFocus();
                         playerTilesManager.setStatus(TilesManagerStatus::statusAttackingUnit);
                         playerTilesManager.updateFocus();
                     }
-                    cardsManager.mouseIsPressed();
+                    if (cardsManager.mouseIsPressed())
+                    {
+                        playerTilesManager.setStatus(TilesManagerStatus::statusReleasingCard);
+                        cardsManager.setStatus(CardsManagerStatus::statusReleasingCard);
+                    }
                     break;
                 }
                 //Если отпустили кнопку на мыши
@@ -338,6 +362,7 @@ private:
 
             if (movesCount == 2)
             {
+
                 BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn(): Ended!";
                 stage = GameStage::stageOpponentsTurn;
                 return;

@@ -20,10 +20,10 @@ enum class GameMsgTypes : uint32_t
     LobbyLeave,
     GetHeroesStats,
     HeroesStats,
-//////////////////////////
+    //////////////////////////
     GameDeck,
     GameHeroesStats,
-    GameCanBeMeleeAttacked,
+    GameCanBeAttacked,
     GameLeaderChoice,
     GamePlayerOptionChoice,
     GameFullCoordinates,
@@ -31,5 +31,6 @@ enum class GameMsgTypes : uint32_t
     GameHelloToPlayer,
     GameCardFromHandChoice,
     GameStr,
-    GameString
+    GameString,
+    GameAttackRequest
 };

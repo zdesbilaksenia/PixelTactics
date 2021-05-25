@@ -18,5 +18,5 @@ struct Breed
 {
     int HP;
     int strength;
-    int texture;
+    int cardID;
 };

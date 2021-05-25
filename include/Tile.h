@@ -32,8 +32,8 @@ public:
     void setStatus(TileStatus _status);
     void draw() override;
     Unit *getUnit();
-    int getCoordX();
-    int getCoordY();
+    int& getCoordX();
+    int& getCoordY();
 
     //coordX - столбец
     //coordY - строка
@@ -116,7 +116,7 @@ public:
     void enable();
     void disable();
     bool getPressed();
-    void setActiveTiles(bool _activeTiles[3][3]);
+    void setActiveTiles(vector<bool>& _activeTiles);
     void resetActiveTiles();
 
 
@@ -144,14 +144,17 @@ public:
         case (RoundType::roundAvangard):
         {
             tilesAvangard[coordY]->setUnit(unit);
+            break;
         }
         case (RoundType::roundFlank):
         {
             tilesFlank[coordY]->setUnit(unit);
+            break;
         }
         case (RoundType::roundRear):
         {
             tilesRear[coordY]->setUnit(unit);
+            break;
         }
         default:
             break;

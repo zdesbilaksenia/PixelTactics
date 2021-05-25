@@ -25,6 +25,8 @@ GameManager::GameManager(RenderWindow &_window,
                                                              opponentUnits(_opponentUnits),
                                                              unitTextures(_textures)
 {
+    side = client.getSide();
+    BOOST_LOG_TRIVIAL(info) << "GameManager::GameManager() : side = " << side;
 }
 
 void GameManager::setAttackButton(Button &_btnAttack)
@@ -91,6 +93,12 @@ void GameManager::gameStart()
     stage = GameStage::stageStart;
     playerTilesManager.setStatus(TilesManagerStatus::statusGameStarting);
     cardsManager.setStatus(CardsManagerStatus::statusGameStarting);
+
+    vector<bool> activeTiles =
+        {1, 1, 1,
+         1, 1, 1,
+         1, 1, 1};
+    playerTilesManager.setActiveTiles(activeTiles);
 
     //Вначале игры берутся 3 карты
     for (int i = 0; i < 3; ++i)

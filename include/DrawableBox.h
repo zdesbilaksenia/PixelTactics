@@ -7,7 +7,7 @@ class DrawableBox
 {
 public:
     DrawableBox(RenderWindow &_window);
-    void setFillColor(Color _color);
+    void setFillColor(const Color& _color);
     void setTexture(Texture *_tx);
     virtual void setSize(const int &_width, const int &_height);
     virtual void setPosition(const int &_posX, const int &_posY);
