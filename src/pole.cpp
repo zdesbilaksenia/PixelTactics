@@ -105,7 +105,7 @@ std::vector<bool> Pole::CanBeMeleeAttackedRequest(int side)
 {
     std::vector<bool> CanBeMeleeAttacked;
     CanBeMeleeAttacked.resize(0);
-    if (side == 1)
+    if (side == 0)
     {
         for (int i = 0; i < 9; i++)
         {

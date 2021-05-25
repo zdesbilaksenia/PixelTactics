@@ -1,17 +1,15 @@
 cmake_minimum_required(VERSION 3.1)
 project(PixelTactics)
 
-find_package(SFML 2 COMPONENTS network audio graphics window system)
 find_library(PTHREAD_LIBRARY pthread)
 
 SET(Boost_USE_STATIC_LIBS OFF)
 SET(Boost_USE_MULTITHREAD ON)
-#FIND_PACKAGE(Boost 1.75.0 COMPONENTS system thread regex REQUIRED)
-FIND_PACKAGE(Boost 1.75.0 REQUIRED)
-#IF(Boost_FOUND)
-#  INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
-#  LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
-#ENDIF(Boost_FOUND)
+FIND_PACKAGE(Boost 1.75.0 COMPONENTS system thread regex REQUIRED)
+IF(Boost_FOUND)
+  INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
+  LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
+ENDIF(Boost_FOUND)
 
 SET(USED_LIBS ${Boost_SYSTEM_LIBRARY} ${Boost_THREAD_LIBRARY} ${Boost_REGEX_LIBRARY} ${PTHREAD_LIBRARY})
 
