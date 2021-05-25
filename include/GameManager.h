@@ -18,6 +18,7 @@ using namespace sf;
 #include "Tile.h"
 #include "Background.h"
 #include <thread>
+#include <mutex>
 
 class GameManager
 {
@@ -129,13 +130,6 @@ private:
         bool firstCardIsReleased = false;
         while (window.isOpen())
         {
-
-            
-
-            cout<<"YOOOO"<<endl;
-
-
-
             while (window.pollEvent(event))
             {
                 switch (event.type)
@@ -185,46 +179,51 @@ private:
                 opponentTilesManager.updateFocus();
                 buttonsManager.updateFocus();
 
-                //#if SERVER_CONNECTING == 1
-
-                BOOST_LOG_TRIVIAL(info) << "GameManager::ForGamesStart() : Waiting for opponent!";
-                client.incoming().wait();
-                auto msg = client.incoming().popFront().msg;
-                vector<Breed> breed;
-                if (msg.header.id == GameMsgTypes::GameHeroesStats)
+                if (client.incoming().empty())
                 {
-                    BOOST_LOG_TRIVIAL(info) << "GameManager::ForGamesStart() : Trying to load breed!";
-                    msg >> breed;
-                    BOOST_LOG_TRIVIAL(info) << "GameManager::ForGamesStart() : breed loaded!";
+                    this->draw();
                 }
-                cout << "======================" << endl;
-
-                //1-му игроку - от 9 до 18, второму - наоборот
-                int id = 0;
-                for (int i = 0 + 9 * (1 - side); i < 9 + 9 * (1 - side); ++i)
+                else
                 {
-                    if (breed[i].cardID != -1)
+                    BOOST_LOG_TRIVIAL(info) << "GameManager::ForGamesStart() : Got message from opponent!";
+
+                    auto msg = client.incoming().popFront().msg;
+                    vector<Breed> breed;
+                    if (msg.header.id == GameMsgTypes::GameHeroesStats)
                     {
-                        id = breed[i].cardID;
+                        BOOST_LOG_TRIVIAL(info) << "GameManager::ForGamesStart() : Trying to load breed!";
+                        msg >> breed;
+                        BOOST_LOG_TRIVIAL(info) << "GameManager::ForGamesStart() : breed loaded!";
                     }
-                    cout << "cardID = " << breed[i].cardID << " strength = " << breed[i].strength << " HP = " << breed[i].HP << endl;
+                    cout << "======================" << endl;
+
+                    //1-му игроку - от 9 до 18, второму - наоборот
+                    int id = 0;
+                    for (int i = 0 + 9 * (1 - side); i < 9 + 9 * (1 - side); ++i)
+                    {
+                        if (breed[i].cardID != -1)
+                        {
+                            id = breed[i].cardID;
+                        }
+                        cout << "cardID = " << breed[i].cardID << " strength = " << breed[i].strength << " HP = " << breed[i].HP << endl;
+                    }
+
+                    opponentTilesManager.setUnit(opponentUnits[id], RoundType::roundFlank, 1);
+
+                    return;
                 }
-
-                opponentTilesManager.setUnit(opponentUnits[id], RoundType::roundFlank, 1);
-                //opponentTilesManager.draw();
-                //#endif
             }
-
-            //////////////////////////
-            //this->draw();
-            /////////////////////////
-
-            return;
+            else
+            {
+                this->draw();
+            }
         }
     }
 
     void _whileForOpponentsTurn()
     {
+        int moveAmounts = 0;
+
         while (window.isOpen())
         {
             while (window.pollEvent(event))
@@ -239,8 +238,7 @@ private:
                     break;
                 }
 
-                //ИСПРАВИТЬ!!!
-                //Необходимо ждать ответ от сервера
+                    /*
                 case (Event::KeyPressed):
                 {
                     if (Keyboard::isKeyPressed(Keyboard::A))
@@ -255,6 +253,7 @@ private:
                     }
                     break;
                 }
+                */
 
                 //Закрытие окна
                 case (Event::Closed):
@@ -268,9 +267,51 @@ private:
                 }
             }
 
-            //////////////////////////
-            //this->draw();
-            /////////////////////////
+            if (client.incoming().empty())
+            {
+                this->draw();
+            }
+            else
+            {
+                //(У игрока два действия)
+                moveAmounts++;
+
+                BOOST_LOG_TRIVIAL(info) << "GameManager::ForGamesStart() : Got message from opponent!";
+
+                auto msg = client.incoming().popFront().msg;
+                vector<Breed> breeds;
+                if (msg.header.id == GameMsgTypes::GameHeroesStats)
+                {
+                    BOOST_LOG_TRIVIAL(info) << "GameManager::ForGamesStart() : Trying to load breed!";
+                    msg >> breeds;
+                    BOOST_LOG_TRIVIAL(info) << "GameManager::ForGamesStart() : breed loaded!";
+                }
+                cout << "======================" << endl;
+
+                //1-му игроку - от 9 до 18, второму - наоборот
+                for (int i = 0 + 9 * (1 - side); i < 9 + 9 * (1 - side); ++i)
+                {
+                    cout << "cardID = " << breeds[i].cardID << " strength = " << breeds[i].strength << " HP = " << breeds[i].HP << endl;
+                    int x = (i - 9 * (1 - side)) / 3;
+                    int y = i % 3;
+                    cout << "id = " << breeds[i].cardID << " x = " << x << " y =  " << y << endl;
+                    if (breeds[i].cardID != -1)
+                    {
+                        opponentTilesManager.setUnit(opponentUnits[breeds[i].cardID], x, y);
+                    }
+                }
+
+                opponentTilesManager.updateFocus();
+                playerTilesManager.updateFocus();
+                buttonsManager.updateFocus();
+                stage = GameStage::stagePlayersTurn;
+                BOOST_LOG_TRIVIAL(info) << "GameManager::opponentsTurn(): Ended!";
+
+                if (moveAmounts == 2)
+                {
+                    return;
+                }
+            }
         }
     }
 
@@ -373,7 +414,7 @@ private:
             }
 
             //////////////////////////
-            //this->draw();
+            this->draw();
             /////////////////////////
 
             if (movesCount == 2)
@@ -388,5 +429,7 @@ private:
 
     //std::thread graphicsThr;
     //Thread graphicsThr;
-    bool gameIsRunning;
+    //bool gameIsRunning;
+
+    //std::mutex mutex;
 };

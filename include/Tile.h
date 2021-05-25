@@ -32,8 +32,8 @@ public:
     void setStatus(TileStatus _status);
     void draw() override;
     Unit *getUnit();
-    int& getCoordX();
-    int& getCoordY();
+    int &getCoordX();
+    int &getCoordY();
 
     //coordX - столбец
     //coordY - строка
@@ -116,25 +116,8 @@ public:
     void enable();
     void disable();
     bool getPressed();
-    void setActiveTiles(vector<bool>& _activeTiles);
+    void setActiveTiles(vector<bool> &_activeTiles);
     void resetActiveTiles();
-
-
-    unique_ptr<Tile> get(unsigned int x, unsigned int y)
-    {
-        if(x < 0 || x > 2 || y < 0 || y > 2)
-        {
-            BOOST_LOG_TRIVIAL(error) << "";
-            return nullptr;
-        }
-        switch(x)
-        {
-            
-            //case 0:
-                //return copy_unique(tilesAvangard[y]);
-        }
-    }
-    
 
     //В том случае, если TilesManager - для отрисовки тайлов оппонента
     void setUnit(Unit &unit, RoundType round, int coordY)
@@ -156,6 +139,24 @@ public:
             tilesRear[coordY]->setUnit(unit);
             break;
         }
+        default:
+            break;
+        }
+    }
+
+    void setUnit(Unit &unit, int coordX, int coordY)
+    {
+        switch (coordX)
+        {
+        case 0:
+            setUnit(unit, RoundType::roundAvangard, coordY);
+            break;
+        case 1:
+            setUnit(unit, RoundType::roundFlank, coordY);
+            break;
+        case 2:
+            setUnit(unit, RoundType::roundRear, coordY);
+            break;
         default:
             break;
         }

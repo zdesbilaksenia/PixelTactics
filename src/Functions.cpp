@@ -4,6 +4,31 @@
 #include "Commands/CommandMakeLobby.h"
 #include "Commands/CommandJoinLobby.h"
 
+bool connectToServer(GameTcpClient &client, const string &host)
+{
+    BOOST_LOG_TRIVIAL(info) << "connectToServer() : trying to connect to " << host;
+    if (client.connect(host) == false)
+    {
+        BOOST_LOG_TRIVIAL(fatal) << "connectToServer() : Connection failed!";
+        return false;
+    }
+    else
+    {
+        client.incoming().wait();
+        auto msg = client.incoming().popFront().msg;
+        if (msg.header.id == GameMsgTypes::ServerAccept)
+        {
+            BOOST_LOG_TRIVIAL(info) << "connectToServer() : Server accepted!";
+            return true;
+        }
+        else
+        {
+            BOOST_LOG_TRIVIAL(fatal) << "connectToServer() : Server didn't accept!";
+            return false;
+        }
+    }
+}
+
 void setData(GameTcpClient &client,
              vector<Unit> &playerUnits,
              vector<Unit> &opponentUnits,

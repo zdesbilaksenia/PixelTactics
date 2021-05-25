@@ -13,10 +13,11 @@ using namespace sf;
 
 #include "Card.h"
 
-
 void setData(GameTcpClient &client, vector<Unit> &playerUnits, vector<Unit> &opponentUnits, vector<Card> &cards, vector<Texture> &textures);
 
 bool menu(RenderWindow &window,
           Mouse &mouse,
           Event &event,
           GameTcpClient &client);
+
+bool connectToServer(GameTcpClient &client, const string& host);

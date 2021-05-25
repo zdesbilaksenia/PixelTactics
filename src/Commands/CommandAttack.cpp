@@ -41,16 +41,12 @@ void CommandAttack::execute()
                         BOOST_LOG_TRIVIAL(info) << "CommandAttack::execute(): active tiles loaded!";
                 }
 
-#if SERVER_CONNECTING == 0
-                //vector<bool> activeTiles = {1, 1, 1, 1, 1, 1, 1, 1, 1};
-#endif // SERVER_CONNECTING
-
-                // 1 1 1
-                // 0 1 0
-                // 1 1 0
-                // ============ 1 0 0 1 1 1 1 0 1
-                // ============ 1 0 1 1 1 1 1 0 1
-
+                /*
+                        0 0 0  |  0 0 0
+                        0 0 0  |  0 0 0
+                        0 0 0  |  0 0 0
+                */
+               
                 for (int i = 0; i < 9; ++i)
                 {
                         cout << activeTiles[i] << " ";

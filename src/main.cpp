@@ -24,47 +24,18 @@ using namespace sf;
 #include "Commands/CommandJoinLobby.h"
 #include "Functions.h"
 
-//#include <X11/Xlib.h>
-
-void hello()
-{
-    for(int i = 0; i<100; ++i)
-    {
-        cout<<"hello";
-    }
-}
-
 int main()
 {
-    //XInitThreads();
-
-    for(int i=0; i<10; ++i){
-        cout<<"I am thread"<<endl;
-    }
-
     BOOST_LOG_TRIVIAL(info) << "main() : Starting!";
 
 #if SERVER_CONNECTING == 1
 
     GameTcpClient client;
-    if (client.connect("10.147.17.71") == false)
+
+    if(!connectToServer(client, "10.147.17.200"))
     {
-        BOOST_LOG_TRIVIAL(fatal) << "main() : Connection failed!";
+        BOOST_LOG_TRIVIAL(fatal) << "main() : error!";
         return 0;
-    }
-    else
-    {
-        client.incoming().wait();
-        auto msg = client.incoming().popFront().msg;
-        if (msg.header.id == GameMsgTypes::ServerAccept)
-        {
-            BOOST_LOG_TRIVIAL(info) << "main() : Server accepted!";
-        }
-        else
-        {
-            BOOST_LOG_TRIVIAL(fatal) << "main() : Server didn't accept!";
-            return 0;
-        }
     }
 
     RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "SFML works!");
@@ -89,12 +60,11 @@ int main()
 
     Mouse mouse;
     Event event;
-
-#endif
+#endif //SERVER_CONNECTING
 
 #if SERVER_CONNECTING == 0
     GameTcpClient client;
-#endif
+#endif //SERVER_CONNECTING
 
 #if GAME_ELEMENTS == 1
 
@@ -164,7 +134,7 @@ int main()
 
     Texture takeCardButtonTx;
     takeCardButtonTx.loadFromFile("../img/take_card.png");
-    CommandTakeCard cmdtakecard(cardsManager);
+    CommandTakeCard cmdtakecard(cardsManager, client);
     Button buttonTakeCard(window, mouse, &cmdtakecard);
     buttonTakeCard.setPosition(50, 30);
     buttonTakeCard.setTexture(&takeCardButtonTx);

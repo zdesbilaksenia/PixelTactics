@@ -23,12 +23,8 @@ GameManager::GameManager(RenderWindow &_window,
                                                              stage(GameStage::stageStart),
                                                              round(RoundType::roundAvangard),
                                                              opponentUnits(_opponentUnits),
-                                                             unitTextures(_textures),
-                                                             //graphicsThr(&draw),
-                                                             gameIsRunning(true)
-
+                                                             unitTextures(_textures)
 {
-    //Thread thread(draw);
     side = client.getSide();
     BOOST_LOG_TRIVIAL(info) << "GameManager::GameManager() : side = " << side;
 }
@@ -60,38 +56,15 @@ void GameManager::setRemoveBodyButton(Button &_btnRemoveBody)
 
 void GameManager::draw()
 {
-    Thread thread([this]() {
-        while (gameIsRunning)
-        {
-            window.clear();
+    window.clear();
 
-            background.draw();
-            buttonsManager.draw();
-            playerTilesManager.draw();
-            opponentTilesManager.draw();
-            cardsManager.draw();
+    background.draw();
+    buttonsManager.draw();
+    playerTilesManager.draw();
+    opponentTilesManager.draw();
+    cardsManager.draw();
 
-            window.display();
-        }
-    });
-    thread.launch();
-    /*
-    graphicsThr = std::thread(
-        [this]() {
-            while (gameIsRunning)
-            {
-                window.clear();
-
-                background.draw();
-                buttonsManager.draw();
-                playerTilesManager.draw();
-                opponentTilesManager.draw();
-                cardsManager.draw();
-
-                window.display();
-            }
-        });
-        */
+    window.display();
 }
 
 void GameManager::play()
@@ -99,11 +72,15 @@ void GameManager::play()
     stage = GameStage::stageStart;
     round = RoundType::roundNoType;
     gameStart();
-    //stage = GameStage::stageOpponentsTurn;
     stage = GameStage::stagePlayersTurn;
 
-    //Ждём здесь, пока ответ о конце хода противника не придёт:
-    opponentsTurn();
+    //Если второй игрок
+    if (side == 1)
+    {
+        cout<<"I am the second player!"<<endl;
+        //Ждём здесь, пока ответ о конце хода противника не придёт:
+        opponentsTurn();
+    }
 
     round = RoundType::roundAvangard;
 
@@ -136,6 +113,7 @@ void GameManager::gameStart()
     //draw();
 
     this->draw();
+
     _whileForGameStart();
 }
 
