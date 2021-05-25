@@ -17,6 +17,7 @@ using namespace sf;
 #include "Card.h"
 #include "Tile.h"
 #include "Background.h"
+#include <thread>
 
 class GameManager
 {
@@ -40,6 +41,8 @@ public:
     void setRemoveBodyButton(Button &_btnRemoveBody);
 
     void play();
+
+    ~GameManager();
 
 private:
     //Текстуры для отрисовки противника
@@ -126,6 +129,13 @@ private:
         bool firstCardIsReleased = false;
         while (window.isOpen())
         {
+
+            
+
+            cout<<"YOOOO"<<endl;
+
+
+
             while (window.pollEvent(event))
             {
                 switch (event.type)
@@ -166,8 +176,6 @@ private:
                 }
             }
 
-            this->draw();
-
             if (firstCardIsReleased)
             {
                 playerTilesManager.setStatus(TilesManagerStatus::statusNothingHappens);
@@ -177,7 +185,7 @@ private:
                 opponentTilesManager.updateFocus();
                 buttonsManager.updateFocus();
 
-//#if SERVER_CONNECTING == 1
+                //#if SERVER_CONNECTING == 1
 
                 BOOST_LOG_TRIVIAL(info) << "GameManager::ForGamesStart() : Waiting for opponent!";
                 client.incoming().wait();
@@ -203,11 +211,15 @@ private:
                 }
 
                 opponentTilesManager.setUnit(opponentUnits[id], RoundType::roundFlank, 1);
-                opponentTilesManager.draw();
-//#endif
-
-                return;
+                //opponentTilesManager.draw();
+                //#endif
             }
+
+            //////////////////////////
+            //this->draw();
+            /////////////////////////
+
+            return;
         }
     }
 
@@ -256,7 +268,9 @@ private:
                 }
             }
 
-            this->draw();
+            //////////////////////////
+            //this->draw();
+            /////////////////////////
         }
     }
 
@@ -358,7 +372,9 @@ private:
                 }
             }
 
-            this->draw();
+            //////////////////////////
+            //this->draw();
+            /////////////////////////
 
             if (movesCount == 2)
             {
@@ -369,4 +385,8 @@ private:
             }
         }
     }
+
+    //std::thread graphicsThr;
+    //Thread graphicsThr;
+    bool gameIsRunning;
 };

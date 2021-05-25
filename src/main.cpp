@@ -24,8 +24,24 @@ using namespace sf;
 #include "Commands/CommandJoinLobby.h"
 #include "Functions.h"
 
+//#include <X11/Xlib.h>
+
+void hello()
+{
+    for(int i = 0; i<100; ++i)
+    {
+        cout<<"hello";
+    }
+}
+
 int main()
 {
+    //XInitThreads();
+
+    for(int i=0; i<10; ++i){
+        cout<<"I am thread"<<endl;
+    }
+
     BOOST_LOG_TRIVIAL(info) << "main() : Starting!";
 
 #if SERVER_CONNECTING == 1

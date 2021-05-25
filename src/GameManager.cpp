@@ -23,8 +23,12 @@ GameManager::GameManager(RenderWindow &_window,
                                                              stage(GameStage::stageStart),
                                                              round(RoundType::roundAvangard),
                                                              opponentUnits(_opponentUnits),
-                                                             unitTextures(_textures)
+                                                             unitTextures(_textures),
+                                                             //graphicsThr(&draw),
+                                                             gameIsRunning(true)
+
 {
+    //Thread thread(draw);
     side = client.getSide();
     BOOST_LOG_TRIVIAL(info) << "GameManager::GameManager() : side = " << side;
 }
@@ -56,15 +60,38 @@ void GameManager::setRemoveBodyButton(Button &_btnRemoveBody)
 
 void GameManager::draw()
 {
-    window.clear();
+    Thread thread([this]() {
+        while (gameIsRunning)
+        {
+            window.clear();
 
-    background.draw();
-    buttonsManager.draw();
-    playerTilesManager.draw();
-    opponentTilesManager.draw();
-    cardsManager.draw();
+            background.draw();
+            buttonsManager.draw();
+            playerTilesManager.draw();
+            opponentTilesManager.draw();
+            cardsManager.draw();
 
-    window.display();
+            window.display();
+        }
+    });
+    thread.launch();
+    /*
+    graphicsThr = std::thread(
+        [this]() {
+            while (gameIsRunning)
+            {
+                window.clear();
+
+                background.draw();
+                buttonsManager.draw();
+                playerTilesManager.draw();
+                opponentTilesManager.draw();
+                cardsManager.draw();
+
+                window.display();
+            }
+        });
+        */
 }
 
 void GameManager::play()
@@ -106,6 +133,9 @@ void GameManager::gameStart()
         cardsManager.takeCard();
     }
 
+    //draw();
+
+    this->draw();
     _whileForGameStart();
 }
 
@@ -139,4 +169,12 @@ void GameManager::playersTurn()
     buttonsManager.updateFocus();
 
     _whileForPlayersTurn();
+}
+
+GameManager::~GameManager()
+{
+    //if (graphicsThr.joinable())
+    {
+        // graphicsThr.join();
+    }
 }
