@@ -12,6 +12,7 @@ using std::vector;
 struct Breed {
     int HP;
     int Strength;
+    int ID;
 };
 
 std::vector<Breed> ReturnRequest(Pole &pole_);

@@ -17,7 +17,7 @@ Deck MySQL::GetCards() {
 
     while ((row = mysql_fetch_row(res)) != nullptr) {
         Card card;
-        card.ID = atoi(row[0]);
+        card.texture = atoi(row[0]);
         card.name = row[1];
         card.HP = atoi(row[2]);
         card.strength = atoi(row[3]);

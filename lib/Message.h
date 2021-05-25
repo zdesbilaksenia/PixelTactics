@@ -64,12 +64,10 @@ struct Message {
 
     template <typename U, typename DT>
     friend Message<U>& operator >> (Message<U>& msg, std::vector<DT>& data) {
-        std::cout << "v vectore?\n";
         size_t len = 0;
         msg >> len;
         for (size_t i = 0; i < len; ++i) {
             DT elem;
-            std::cout << "zaxodim?\n";
             msg >> elem;
             data.push_back(elem);
         }
@@ -103,13 +101,14 @@ struct Message {
         msg << data.strength;
         msg << data.HP;
         msg << data.name;
+        msg << data.texture;
         msg << data.ID;
     }
 
     template <typename U>
     friend Message<U>& operator >> (Message<U>& msg, Card& data) {
-        std::cout << "tyt owibka\n";
-        msg >> data.ID;
+        msg << data.ID;
+        msg >> data.texture;
         msg >> data.name;
         msg >> data.HP;
         msg >> data.strength;

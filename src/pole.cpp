@@ -209,3 +209,8 @@ std::vector<bool> Pole::CanBeMeleeAttackedRequest(int side)
     }
     return CanBeMeleeAttacked;
 }
+
+Position* Pole::GetLeaderPos(int player) {
+        Position* leader;
+        leader = GetPosition(1,1,player);
+}

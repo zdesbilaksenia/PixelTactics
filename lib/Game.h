@@ -14,12 +14,14 @@
 
 class Game {
 public:
-    
-    Game(Lobby* lobby_):lobby(lobby_){}
+
+    Game(Lobby *lobby_) : lobby(lobby_) {}
+
     void StartGame();
+
     void CallPechkin(int playerId, const Message<GameMsgTypes> &msg);
-    
-    void LobbyShortCoordinates(int& line, int& cell){
+
+    void LobbyShortCoordinates(int &line, int &cell) {
         lobby->incoming().wait();
         auto msg = lobby->incoming().popFront().msg;
         if (msg.header.id == GameMsgTypes::GameShortCoordinates) {
@@ -29,9 +31,13 @@ public:
             return;
         }
     }
-    
+
+    void SetLeader(std::vector<Player *> &players, int playerside, int choice, Pole &pole, PowerMapper &mapper);
+
+    void SendBreeds(Pole &pole);
+
 private:
-    Lobby* lobby;
+    Lobby *lobby;
 };
 
 #endif

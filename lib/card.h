@@ -8,6 +8,7 @@
 typedef struct Card {
 
     int ID;
+    int texture;
     std::string name;
     int HP;
     int strength;

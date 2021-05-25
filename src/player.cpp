@@ -28,8 +28,15 @@ Card Player::ChooseCard(int CardIndex){
     if(CardIndex < 0 || CardIndex >= size){
         //throw exception
     }
-    Card card = hand_.GetVector()[CardIndex];
-    hand_.GetVector().erase(hand_.GetVector().begin()+CardIndex);
+    Card card;
+    for (int i =0;i<hand_.GetVector().size();i++) {
+        if (hand_.GetVector()[i].ID==CardIndex){
+            card =hand_.GetVector()[i];
+            hand_.GetVector().erase(hand_.GetVector().begin()+i);
+            std::cout << "РЕАЛИЗОВАНА КАРТА " << card.name << std::endl;
+            break;
+        }
+    }
     return card;
 }
 

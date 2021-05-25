@@ -10,6 +10,7 @@ class Hero{
 private:
     int ID;
     int HP;
+    int texture;
     int curHP;
     std::string name;
     int strength;
@@ -47,6 +48,8 @@ public:
     void SetCurHealth(int HP);
 
     int GetID();
+
+    int GetTexture();
 
     void ReduceHealth(int damage);
 

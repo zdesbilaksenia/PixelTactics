@@ -17,6 +17,7 @@ public:
     void InfoPosition(Position* position);
     bool CheckLeader();
     std::vector<bool> CanBeMeleeAttackedRequest(int side);
+    Position* GetLeaderPos(int player);
 private:
     std::vector<Position*> pole_;
 };

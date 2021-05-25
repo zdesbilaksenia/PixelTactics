@@ -1,7 +1,44 @@
 #include "Game.h"
 #include "request.h"
 
-void Game::StartGame(){
+void Game::SetLeader(std::vector<Player *> &players, int playerside, int choice, Pole &pole, PowerMapper &mapper) {
+    Player *CurrentPlayer = players[playerside];
+    Position *LeaderPos = pole.GetPosition(1, 1, playerside);
+    for (int i = 0; i < CurrentPlayer->GetDeck().GetVector().size(); i++) {
+        if (CurrentPlayer->GetDeck().GetVector()[i].ID == choice) {
+            LeaderPos->SetHero(CurrentPlayer->GetDeck().GetVector()[i]);
+            break;
+        }
+    }
+    mapper.MapPowers(LeaderPos->GetHero());
+    LeaderPos->GetHero().MakeLeader();
+    pole.SetPosition(LeaderPos);
+    CurrentPlayer->GetDeck().GetVector().erase(CurrentPlayer->GetDeck().GetVector().begin() + choice);
+    for (int i = 0; i < 2; i++) {
+        CurrentPlayer->GetHand().push_back(CurrentPlayer->GetDeck().GetVector().back());
+        CurrentPlayer->GetDeck().GetVector().pop_back();
+    }
+}
+
+void Game::SendBreeds(Pole &pole) {
+    std::vector<Breed> allStats;
+    allStats.resize(0);
+    for (int i = 0; i < pole.GetVector().size(); i++) {
+        Breed stats;
+        stats.HP = pole.GetVector()[i]->GetHero().GetCurHealth();
+        stats.Strength = pole.GetVector()[i]->GetHero().GetCurStrength();
+        stats.ID = pole.GetVector()[i]->GetHero().GetID();
+        allStats.push_back(stats);
+    }
+
+    Message<GameMsgTypes> statsMsg(GameMsgTypes::GameHeroesStats);
+    statsMsg << allStats;
+    CallPechkin(0, statsMsg);
+    CallPechkin(1, statsMsg);
+}
+
+
+void Game::StartGame() {
     Pole pole;
 
     Position FirstPlayerLeader(1, 1, 0);
@@ -14,15 +51,22 @@ void Game::StartGame(){
     Deck SecondPlayerDeck(allCards.GetVector());
     Player FirstPlayer(FirstPlayerDeck, 0);
     Player SecondPlayer(SecondPlayerDeck, 1);
+    std::vector<Player *> Players(0);
+    Players.push_back(&(FirstPlayer));
+    Players.push_back(&(SecondPlayer));
     std::vector<Card> StepaFirstAllCards = FirstPlayerDeck.GetVector();
     auto msg = Message<GameMsgTypes>(GameMsgTypes::GameDeck);
     msg << StepaFirstAllCards;
-    CallPechkin(0,msg);
+    CallPechkin(0, msg);
 
-    std::vector<Card> StepaSecondAllCards = FirstPlayerDeck.GetVector();
+    std::vector<Card> StepaSecondAllCards = SecondPlayerDeck.GetVector();
     msg = Message<GameMsgTypes>(GameMsgTypes::GameDeck);
     msg << StepaSecondAllCards;
-    CallPechkin(1,msg);
+    CallPechkin(1, msg);
+
+    CallPechkin(0, msg);
+    msg << StepaFirstAllCards;
+    CallPechkin(1, msg);
 
     std::cout << "//////////////////////////" << std::endl;
     Deck FirstLeaderCards;
@@ -36,88 +80,48 @@ void Game::StartGame(){
                   << FirstPlayerDeck.GetVector()[i].HP << " " << "Атака Героя:"
                   << FirstPlayerDeck.GetVector()[i].strength << std::endl;
     }
-    int choice;
-    std::cout << "////" << std::endl;
-    lobby->incoming().wait();
-    auto leadmsg = lobby->incoming().popFront().msg;
-    if (leadmsg.header.id == GameMsgTypes::GameCardFromHandChoice) {
-       leadmsg >> choice;
-    } else {
-        std::cout << "Error in leader choice!\n";
-        return;
-    }
-    std::cout << choice << std::endl;
-    for (int i = 0; i < FirstPlayerDeck.GetVector().size(); i++) {
-        std::cout << FirstPlayerDeck.GetVector()[i].name << " " << "Здоровье Героя:"
-                  << FirstPlayerDeck.GetVector()[i].HP << " " << "Атака Героя:"
-                  << FirstPlayerDeck.GetVector()[i].strength << std::endl;
-    }
-    FirstPlayerLeader.SetHero(FirstPlayerDeck.GetVector()[choice]);
-    mapper.MapPowers(FirstPlayerLeader.GetHero());
-    FirstPlayerLeader.GetHero().MakeLeader();
-    pole.SetPosition(&(FirstPlayerLeader));
-    FirstPlayerDeck.GetVector().erase(FirstPlayerDeck.GetVector().begin() + choice);
-    FirstPlayer.GetHand().push_back(FirstPlayerDeck.GetVector().back());
-    FirstPlayerDeck.GetVector().pop_back();
-    FirstPlayer.GetHand().push_back(FirstPlayerDeck.GetVector().back());
-    FirstPlayerDeck.GetVector().pop_back();
-
-    FirstPlayerLeader.InfoPosition();
-    for(int i = 0; i < FirstPlayer.GetHand().GetVector().size(); i++){
-        std::cout << FirstPlayer.GetHand().GetVector()[i].name << " " << "Здоровье Героя:"
-                  << FirstPlayer.GetHand().GetVector()[i].HP << " " << "Атака Героя:"
-                  << FirstPlayer.GetHand().GetVector()[i].strength << std::endl;
-    }
-
     std::cout << "Выбери лидера Второй игрок" << std::endl;
     for (int i = 17; i < SecondPlayerDeck.GetVector().size(); i++) {
         std::cout << SecondPlayerDeck.GetVector()[i].name << " " << "Здоровье Героя:"
                   << SecondPlayerDeck.GetVector()[i].HP << " " << "Атака Героя:"
                   << SecondPlayerDeck.GetVector()[i].strength << std::endl;
     }
-
-    FirstPlayerLeader.InfoPosition();
-    for(int i = 0; i < SecondPlayer.GetHand().GetVector().size(); i++){
-        std::cout << SecondPlayer.GetHand().GetVector()[i].name << " " << "Здоровье Героя:"
-                  << SecondPlayer.GetHand().GetVector()[i].HP << " " << "Атака Героя:"
-                  << SecondPlayer.GetHand().GetVector()[i].strength << std::endl;
-    }
+    int choice, playerside;
+    int x, y;
+    std::cout << "////" << std::endl;
     lobby->incoming().wait();
-    leadmsg = lobby->incoming().popFront().msg;
+    auto leadmsg = lobby->incoming().popFront().msg;
     if (leadmsg.header.id == GameMsgTypes::GameCardFromHandChoice) {
-        leadmsg >> choice;
+        leadmsg >> choice >> x >> y >> playerside;
     } else {
         std::cout << "Error in leader choice!\n";
         return;
     }
-    SecondPlayerLeader.SetHero(SecondPlayerDeck.GetVector()[choice]);
-    mapper.MapPowers(SecondPlayerLeader.GetHero());
-    SecondPlayerLeader.GetHero().MakeLeader();
-    pole.SetPosition(&(SecondPlayerLeader));
-    SecondPlayerDeck.GetVector().erase(SecondPlayerDeck.GetVector().begin() + choice);
-    SecondPlayer.GetHand().push_back(SecondPlayerDeck.GetVector().back());
-    SecondPlayerDeck.GetVector().pop_back();
-    SecondPlayer.GetHand().push_back(SecondPlayerDeck.GetVector().back());
-    SecondPlayerDeck.GetVector().pop_back();
+    std::cout << "CHOICE " << choice << " PLAYERSIDE " << playerside << std::endl;
+    SetLeader(Players, playerside, choice, pole, mapper);
 
+    lobby->incoming().wait();
+    leadmsg = lobby->incoming().popFront().msg;
+    if (leadmsg.header.id == GameMsgTypes::GameCardFromHandChoice) {
+        leadmsg >> choice >> x >> y >> playerside;
+    } else {
+        std::cout << "Error in leader choice!\n";
+        return;
+    }
+    std::cout << "CHOICE " << choice << " PLAYERSIDE " << playerside << std::endl;
+    SetLeader(Players, playerside, choice, pole, mapper);
+
+    cout << " Лидер 1 ";
+    pole.GetPosition(1, 1, 0)->InfoPosition();
+    cout << " Лидер 2 ";
+    pole.GetPosition(1, 1, 1)->InfoPosition();
 
     // Breed allStats[pole.GetVector().size()];
-    std::vector<Breed> allStats;
-    allStats.resize(0);
-    for (int i = 0; i < pole.GetVector().size(); i++) {
-        Breed stats;
-        stats.HP = pole.GetVector()[i]->GetHero().GetCurHealth();
-        stats.Strength = pole.GetVector()[i]->GetHero().GetCurStrength();
-        allStats.push_back(stats);
-    }
-    Message<GameMsgTypes> Inmsg(GameMsgTypes::HeroesStats);
-    msg << allStats;
-    CallPechkin(0, Inmsg);
-    std::cout << "//////////////////////////" << std::endl;
 
+    SendBreeds(pole);
 
-    FirstPlayer.StartingHand();
-    SecondPlayer.StartingHand();
+    // FirstPlayer.StartingHand();
+    // SecondPlayer.StartingHand();
 
 
     int currentside = 0;
@@ -161,45 +165,40 @@ void Game::StartGame(){
             }
         }
 
-        std::cout << "//////////////////////////" << std::endl;
-        std::cout << "Взять карту(1)" << std::endl;
-        std::cout << "Посмотреть руку(2)" << std::endl;
-        std::cout << "Получить информацию о герое на поле(3)" << std::endl;
-        std::cout << "Атаковать своим героем врага(4)" << std::endl;
-        std::cout << "Посмотреть поле(5)" << std::endl;
-        std::cout << "Поставить героя(6)" << std::endl;
-        std::cout << "Способность(7)" << std::endl;
-        std::cout << "Убрать труп(8)" << std::endl;
-        std::cout << "//////////////////////////" << std::endl;
+        /* std::cout << "//////////////////////////" << std::endl;
+         std::cout << "Взять карту(1)" << std::endl;
+         std::cout << "Посмотреть руку(2)" << std::endl;
+         std::cout << "Получить информацию о герое на поле(3)" << std::endl;
+         std::cout << "Атаковать своим героем врага(4)" << std::endl;
+         std::cout << "Посмотреть поле(5)" << std::endl;
+         std::cout << "Поставить героя(6)" << std::endl;
+         std::cout << "Способность(7)" << std::endl;
+         std::cout << "Убрать труп(8)" << std::endl;
+         std::cout << "//////////////////////////" << std::endl;*/
 
         choice = 0;
         lobby->incoming().wait();
         msg = lobby->incoming().popFront().msg;
-        if (msg.header.id == GameMsgTypes::GamePlayerOptionChoice) {
-            msg >> choice;
-        } else {
-            std::cout << "Error in option choice!\n";
-            return;
-        }
-        switch (choice) {
-            case (1): {
+        cout << "ПРИШЛО" << std::endl;
+        switch (msg.header.id) {
+            /*case (): {
                 CurrentPlayer.DrawCard();
                 MovesAmount--;
                 break;
-            }
-            case (2): {
+            }*/
+            /*case (2): {
                 CurrentPlayer.GetHand().ShowDeck();
                 std::cout << "//////////////////////////" << std::endl;
                 break;
-            }
-            case (3): {
+            }*/
+            /*case (3): {
                 std::cout << "Введите клетку и линию и сторону" << std::endl;
                 int line = 0;
                 int cell = 0;
                 int side = 0;
                 lobby->incoming().wait();
                 msg = lobby->incoming().popFront().msg;
-                    if (msg.header.id == GameMsgTypes::GameFullCoordinates) {
+                if (msg.header.id == GameMsgTypes::GameFullCoordinates) {
                     msg >> line >> cell >> side;
                 } else {
                     std::cout << "Error in Full Coordinates!\n";
@@ -210,24 +209,29 @@ void Game::StartGame(){
                 kletka->InfoPosition();
                 std::cout << "//////////////////////////" << std::endl;
                 break;
-            }
-            case (4): {
-                std::cout << "Введите клетку и линию вашего героя" << std::endl;
+            }*/
+            case (GameMsgTypes::GameAttackRequest): {
+                pole.Show();
+                std::cout << "ВЫБРАНА АТАКА" << std::endl;
                 int line = 0;
                 int cell = 0;
 
-                LobbyShortCoordinates(line,cell);
+                msg >> line >> cell;
+                cout << "АТАКУЮЩИЙ " << line << " " << cell << std::endl;
                 std::vector<bool> CanBeMeleeAttacked;
-                CanBeMeleeAttacked = pole.CanBeMeleeAttackedRequest(CurrentPlayer.GetSide()? 0:1);
+                CanBeMeleeAttacked = pole.CanBeMeleeAttackedRequest(currentside);
 
-                auto Attackmsg = Message<GameMsgTypes>(GameMsgTypes::GameCanBeMeleeAttacked);
+                auto Attackmsg = Message<GameMsgTypes>(GameMsgTypes::GameCanBeAttacked);
                 Attackmsg << CanBeMeleeAttacked;
-                CallPechkin(0,Attackmsg);
+                CallPechkin(currentside, Attackmsg);
+                for (int i = 0; i < 9; i++)
+                    cout << CanBeMeleeAttacked[i] << " ";
+                cout << std::endl;
 
                 Position *YourHero = pole.GetPosition(cell, line, CurrentPlayer.GetSide());
 
-                std::cout << "Введите клетку и линию вражеского героя" << std::endl;
-                LobbyShortCoordinates(line,cell);
+                /*std::cout << "Введите клетку и линию вражеского героя" << std::endl;
+                LobbyShortCoordinates(line, cell);
                 int EnemySide;
                 if (CurrentPlayer.GetSide() == 0) {
                     EnemySide = 1;
@@ -243,81 +247,80 @@ void Game::StartGame(){
                     std::vector<Breed> Stats;
                     Stats = ReturnRequest(pole);
 
-                    auto Statsmsg = Message<GameMsgTypes>(GameMsgTypes::GameHeroStats);
+                    auto Statsmsg = Message<GameMsgTypes>(GameMsgTypes::GameHeroesStats);
                     Statsmsg << Stats;
-                    CallPechkin(0,Attackmsg);
+                    CallPechkin(0, Attackmsg);
                 } else {
                     std::cout << "СПЕРЕДИ СТОИТ ДРУГОЙ ГЕРОЙ. НЕЛЬЗЯ АТАКОВАТЬ!!" << std::endl;
-                }
-                break;
-            }
-            case (5): {
-                pole.Show();
-                std::vector<bool> Test;
-                Test = pole.CanBeMeleeAttackedRequest(CurrentPlayer.GetSide());
-                for (int i = 0; i < Test.size(); i++) {
-                    std::cout << std::boolalpha << Test[i] << " ";
-                }
-                break;
-            }
-            case (6): {
-                std::cout << "Выберете карту" << std::endl;
+                }*/
                 lobby->incoming().wait();
-                msg = lobby->incoming().popFront().msg;
-                if (msg.header.id == GameMsgTypes::GameCardFromHandChoice) {
-                    msg >> choice;
-                } else {
-                    std::cout << "Error in Card from Hand choice\n";
-                    return;
+                auto attackerMsg = lobby->incoming().popFront().msg;
+                if (msg.header.id == GameMsgTypes::GameAttackRequest) {
+                    attackerMsg >> line >> cell;
+                    Position *EnemyHero = pole.GetPosition(cell, line, currentside ? 0 : 1);
+                    cout << "АТАКОВАННЫЙ " << line << " " << cell << " " << EnemyHero->GetHero().GetName();
                 }
-                Card ChosenCard = CurrentPlayer.ChooseCard(choice);
-
-                std::cout << "Введите клетку и линию" << std::endl;
+                break;
+            }
+                /*case (5): {
+                    pole.Show();
+                    std::vector<bool> Test;
+                    Test = pole.CanBeMeleeAttackedRequest(CurrentPlayer.GetSide());
+                    for (int i = 0; i < Test.size(); i++) {
+                        std::cout << std::boolalpha << Test[i] << " ";
+                    }
+                    break;
+                }*/
+            case (GameMsgTypes::GameCardFromHandChoice): {
+                std::cout << "РЕАЛИЗАЦИЯ КАРТЫ" << std::endl;
                 int line = 0;
                 int cell = 0;
-                LobbyShortCoordinates(line,cell);
+                msg >> choice >> line >> cell;
+                cout << " CHOICE " << choice << " CELL " << cell << " LINE " << line << std::endl;
+                Card ChosenCard = CurrentPlayer.ChooseCard(choice);
 
-                Position *kletka = pole.GetPosition(cell, line, CurrentPlayer.GetSide());
+                Position *kletka = pole.GetPosition(cell, line, currentside);
                 kletka->SetHero(ChosenCard);
                 mapper.MapPowers(kletka->GetHero());
                 pole.SetPosition(kletka);
                 MovesAmount--;
+                pole.Show();
                 break;
             }
-            case (7): {
-                int cell, line;
-                std::cout << "Введите клетку и линию вашего героя: " << std::endl;
-               LobbyShortCoordinates(line,cell);
-                switch (Phase) {
-                    case (0): {
-                        Position *Hero = pole.GetPosition(cell, line, currentside);
-                        cout << "\nИмя: " << Hero->GetHero().GetName() << "\nСпособность авангарда: "
-                             << allCards.GetVector()[Hero->GetHero().GetID() - 1].frontLinePower << "\n";
-                        FrontRequest(Hero, pole, currentside);
-                        break;
+                /*case (7): {
+                    int cell, line;
+                    std::cout << "Введите клетку и линию вашего героя: " << std::endl;
+                    LobbyShortCoordinates(line, cell);
+                    switch (Phase) {
+                        case (0): {
+                            Position *Hero = pole.GetPosition(cell, line, currentside);
+                            cout << "\nИмя: " << Hero->GetHero().GetName() << "\nСпособность авангарда: "
+                                 << allCards.GetVector()[Hero->GetHero().GetID() - 1].frontLinePower << "\n";
+                            FrontRequest(Hero, pole, currentside);
+                            break;
+                        }
+                        case (1): {
+                            Position *Hero = pole.GetPosition(cell, line, currentside);
+                            MiddleRequest(Hero, pole, currentside);
+                            break;
+                        }
+                        case (2): {
+                            Position *Hero = pole.GetPosition(cell, line, currentside);
+                            BackRequest(Hero, pole, currentside);
+                            break;;
+                        }
+                        default:
+                            break;
                     }
-                    case (1): {
-                        Position *Hero = pole.GetPosition(cell, line, currentside);
-                        MiddleRequest(Hero, pole, currentside);
-                        break;
-                    }
-                    case (2): {
-                        Position *Hero = pole.GetPosition(cell, line, currentside);
-                        BackRequest(Hero, pole,currentside);
-                        break;;
-                    }
-                    default: 
-                        break;
-                }
-            }
-            case(8):{
-                int line,cell=0;
-                std::cout << "Введите клетку и линию вашего трупа: " << std::endl;
-                LobbyShortCoordinates(line,cell);
+                }*/
+                /*case (8): {
+                    int line, cell = 0;
+                    std::cout << "Введите клетку и линию вашего трупа: " << std::endl;
+                    LobbyShortCoordinates(line, cell);
 
-                Position *kletka = pole.GetPosition(cell, line, CurrentPlayer.GetSide());
-                kletka->RemoveHero();
-            }
+                    Position *kletka = pole.GetPosition(cell, line, CurrentPlayer.GetSide());
+                    kletka->RemoveHero();
+                }*/
             default: {
                 break;
             }
@@ -325,6 +328,6 @@ void Game::StartGame(){
     }
 }
 
-void Game::CallPechkin(int playerId, const Message<GameMsgTypes> &msg){
+void Game::CallPechkin(int playerId, const Message<GameMsgTypes> &msg) {
     lobby->sendToPlayer(playerId, msg);
 }

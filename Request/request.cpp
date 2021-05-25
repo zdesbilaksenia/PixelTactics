@@ -8,6 +8,7 @@ std::vector<Breed> ReturnRequest(Pole &pole_) {
         Breed stats;
         stats.HP = pole_.GetVector()[i]->GetHero().GetCurHealth();
         stats.Strength = pole_.GetVector()[i]->GetHero().GetCurStrength();
+        stats.ID = pole_.GetVector()[i]->GetHero().GetID();
         allStats[i] = stats;
     }
     return allStats;
@@ -47,7 +48,7 @@ void UseMagic(int xAttack, int yAttack, int friendlyside, Pole &pole_, int phase
 
 
 void FrontRequest(Position *friendPosition, Pole &pole, int friendlyside) {
-    switch (friendPosition->GetHero().GetID()) {
+    switch (friendPosition->GetHero().GetTexture()) {
         case (5): {
             SendAllAliveEnemies(friendPosition, pole, friendlyside, 0);
             break;
@@ -92,7 +93,7 @@ void FrontRequest(Position *friendPosition, Pole &pole, int friendlyside) {
 }
 
 void MiddleRequest(Position *friendPosition, Pole &pole, int friendlyside) {
-    switch (friendPosition->GetHero().GetID()) {
+    switch (friendPosition->GetHero().GetTexture()) {
         case (2, 6): {
             SendAllDeadFriends(friendPosition, pole, friendlyside, 1);
             break;
@@ -124,7 +125,7 @@ void MiddleRequest(Position *friendPosition, Pole &pole, int friendlyside) {
 }
 
 void BackRequest(Position *friendPosition, Pole &pole, int friendlyside) {
-    switch (friendPosition->GetHero().GetID()) {
+    switch (friendPosition->GetHero().GetTexture()) {
         case (3, 5): {
             SendAllAliveEnemies(friendPosition, pole, friendlyside, 2);
             break;
