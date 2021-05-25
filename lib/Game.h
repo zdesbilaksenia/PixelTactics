@@ -36,6 +36,8 @@ public:
 
     void SendBreeds(Pole &pole, int numOfPlayers);
 
+    bool WaitForMessage();
+
 private:
     Lobby *lobby;
 };

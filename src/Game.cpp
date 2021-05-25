@@ -1,6 +1,14 @@
 #include "Game.h"
 #include "request.h"
 
+bool Game::WaitForMessage(){
+    lobby->incoming().wait();
+    if (lobby->incoming().front().msg.header.id == GameMsgTypes::LobbyLeave) {
+        return false;
+    } 
+    return true;
+}
+
 void Game::SetLeader(std::vector<Player *> &players, int playerside, int choice, Pole &pole, PowerMapper &mapper) {
     Player *CurrentPlayer = players[playerside];
     Position *LeaderPos = pole.GetPosition(1, 1, playerside);
@@ -98,7 +106,7 @@ void Game::StartGame() {
     int choice, playerside;
     int x, y;
     std::cout << "////" << std::endl;
-    lobby->incoming().wait();
+    if(!WaitForMessage()) return;
     auto leadmsg = lobby->incoming().popFront().msg;
     if (leadmsg.header.id == GameMsgTypes::GameCardFromHandChoice) {
         leadmsg >> choice >> x >> y >> playerside;
@@ -109,7 +117,7 @@ void Game::StartGame() {
     std::cout << "CHOICE " << choice << " PLAYERSIDE " << playerside << std::endl;
     SetLeader(Players, playerside, choice, pole, mapper);
 
-    lobby->incoming().wait();
+    if(!WaitForMessage()) return;
     leadmsg = lobby->incoming().popFront().msg;
     if (leadmsg.header.id == GameMsgTypes::GameCardFromHandChoice) {
         leadmsg >> choice >> x >> y >> playerside;
@@ -186,7 +194,7 @@ void Game::StartGame() {
          std::cout << "//////////////////////////" << std::endl;*/
 
         choice = 0;
-        lobby->incoming().wait();
+        if(!WaitForMessage()) return;
         msg = lobby->incoming().popFront().msg;
         cout << "ПРИШЛО" << std::endl;
         switch (msg.header.id) {
@@ -207,7 +215,7 @@ void Game::StartGame() {
                 int line = 0;
                 int cell = 0;
                 int side = 0;
-                lobby->incoming().wait();
+                if(!WaitForMessage()) return;
                 msg = lobby->incoming().popFront().msg;
                 if (msg.header.id == GameMsgTypes::GameFullCoordinates) {
                     msg >> line >> cell >> side;
@@ -240,9 +248,6 @@ void Game::StartGame() {
                 cout << std::endl;
 
                 Position *YourHero = pole.GetPosition(cell, line, CurrentPlayer.GetSide());
-
-                /*std::cout << "Введите клетку и линию вражеского героя" << std::endl;
-                LobbyShortCoordinates(line, cell);
                 int EnemySide;
                 if (CurrentPlayer.GetSide() == 0) {
                     EnemySide = 1;
@@ -250,7 +255,7 @@ void Game::StartGame() {
                     EnemySide = 0;
                 }
                 Position *EnemyHero = pole.GetPosition(cell, line, EnemySide);
-
+               // std::cout <<" Сила аттакующего " <<YourHero->GetHero().GetCurStrength() <<" Здоровье врага до атаки " << EnemyHero->GetHero().GetCurHealth()  << std::endl;
                 if (CurrentPlayer.MeleeAttackCheck(EnemyHero, pole)) {
                     YourHero->GetHero().Attack(EnemyHero->GetHero(), YourHero->GetHero().GetCurStrength());
                     pole.SetPosition(EnemyHero);
@@ -263,13 +268,14 @@ void Game::StartGame() {
                     CallPechkin(0, Attackmsg);
                 } else {
                     std::cout << "СПЕРЕДИ СТОИТ ДРУГОЙ ГЕРОЙ. НЕЛЬЗЯ АТАКОВАТЬ!!" << std::endl;
-                }*/
-                lobby->incoming().wait();
+                }
+                if(!WaitForMessage()) return;
                 auto attackerMsg = lobby->incoming().popFront().msg;
                 if (msg.header.id == GameMsgTypes::GameAttackRequest) {
                     attackerMsg >> line >> cell;
                     Position *EnemyHero = pole.GetPosition(cell, line, currentside ? 0 : 1);
-                    cout << "АТАКОВАННЫЙ " << line << " " << cell << " " << EnemyHero->GetHero().GetName();
+                    cout << "АТАКОВАННЫЙ " << line << " " << cell << " " << EnemyHero->GetHero().GetName() <<std::endl;
+                    //std::cout <<" Сила аттакющего " <<YourHero->GetHero().GetCurStrength() <<" Здоровье врага после атаки " << EnemyHero->GetHero().GetCurHealth() <<std::endl;
                 }
                 MovesAmount--;
                 break;

@@ -20,6 +20,8 @@ protected:
     virtual void onClientDisconnect(boost::shared_ptr<TcpConnection<GameMsgTypes>> client);
     virtual void onMessage(boost::shared_ptr<TcpConnection<GameMsgTypes>> client, Message<GameMsgTypes>& msg);
 private:
+    void messageToLobby(Message<GameMsgTypes> msg, boost::shared_ptr<TcpConnection<GameMsgTypes>> client = nullptr);
+
     std::map<uint16_t, Lobby> lobbies;
     std::map<boost::shared_ptr<TcpConnection<GameMsgTypes>>, uint16_t> players;
     uint16_t maxLobbiesNum;
