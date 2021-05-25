@@ -20,7 +20,7 @@ void Game::SetLeader(std::vector<Player *> &players, int playerside, int choice,
     }
 }
 
-void Game::SendBreeds(Pole &pole) {
+void Game::SendBreeds(Pole &pole, int numOfPlayers) {
     std::vector<Breed> allStats;
     allStats.resize(0);
     for (int i = 0; i < pole.GetVector().size(); i++) {
@@ -33,8 +33,17 @@ void Game::SendBreeds(Pole &pole) {
 
     Message<GameMsgTypes> statsMsg(GameMsgTypes::GameHeroesStats);
     statsMsg << allStats;
-    CallPechkin(0, statsMsg);
-    CallPechkin(1, statsMsg);
+    if (numOfPlayers == 0) {
+        CallPechkin(0, statsMsg);
+        cout << "Бреды отправлены первому" << std::endl;
+    } else if (numOfPlayers == 1) {
+        CallPechkin(1, statsMsg);
+        cout << "Бреды отправлены второму" << std::endl;
+    } else {
+        CallPechkin(0, statsMsg);
+        CallPechkin(1, statsMsg);
+        cout << "Бреды отправлены обоим" << std::endl;
+    }
 }
 
 
@@ -118,7 +127,7 @@ void Game::StartGame() {
 
     // Breed allStats[pole.GetVector().size()];
 
-    SendBreeds(pole);
+    SendBreeds(pole, 3);
 
     // FirstPlayer.StartingHand();
     // SecondPlayer.StartingHand();
@@ -288,6 +297,7 @@ void Game::StartGame() {
                 pole.SetPosition(kletka);
                 MovesAmount--;
                 pole.Show();
+                SendBreeds(pole, currentside ? 0 : 1);
                 break;
             }
                 /*case (7): {

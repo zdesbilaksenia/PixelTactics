@@ -34,7 +34,7 @@ public:
 
     void SetLeader(std::vector<Player *> &players, int playerside, int choice, Pole &pole, PowerMapper &mapper);
 
-    void SendBreeds(Pole &pole);
+    void SendBreeds(Pole &pole, int numOfPlayers);
 
 private:
     Lobby *lobby;

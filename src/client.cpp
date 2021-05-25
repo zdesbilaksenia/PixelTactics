@@ -11,7 +11,7 @@
 int main(int argc, char* argv[])
 {
     GameTcpClient c;
-    c.connect("10.147.17.200");
+    c.connect("10.147.17.71");
     c.incoming().wait();
     c.incoming().popFront();
 
