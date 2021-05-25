@@ -15,7 +15,6 @@
 class Lobby {
 public:
     enum class status {
-        empty,
         incomplete,
         full
     };
@@ -30,7 +29,8 @@ public:
     void gameOver();
 
     void addPlayer(boost::shared_ptr<TcpConnection<GameMsgTypes>> connection);
-
+    bool isFull() const;
+    uint16_t getLobbyID();
     void addMessage(const OwnedMessage<GameMsgTypes>& msg);
 
     TsQueue<OwnedMessage<GameMsgTypes>>& incoming();
@@ -46,7 +46,6 @@ private:
     void msgLobbyGameStart();
     void msgLobbyGameOver();
 
-    bool playersOnline();
     void onPlayerDisconnected();
     void clearLobby();
 

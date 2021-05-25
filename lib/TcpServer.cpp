@@ -76,9 +76,7 @@ void TcpServer<T>::removeDisconnectedClients() {
 
     for (auto& client : deqConnections) {
         if (!client || !client->isConnected()) {
-            std::cout << "in ondisc\n";
             onClientDisconnect(client);
-            std::cout << "not in ondisc\n";
             client.reset();
 
             invalidClientExists = true;
@@ -95,7 +93,6 @@ void TcpServer<T>::messageToClient(boost::shared_ptr<TcpConnection<T>> client, c
     if (client && client->isConnected()) {
         client->send(msg);
     } else {
-        std::cout << "disc\n";
         onClientDisconnect(client);
         client.reset();
         deqConnections.erase(std::remove(deqConnections.begin(), deqConnections.end(), client), deqConnections.end());

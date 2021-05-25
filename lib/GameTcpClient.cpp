@@ -12,13 +12,8 @@ void GameTcpClient::getHeroesStats() const {
     Message<GameMsgTypes> msg(GameMsgTypes::GetHeroesStats);
     send(msg);
 }
-void GameTcpClient::joinLobby(uint16_t lobbyID) const {
-    Message<GameMsgTypes> msg(GameMsgTypes::JoinLobby);
-    msg << lobbyID;
-    send(msg);
-}
-void GameTcpClient::makeLobby() const {
-    Message<GameMsgTypes> msg(GameMsgTypes::MakeLobby);
+void GameTcpClient::connectToLobby() const {
+    Message<GameMsgTypes> msg(GameMsgTypes::ConnectToLobby);
     send(msg);
 }
 void GameTcpClient::pingServer() const {
