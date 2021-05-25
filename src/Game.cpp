@@ -182,8 +182,10 @@ void Game::StartGame() {
         cout << "ПРИШЛО" << std::endl;
         switch (msg.header.id) {
             /*case (): {
-                CurrentPlayer.DrawCard();
-                MovesAmount--;
+                if(!(CurrentPlayer.GetHand().GetVector().size() >=5)){
+                    CurrentPlayer.DrawCard();
+                    MovesAmount--;
+                }
                 break;
             }*/
             /*case (2): {
