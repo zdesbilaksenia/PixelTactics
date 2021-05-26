@@ -638,6 +638,7 @@ void SendAllAliveEnemies(Position *position, Pole &pole_, int friendlyside, int 
         }
     }
     //return HeroesAlive;
+    std::cout << "   Отправила всех живых врагов" << std::endl;
     //GetCoordinates
     int xCoord = 0;
     int yCoord = 0;
@@ -679,6 +680,7 @@ void SendAllAliveFriends(Position *position, Pole &pole_, int friendlyside, int 
         }
     }
     //return HeroesAlive;
+    std::cout << "   Отправила всех живых своих" << std::endl;
     //GetCoordinates
     int xCoord = 0;
     int yCoord = 0;
@@ -720,6 +722,7 @@ void SendAllDeadFriends(Position *position, Pole &pole_, int friendlyside, int t
         }
     }
     //return HeroesAlive;
+    std::cout << "   Отправила всех мертвых своих" << std::endl;
     //GetCoordinates
     int xCoord = 0;
     int yCoord = 0;

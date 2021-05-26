@@ -29,7 +29,9 @@ enum class GameMsgTypes : uint32_t {
     GameCardFromHandChoice,
     GameStr,
     GameString,
-    GameAttackRequest
+    GameAttackRequest,
+    GameTakeCard,
+    GamePowerRequest
 
 };
 

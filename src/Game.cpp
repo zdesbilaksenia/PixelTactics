@@ -198,37 +198,41 @@ void Game::StartGame() {
         msg = lobby->incoming().popFront().msg;
         cout << "ПРИШЛО" << std::endl;
         switch (msg.header.id) {
-            /*case (): {
-                if(!(CurrentPlayer.GetHand().GetVector().size() >=5)){
+            case (GameMsgTypes::GameTakeCard): {
+                if (CurrentPlayer.GetHand().GetVector().size() < 5) {
                     CurrentPlayer.DrawCard();
                     MovesAmount--;
+                    cout << " ВЗЯЛ КАРТУ " << std::endl << CurrentPlayer.GetHand().GetVector().back().name << std::endl;
+                    auto cardTookMsg = Message<GameMsgTypes>(GameMsgTypes::GameTakeCard);
+                    CallPechkin(currentside ? 0 : 1, cardTookMsg);
+                    cout << " Отправлено в ответ на взятие карты " << std::endl;
                 }
                 break;
-            }*/
-            /*case (2): {
-                CurrentPlayer.GetHand().ShowDeck();
-                std::cout << "//////////////////////////" << std::endl;
-                break;
-            }*/
-            /*case (3): {
-                std::cout << "Введите клетку и линию и сторону" << std::endl;
-                int line = 0;
-                int cell = 0;
-                int side = 0;
-                if(!WaitForMessage()) return;
-                msg = lobby->incoming().popFront().msg;
-                if (msg.header.id == GameMsgTypes::GameFullCoordinates) {
-                    msg >> line >> cell >> side;
-                } else {
-                    std::cout << "Error in Full Coordinates!\n";
-                    return;
-                }
-                std::cin >> cell >> line >> side;
-                Position *kletka = pole.GetPosition(cell, line, side);
-                kletka->InfoPosition();
-                std::cout << "//////////////////////////" << std::endl;
-                break;
-            }*/
+            }
+                /*case (2): {
+                    CurrentPlayer.GetHand().ShowDeck();
+                    std::cout << "//////////////////////////" << std::endl;
+                    break;
+                }*/
+                /*case (3): {
+                    std::cout << "Введите клетку и линию и сторону" << std::endl;
+                    int line = 0;
+                    int cell = 0;
+                    int side = 0;
+                    if(!WaitForMessage()) return;
+                    msg = lobby->incoming().popFront().msg;
+                    if (msg.header.id == GameMsgTypes::GameFullCoordinates) {
+                        msg >> line >> cell >> side;
+                    } else {
+                        std::cout << "Error in Full Coordinates!\n";
+                        return;
+                    }
+                    std::cin >> cell >> line >> side;
+                    Position *kletka = pole.GetPosition(cell, line, side);
+                    kletka->InfoPosition();
+                    std::cout << "//////////////////////////" << std::endl;
+                    break;
+                }*/
             case (GameMsgTypes::GameAttackRequest): {
                 pole.Show();
                 std::cout << "ВЫБРАНА АТАКА" << std::endl;
@@ -310,32 +314,36 @@ void Game::StartGame() {
                 SendBreeds(pole, currentside ? 0 : 1);
                 break;
             }
-                /*case (7): {
-                    int cell, line;
-                    std::cout << "Введите клетку и линию вашего героя: " << std::endl;
-                    LobbyShortCoordinates(line, cell);
-                    switch (Phase) {
-                        case (0): {
-                            Position *Hero = pole.GetPosition(cell, line, currentside);
-                            cout << "\nИмя: " << Hero->GetHero().GetName() << "\nСпособность авангарда: "
-                                 << allCards.GetVector()[Hero->GetHero().GetID() - 1].frontLinePower << "\n";
-                            FrontRequest(Hero, pole, currentside);
-                            break;
-                        }
-                        case (1): {
-                            Position *Hero = pole.GetPosition(cell, line, currentside);
-                            MiddleRequest(Hero, pole, currentside);
-                            break;
-                        }
-                        case (2): {
-                            Position *Hero = pole.GetPosition(cell, line, currentside);
-                            BackRequest(Hero, pole, currentside);
-                            break;;
-                        }
-                        default:
-                            break;
+            case (GameMsgTypes::GamePowerRequest): {
+
+                int cell, line;
+                std::cout << "Введите клетку и линию вашего героя: " << std::endl;
+
+                msg >> choice >> line >> cell;
+                Position *Hero = pole.GetPosition(cell, line, currentside);
+                switch (Phase) {
+                    case (0): {
+                        cout << "\nИмя: " << Hero->GetHero().GetName() << "\nСпособность авангарда: "
+                             << allCards.GetVector()[Hero->GetHero().GetID() - 1].frontLinePower << "\n";
+                        FrontRequest(Hero, pole, currentside);
+                        break;
                     }
-                }*/
+                    case (1): {
+                        cout << "\nИмя: " << Hero->GetHero().GetName() << "\nСпособность фланга: "
+                             << allCards.GetVector()[Hero->GetHero().GetID() - 1].middleLinePower << "\n";
+                        MiddleRequest(Hero, pole, currentside);
+                        break;
+                    }
+                    case (2): {
+                        cout << "\nИмя: " << Hero->GetHero().GetName() << "\nСпособность тыла: "
+                             << allCards.GetVector()[Hero->GetHero().GetID() - 1].backLinePower << "\n";
+                        BackRequest(Hero, pole, currentside);
+                        break;;
+                    }
+                    default:
+                        break;
+                }
+            }
                 /*case (8): {
                     int line, cell = 0;
                     std::cout << "Введите клетку и линию вашего трупа: " << std::endl;
