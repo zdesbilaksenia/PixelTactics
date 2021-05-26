@@ -9,7 +9,6 @@
 #include "../DataBase/MySQL.h"
 #include "PowerMapper.h"
 #include "request.h"
-#include "Lobby.h"
 
 
 class Game {
@@ -36,9 +35,16 @@ public:
 
     void SendBreeds(Pole &pole, int numOfPlayers);
 
+    void FrontRequest(Position *friendPosition);
+    void MiddleRequest(Position *friendPosition);
+    void BackRequest(Position *friendPosition);
     bool WaitForMessage();
+    void RecieveTarget(int &line, int &cell) ;
+    void ReleasePower(int type, Position* position);
 
 private:
+    int currentside;
+    Pole pole;
     Lobby *lobby;
 };
 

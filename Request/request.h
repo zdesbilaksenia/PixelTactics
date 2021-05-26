@@ -5,7 +5,7 @@
 
 #include "pole.h"
 #include "vector"
-
+#include "Lobby.h"
 
 using std::vector;
 
@@ -14,6 +14,8 @@ struct Breed {
     int Strength;
     int ID;
 };
+
+void SendBreeds(Pole &pole, int numOfPlayers);
 
 std::vector<Breed> ReturnRequest(Pole &pole_);
 
@@ -69,19 +71,15 @@ void FrontAndBackGetDamage(Position *position, Pole &pole_, int friendlyside);
 
 void MakeDistantAttack(Position *position, Pole &pole_, int friendlyside);
 
-void SendAllAliveFriends(Position *position, Pole &pole_, int friendlySide, int type);
+vector<bool> SendAllDeadFriends(Position *position, Pole &pole_, int friendlySide);
 
-void SendAllAliveEnemies(Position *position, Pole &pole_, int friendlySide, int type);
+vector<bool> SendAllAliveEnemies(Position *position, Pole &pole_, int friendlyside);
 
-void SendAllDeadFriends(Position *position, Pole &pole_, int friendlySide, int type);
+vector<bool>  SendAllAliveFriends(Position *position, Pole &pole_, int friendlyside);
 
-void SendAllAliveEnemies(Position *position,Pole &pole_, int friendlyside);
+void DoubleStrengthAgainstLeader(Position *position, Pole &pole_, int friendlyside);
 
-void SendAllAliveFriends(Position *position,Pole &pole_, int friendlyside);
-
-void DoubleStrengthAgainstLeader(Position *position,Pole &pole_, int friendlyside);
-
-void HitFrontRowHeroes(Position *position,Pole &pole_, int friendlyside);
+void HitFrontRowHeroes(Position *position, Pole &pole_, int friendlyside);
 
 #endif
 
