@@ -113,7 +113,7 @@ std::vector<bool> Pole::CanBeMeleeAttackedRequest(int side)
             for (int itcell = 0; itcell < 3; itcell++)
             {
                 Position *position = GetPosition(itcell, itline, 1);
-                if (position->isEmpty())
+                if (position->isEmpty() && position->GetHero().IsDead())
                 {
                     CanBeMeleeAttacked.push_back(false);
                 }
@@ -124,7 +124,7 @@ std::vector<bool> Pole::CanBeMeleeAttackedRequest(int side)
                 else if (itline == 1)
                 {
                     position = GetPosition(itcell, 0, 1);
-                    if (position->isEmpty())
+                    if (position->isEmpty() && position->GetHero().IsDead())
                     {
                         CanBeMeleeAttacked.push_back(true);
                     }
@@ -132,14 +132,14 @@ std::vector<bool> Pole::CanBeMeleeAttackedRequest(int side)
                 else if (itline == 2)
                 {
                     position = GetPosition(itcell, 1, 1);
-                    if (!position->isEmpty())
+                    if (!position->isEmpty() && position->GetHero().IsDead())
                     {
                         CanBeMeleeAttacked.push_back(false);
                     }
                     else
                     {
                         position = GetPosition(itcell, 0, 1);
-                        if (position->isEmpty())
+                        if (position->isEmpty() && position->GetHero().IsDead())
                         {
                             CanBeMeleeAttacked.push_back(false);
                         }
@@ -160,7 +160,7 @@ std::vector<bool> Pole::CanBeMeleeAttackedRequest(int side)
             for (int itcell = 0; itcell < 3; itcell++)
             {
                 Position *position = GetPosition(itcell, itline, 0);
-                if (position->isEmpty())
+                if (position->isEmpty() && position->GetHero().IsDead())
                 {
                     CanBeMeleeAttacked.push_back(false);
                 }
@@ -171,7 +171,7 @@ std::vector<bool> Pole::CanBeMeleeAttackedRequest(int side)
                 else if (itline == 1)
                 {
                     position = GetPosition(itcell, 0, 0);
-                    if (position->isEmpty())
+                    if (position->isEmpty() && position->GetHero().IsDead())
                     {
                         CanBeMeleeAttacked.push_back(true);
                     }
@@ -179,14 +179,14 @@ std::vector<bool> Pole::CanBeMeleeAttackedRequest(int side)
                 else if (itline == 2)
                 {
                     position = GetPosition(itcell, 1, 0);
-                    if (!position->isEmpty())
+                    if (!position->isEmpty() && position->GetHero().IsDead())
                     {
                         CanBeMeleeAttacked.push_back(false);
                     }
                     else
                     {
                         position = GetPosition(itcell, 0, 0);
-                        if (position->isEmpty())
+                        if (position->isEmpty() && position->GetHero().IsDead())
                         {
                             CanBeMeleeAttacked.push_back(false);
                         }
