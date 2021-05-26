@@ -17,8 +17,9 @@ TEST(CanBeAttackedMeleeRequest,Test_1){
     pole.SetPosition(test_pos);
     std::vector<bool> result;
     result = pole.CanBeMeleeAttackedRequest(0);
+    EXPECT_EQ(result.size(),9);
     std::vector<bool> ShouldBe = {false,false,false,false,true,false,false,false,false};
-    for(int i = 0; i < result.size(); i++){
+    for(int i = 0; i < ShouldBe.size(); i++){
         ASSERT_TRUE(ShouldBe[i] == result[i]);
     }
 
@@ -46,8 +47,9 @@ TEST(CanBeAttackedMeleeRequest,Test_2){
 
     std::vector<bool> result;
     result = pole.CanBeMeleeAttackedRequest(0);
+    EXPECT_EQ(result.size(),9);
     std::vector<bool> ShouldBe = {false,true,false,false,false,false,false,false,false};
-    for(int i = 0; i < result.size(); i++){
+    for(int i = 0; i < ShouldBe.size(); i++){
         EXPECT_EQ(ShouldBe[i],result[i]);
     }
 
@@ -85,8 +87,9 @@ TEST(CanBeAttackedMeleeRequest,Test_3){
 
     std::vector<bool> result;
     result = pole.CanBeMeleeAttackedRequest(0);
+    EXPECT_EQ(result.size(),9);
     std::vector<bool> ShouldBe = {false,true,true,false,false,false,false,false,false};
-    for(int i = 0; i < result.size(); i++){
+    for(int i = 0; i < ShouldBe.size(); i++){
         std::cout << i << " " <<std::endl;
         EXPECT_EQ(ShouldBe[i],result[i]);
     }
@@ -124,8 +127,69 @@ TEST(CanBeAttackedMeleeRequest,Test_4){
 
     std::vector<bool> result;
     result = pole.CanBeMeleeAttackedRequest(0);
+    EXPECT_EQ(result.size(),9);
     std::vector<bool> ShouldBe = {true,false,false,false,true,false,false,false,true};
-    for(int i = 0; i < result.size(); i++){
+    for(int i = 0; i < ShouldBe.size(); i++){
+        std::cout << i << " " <<std::endl;
+        EXPECT_EQ(ShouldBe[i],result[i]);
+    }
+
+}
+
+TEST(CanBeAttackedMeleeRequest,Test_5){
+    Pole pole;
+    MySQL sql;
+    Deck allCards;
+    allCards = sql.GetCards();
+    Deck FirstPlayerDeck(allCards.GetVector());
+    Deck SecondPlayerDeck(allCards.GetVector());
+    Player FirstPlayer(FirstPlayerDeck, 0);
+    Player SecondPlayer(SecondPlayerDeck, 1);
+    PowerMapper mapper;
+
+    Position* test_pos = pole.GetPosition(0,0,1);
+    test_pos->SetHero(FirstPlayer.GetDeck().GetVector().back());
+    pole.SetPosition(test_pos);
+    
+    test_pos = pole.GetPosition(0,1,1);
+    test_pos->SetHero(FirstPlayer.GetDeck().GetVector().back());
+    pole.SetPosition(test_pos);
+
+    test_pos = pole.GetPosition(0,2,1);
+    test_pos->SetHero(FirstPlayer.GetDeck().GetVector().back());
+    pole.SetPosition(test_pos);
+
+    test_pos = pole.GetPosition(1,0,1);
+    test_pos->SetHero(FirstPlayer.GetDeck().GetVector().back());
+    pole.SetPosition(test_pos);
+
+    test_pos = pole.GetPosition(1,1,1);
+    test_pos->SetHero(FirstPlayer.GetDeck().GetVector().back());
+    pole.SetPosition(test_pos);
+
+    test_pos = pole.GetPosition(1,2,1);
+    test_pos->SetHero(FirstPlayer.GetDeck().GetVector().back());
+    pole.SetPosition(test_pos);
+
+    test_pos = pole.GetPosition(2,0,1);
+    test_pos->SetHero(FirstPlayer.GetDeck().GetVector().back());
+    pole.SetPosition(test_pos);
+
+    test_pos = pole.GetPosition(2,1,1);
+    test_pos->SetHero(FirstPlayer.GetDeck().GetVector().back());
+    pole.SetPosition(test_pos);
+
+    test_pos = pole.GetPosition(2,2,1);
+    test_pos->SetHero(FirstPlayer.GetDeck().GetVector().back());
+    pole.SetPosition(test_pos);
+
+    pole.Show();
+
+    std::vector<bool> result;
+    result = pole.CanBeMeleeAttackedRequest(0);
+    EXPECT_EQ(result.size(),9);
+    std::vector<bool> ShouldBe = {true,true,true,false,false,false,false,false,false};
+    for(int i = 0; i < ShouldBe.size(); i++){
         std::cout << i << " " <<std::endl;
         EXPECT_EQ(ShouldBe[i],result[i]);
     }
