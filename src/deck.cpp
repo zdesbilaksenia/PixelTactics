@@ -12,9 +12,9 @@ Deck::Deck() {
 Deck::Deck(std::vector<Card> &Cards) {
     int count = Cards.size();
     for (int i = 0; i < 20; i++) {
-        int random_card = roll_card(count);
-        Cards[random_card].ID = i;
-        deck_.push_back(Cards[random_card]);
+        //int random_card = roll_card(count);
+        Cards[4].ID = i;
+        deck_.push_back(Cards[4]);
     }
 }
 

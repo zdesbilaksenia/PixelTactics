@@ -381,11 +381,13 @@ void Game::RecieveTarget(int &line, int &cell) {
 void Game::ReleasePower(int type, Position *position) {
     vector<Hero *> heroes;
     heroes.push_back(&position->GetHero());
-    auto choiceMsg = lobby->incoming().popFront().msg;
+    cout << "В вектор добавлен свой " << std::endl;
     int line, cell;
     RecieveTarget(line, cell);
+    cout << " Пришел челик " << line << " " << cell << std::endl;
     Position *chosen_pos = pole.GetPosition(cell, line, currentside ? 0 : 1);
-    heroes.push_back(&(chosen_pos->GetHero()));
+    cout << "В вектор добавлен противник " << std::endl;
+    /*heroes.push_back(&(chosen_pos->GetHero()));
     switch (type) {
         case 0: {
             position->GetHero().frontLinePower(heroes);
@@ -403,7 +405,7 @@ void Game::ReleasePower(int type, Position *position) {
             break;
     }
 
-    SendBreeds(pole, 3);
+    SendBreeds(pole, 3);*/
 }
 
 void Game::FrontRequest(Position *friendPosition) {
@@ -425,6 +427,8 @@ void Game::FrontRequest(Position *friendPosition) {
         }
         case (11): {
             MakeDistantAttack(friendPosition, pole, currentside);
+            SendBreeds(pole, 3);
+            break;
         }
         case (6, 8): {
             vector<bool> result = SendAllAliveFriends(friendPosition, pole, currentside);
@@ -458,26 +462,32 @@ void Game::FrontRequest(Position *friendPosition) {
         }
         case (1): {
             Interception(friendPosition, pole);
+            SendBreeds(pole, 3);
             break;
         }
         case (2): {
             HPFromDead(friendPosition, pole);
+            SendBreeds(pole, 3);
             break;
         }
         case (3): {
             PlusPower(friendPosition, pole, currentside);
+            SendBreeds(pole, 3);
             break;
         }
         case (4): {
             InterceptionPlusPower(friendPosition, pole);
+            SendBreeds(pole, 3);
             break;
         }
         case (9): {
             PlusStrMinusHP(friendPosition, pole);
+            SendBreeds(pole, 3);
             break;
         }
         case (10): {
             Interception(friendPosition, pole);
+            SendBreeds(pole, 3);
             break;
         }
     }
@@ -518,21 +528,26 @@ void Game::MiddleRequest(Position *friendPosition) {
         }
         case (4, 11): {
             MakeDistantAttack(friendPosition, pole, currentside);
+            SendBreeds(pole, 3);
         }
         case (1): {
             PlusPowerInCloseAttack(friendPosition, pole, currentside);
+            SendBreeds(pole, 3);
             break;
         }
         case (5): {
             HitAvangard(friendPosition, pole, currentside);
+            SendBreeds(pole, 3);
             break;
         }
         case (9): {
             InterceptionPlusPower(friendPosition, pole);
+            SendBreeds(pole, 3);
             break;
         }
         case (10): {
             FrontAndBackGetDamage(friendPosition, pole, currentside);
+            SendBreeds(pole, 3);
             break;
         }
     }
@@ -557,6 +572,8 @@ void Game::BackRequest(Position *friendPosition) {
         }
         case (2, 9): {
             MakeDistantAttack(friendPosition, pole, currentside);
+            SendBreeds(pole, 3);
+            break;
         }
         case (4, 6, 7): {
             vector<bool> result = SendAllAliveFriends(friendPosition, pole, currentside);
@@ -575,16 +592,22 @@ void Game::BackRequest(Position *friendPosition) {
         }
         case (1): {
             DoubleStrengthAgainstLeader(friendPosition, pole, currentside);
+            SendBreeds(pole, 3);
+            break;
         }
         case (8): {
             HitFrontRowHeroes(friendPosition, pole, currentside);
+            SendBreeds(pole, 3);
+            break;
         }
         case (10): {
             MakeDistantAttack(friendPosition, pole, currentside);
+            SendBreeds(pole, 3);
             break;
         }
         case (11): {
             PlusPower(friendPosition, pole, currentside);
+            SendBreeds(pole, 3);
             break;
         }
     }
