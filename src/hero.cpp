@@ -1,6 +1,6 @@
 #include "hero.h"
 
-Hero::Hero() : ID(-1), HP(0), texture(0), curHP(0), name("Болванчик"), strength(0), curStrength(0), isAlive(true),
+Hero::Hero() : ID(-1), HP(0), texture(0), curHP(0), name("Болванчик"), strength(0), curStrength(0), isAlive(false),
                isLeader(false), isDamaged(false), canBeAttackedFromDistance(true),
                canBeAttackedClosely(true), canUseLeaderPower(false) {
     frontLinePower = NULL;
