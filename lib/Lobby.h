@@ -6,11 +6,12 @@
 #include <boost/shared_ptr.hpp>
 
 #include "TsQueue.h"
-#include "TcpServer.h"
 #include "TcpConnection.h"
 #include "Message.h"
 #include "OwnedMessage.h"
 #include "GameMsgTypes.h"
+
+class GameTcpServer;
 
 class Lobby {
 public:
@@ -19,7 +20,7 @@ public:
         full
     };
     Lobby() = default;
-    Lobby(uint8_t lobbyID_,TsQueue<OwnedMessage<GameMsgTypes>>* pQMsgServer_, TcpServer<GameMsgTypes>* server_);
+    Lobby(uint8_t lobbyID_,TsQueue<OwnedMessage<GameMsgTypes>>* pQMsgServer_, GameTcpServer* server_);
     Lobby(const Lobby& other);
     Lobby& operator=(const Lobby& other);
 
@@ -55,6 +56,6 @@ private:
     TsQueue<OwnedMessage<GameMsgTypes>> qMsgIn;
     std::vector<boost::shared_ptr<TcpConnection<GameMsgTypes>>> lobby;
 
-    TcpServer<GameMsgTypes>* server;
+    GameTcpServer* server;
     std::thread gameThr;
 };
