@@ -134,7 +134,7 @@ std::vector<bool> Pole::CanBeMeleeAttackedRequest(int side)
             for (int itline = 0; itline < 3; itline++)
             {
                 Position *position = GetPosition(itcell, itline, 0);
-                if (position->isEmpty() == false)
+                if (!(position->isEmpty()) && !(position->GetHero().IsDead()))
                 {
                     CanBeMeleeAttacked.push_back(true);
                     for (int j = itline + 1; j < 3; j++)
