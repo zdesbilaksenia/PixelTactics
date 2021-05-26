@@ -270,19 +270,14 @@ void Game::StartGame() {
                 if (CurrentPlayer.MeleeAttackCheck(EnemyHero, pole)) {
                     cout << "ДО АТАКИ " << "ХП " << EnemyHero->GetHero().GetCurHealth() << " Сила атакующего "
                          << YourHero->GetHero().GetCurStrength() << std::endl;
-                    
+
                     YourHero->GetHero().Attack(EnemyHero->GetHero(), YourHero->GetHero().GetCurStrength());
 
                     cout << "ПОСЛЕ АТАКИ " << "ХП " << EnemyHero->GetHero().GetCurHealth() << " Сила атакующего "
                          << YourHero->GetHero().GetCurStrength() << std::endl;
                     pole.SetPosition(EnemyHero);
-                    MovesAmount--;
-                    std::vector<Breed> Stats;
-                    Stats = ReturnRequest(pole);
 
-                    auto Statsmsg = Message<GameMsgTypes>(GameMsgTypes::GameHeroesStats);
-                    Statsmsg << Stats;
-                    CallPechkin(0, Attackmsg);
+                    SendBreeds(pole, 3);
                 } else {
                     std::cout << "СПЕРЕДИ СТОИТ ДРУГОЙ ГЕРОЙ. НЕЛЬЗЯ АТАКОВАТЬ!!" << std::endl;
                 }
