@@ -1,7 +1,9 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <string>
 using namespace sf;
+using std::string;
 
 class DrawableBox
 {
@@ -18,6 +20,11 @@ public:
     const int &getWidth();
     const int &getHeight();
 
+    virtual void setFont(const string& fontPath)
+    {
+        font.loadFromFile(fontPath);
+    }
+
     virtual void draw() = 0;
     ~DrawableBox();
 
@@ -29,4 +36,5 @@ protected:
     int height;
     RenderWindow &window;
     RectangleShape rect;
+    Font font;
 };

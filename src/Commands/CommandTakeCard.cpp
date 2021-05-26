@@ -12,11 +12,12 @@ void CommandTakeCard::execute()
     //Доделать отправку серверу инфы о взятии карты
     if (cardsManager.takeCard())
     {
-        cout << "CommandTakeCard::execute():: Card was taken!!!" << endl;
+        BOOST_LOG_TRIVIAL(info) << "CommandTakeCard::execute():: Card was taken!";
+        client.sendTakeCard();
     }
     else
     {
-        cout << "CommandTakeCard::execute():: Card wasn't taken!!!" << endl;
+        BOOST_LOG_TRIVIAL(info) << "CommandTakeCard::execute():: Card wasn't taken!";
     }
 }
 

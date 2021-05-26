@@ -1,10 +1,13 @@
 #include "Unit.h"
+#include <iostream>
+#include "configurations.cpp"
+using namespace std;
 
 Unit::Unit(RenderWindow &_window) : DrawableBox(_window) {}
 
 void Unit::setCharacter() {}
 
-void Unit::setData(const int& _Id, const string& _name, const string _description[3], const int& _health, const int& _attack)
+void Unit::setData(const int &_Id, const string &_name, const string _description[3], const int &_health, const int &_attack)
 {
     this->Id = _Id;
     this->name = _name;
@@ -28,6 +31,12 @@ int Unit::getAttack()
 void Unit::draw()
 {
     window.draw(rect);
+    textName.setPosition(Vector2f(this->getPosX(), this->getPosY() - 20));
+    textHP.setPosition(Vector2f(this->getPosX() - 20, this->getPosY() + tileHeight + 10));
+    textAttack.setPosition(Vector2f(this->getPosX() + 40, this->getPosY() + 20));
+    //window.draw(textName);
+    window.draw(textHP);
+    //window.draw(textAttack);
 }
 
 Unit::~Unit() {}

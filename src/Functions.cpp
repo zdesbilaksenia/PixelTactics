@@ -56,6 +56,11 @@ void setData(GameTcpClient &client,
         BOOST_LOG_TRIVIAL(info) << "||\tname: " << playerCardsInfo[i].name << " ID: " << playerCardsInfo[i].ID;
         playerUnits[i].setTexture(&textures[playerCardsInfo[i].textureId - 1]);
 
+        playerUnits[i].setFont("../src/Pixel.ttf");
+        playerUnits[i].setTextName(playerCardsInfo[i].name);
+        playerUnits[i].setTextHP(playerCardsInfo[i].HP);
+        playerUnits[i].setTextAttack(playerCardsInfo[i].strength);
+
         string description[3];
         description[0] = playerCardsInfo[i].frontLinePower;
         description[1] = playerCardsInfo[i].middleLinePower;
@@ -78,6 +83,11 @@ void setData(GameTcpClient &client,
     {
         BOOST_LOG_TRIVIAL(info) << "||\tname: " << opponentCardsInfo[i].name << " ID: " << opponentCardsInfo[i].ID;
         opponentUnits[i].setTexture(&textures[opponentCardsInfo[i].textureId - 1]);
+
+        opponentUnits[i].setFont("../src/Pixel.ttf");
+        opponentUnits[i].setTextName(opponentCardsInfo[i].name);
+        opponentUnits[i].setTextHP(opponentCardsInfo[i].HP);
+        opponentUnits[i].setTextAttack(opponentCardsInfo[i].strength);
 
         string description[3];
         description[0] = opponentCardsInfo[i].frontLinePower;
@@ -135,6 +145,14 @@ bool menu(RenderWindow &window,
     ButtonsManager buttonsManager;
     buttonsManager.setButtons(buttons);
 
+    //////////////////
+    Font font;
+    font.loadFromFile("../src/pixel.ttf");
+    Text text("Hello", font, 20);
+    text.setColor(Color::Blue);
+    text.setPosition(400, 400);
+    ///////////////////
+
     while (window.isOpen())
     {
         while (window.pollEvent(event))
@@ -145,9 +163,9 @@ bool menu(RenderWindow &window,
             case (Event::MouseButtonPressed):
             {
                 buttonsManager.mouseIsPressed();
-                if (client.isConnected())
+                if (lobbyWasCreated)
                 {
-                    cout << "Lobby was created!!!" << endl;
+                    BOOST_LOG_TRIVIAL(info) << "menu() : Lobby was created!";
                     return 1;
                 }
                 break;
@@ -175,6 +193,8 @@ bool menu(RenderWindow &window,
 
         window.draw(backgroundRect);
         buttonsManager.draw();
+
+        window.draw(text);
 
         window.display();
     }

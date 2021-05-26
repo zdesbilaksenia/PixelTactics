@@ -25,9 +25,11 @@ void CommandAttack::execute()
                 //Сама обработка запроса будет происходить уже в buttonIsPressed в объекте opponentTilesManager.
                 opponentTilesManager.setTileBuffer(playerTilesManager.getTileBuffer());
                 opponentTilesManager.setStatus(TilesManagerStatus::statusWaitingForAttack);
-                opponentTilesManager.updateFocus();
+
+                //opponentTilesManager.updateFocus();
 
                 BOOST_LOG_TRIVIAL(info) << "CommandAttack::execute(): Sending attacker position!";
+                cout << " ATTACKER POS = " << playerTilesManager.getTileBuffer()->getCoordX() << " " << playerTilesManager.getTileBuffer()->getCoordY() << endl;
                 client.sendAttackerPos(playerTilesManager.getTileBuffer()->getCoordX(), playerTilesManager.getTileBuffer()->getCoordY());
                 BOOST_LOG_TRIVIAL(info) << "CommandAttack::execute(): Attacker position sent!";
 
@@ -41,24 +43,12 @@ void CommandAttack::execute()
                         BOOST_LOG_TRIVIAL(info) << "CommandAttack::execute(): active tiles loaded!";
                 }
 
-                /*
-                        0 0 0  |  0 0 0
-                        0 0 0  |  0 0 0
-                        0 0 0  |  0 0 0
-                */
-               
-                for (int i = 0; i < 9; ++i)
-                {
-                        cout << activeTiles[i] << " ";
-                }
-                cout << endl;
-
                 opponentTilesManager.setActiveTiles(activeTiles);
 
                 opponentTilesManager.updateFocus();
 
                 playerTilesManager.setTileBuffer(nullptr);
-                playerTilesManager.setStatus(TilesManagerStatus::statusNothingHappens);
+                //playerTilesManager.setStatus(TilesManagerStatus::statusNothingHappens);
                 playerTilesManager.updateFocus();
         }
 }

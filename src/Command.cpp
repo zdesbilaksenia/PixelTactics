@@ -15,7 +15,7 @@ CommandTest::~CommandTest() {}
 
 void CommandTest::execute()
 {
-    cout << "HEY" << endl;
+    cout << "CommandTest::execute()" << endl;
 }
 // ====================================
 // =========CommandStringTest==========

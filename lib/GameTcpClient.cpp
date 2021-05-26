@@ -16,7 +16,8 @@ void GameTcpClient::getHeroesStats() const
     Message<GameMsgTypes> msg(GameMsgTypes::GetHeroesStats);
     send(msg);
 }
-void GameTcpClient::connectToLobby() const {
+void GameTcpClient::connectToLobby() const
+{
     Message<GameMsgTypes> msg(GameMsgTypes::ConnectToLobby);
     send(msg);
 }
@@ -46,10 +47,23 @@ void GameTcpClient::sendAttackerPos(const int posX, const int posY) const
     send(msg);
 }
 
+void GameTcpClient::sendPowerUserPos(const int posX, const int posY) const
+{
+    Message<GameMsgTypes> msg(GameMsgTypes::GamePowerRequest);
+    msg << posY << posX;
+    send(msg);
+}
+
 void GameTcpClient::sendAttackedPos(const int posX, const int posY) const
 {
     Message<GameMsgTypes> msg(GameMsgTypes::GameAttackRequest);
     msg << posY << posX;
+    send(msg);
+}
+
+void GameTcpClient::sendTakeCard()
+{
+    Message<GameMsgTypes> msg(GameMsgTypes::GameTakeCard);
     send(msg);
 }
 

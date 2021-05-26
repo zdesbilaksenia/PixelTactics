@@ -14,6 +14,7 @@ using namespace sf;
 #include "Button.h"
 #include "Command.h"
 #include "Commands/CommandAttack.h"
+#include "Commands/CommandPower.h"
 #include "Commands/CommandTakeCard.h"
 #include "Card.h"
 #include "Tile.h"
@@ -24,13 +25,16 @@ using namespace sf;
 
 int main()
 {
+
+    setlocale(LC_ALL, "Russian");
+
     BOOST_LOG_TRIVIAL(info) << "main() : Starting!";
 
 #if SERVER_CONNECTING == 1
 
     GameTcpClient client;
 
-    if(!connectToServer(client, "10.147.17.200"))
+    if (!connectToServer(client, "10.147.17.71"))
     {
         BOOST_LOG_TRIVIAL(fatal) << "main() : error!";
         return 0;
@@ -150,8 +154,8 @@ int main()
     attackButton.setPosition(50, 80);
     attackButton.setTexture(&attackButtonTx);
 
-    CommandStringTest cmdtest2("CommandStringTest::execute(): Power!");
-    Button powerButton(window, mouse, &cmdtest2);
+    CommandPower cmdpower(playerTilesManager, opponentTilesManager, client);
+    Button powerButton(window, mouse, &cmdpower);
     powerButton.setColors(Color::White, Color(240, 200, 150), Color(190, 70, 80), Color(200, 200, 200));
     powerButton.setPosition(50, 130);
     powerButton.setTexture(&powerButtonTx);
@@ -192,6 +196,7 @@ int main()
                    opponentTilesManager,
                    cardsManager,
                    background,
+                   playerUnits,
                    opponentUnits,
                    texturesForUnits);
 

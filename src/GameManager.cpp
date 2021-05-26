@@ -10,6 +10,7 @@ GameManager::GameManager(RenderWindow &_window,
                          TilesManager &_opponentTM,
                          CardsManager &_cardsM,
                          Background &_background,
+                         vector<Unit>& _playerUnits,
                          vector<Unit> &_opponentUnits,
                          const vector<Texture> &_textures) : window(_window),
                                                              mouse(_mouse),
@@ -22,6 +23,7 @@ GameManager::GameManager(RenderWindow &_window,
                                                              background(_background),
                                                              stage(GameStage::stageStart),
                                                              round(RoundType::roundAvangard),
+                                                             playerUnits(_playerUnits),
                                                              opponentUnits(_opponentUnits),
                                                              unitTextures(_textures)
 {
@@ -77,7 +79,6 @@ void GameManager::play()
     //Если второй игрок
     if (side == 1)
     {
-        cout<<"I am the second player!"<<endl;
         //Ждём здесь, пока ответ о конце хода противника не придёт:
         opponentsTurn();
     }
@@ -109,8 +110,6 @@ void GameManager::gameStart()
     {
         cardsManager.takeCard();
     }
-
-    //draw();
 
     this->draw();
 

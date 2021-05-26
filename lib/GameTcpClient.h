@@ -17,7 +17,10 @@ public:
     void sendCardReleased(const int, const int, const int) const;
     void sendAttackerPos(const int, const int) const;
     void sendAttackedPos(const int, const int) const;
-    void sendAttack() const;
+    void sendPowerUserPos(const int, const int) const;
+    //void sendAttackedPos(const int, const int) const;
+    void sendTakeCard();
+
     //.......
     //
 

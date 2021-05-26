@@ -47,6 +47,7 @@ set(LIB_SOURCE_FILES
     src/Background.cpp
     src/GameManager.cpp
     src/Commands/CommandAttack.cpp
+    src/Commands/CommandPower.cpp
     src/Commands/CommandTakeCard.cpp
     src/Commands/CommandConnectToLobby.cpp
     src/Functions.cpp)

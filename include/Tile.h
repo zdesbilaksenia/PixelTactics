@@ -48,7 +48,7 @@ private:
     int coordX;
     int coordY;
 
-    unique_ptr<Unit> unit;
+    Unit* unit;
     //Unit *unit;
     TileStatus status;
     const Color colorForAttack = Color(255, 111, 0);
@@ -178,7 +178,7 @@ private:
     void setNormalColors();
 
     //Какую карту мы хотим вывести в игру
-    unique_ptr<Unit> unitBuffer;
+    Unit* unitBuffer;
 
     //Какой тайл будет атаковать/использовать способность
     Tile *tileBuffer;
