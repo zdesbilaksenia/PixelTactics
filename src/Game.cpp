@@ -276,10 +276,8 @@ void Game::StartGame() {
                     cout << "ПОСЛЕ АТАКИ " << "ХП " << EnemyHero->GetHero().GetCurHealth() << " Сила атакующего "
                          << YourHero->GetHero().GetCurStrength() << std::endl;
                     pole.SetPosition(EnemyHero);
-                    MovesAmount--;
                     std::vector<Breed> Stats;
                     Stats = ReturnRequest(pole);
-
                     auto Statsmsg = Message<GameMsgTypes>(GameMsgTypes::GameHeroesStats);
                     Statsmsg << Stats;
                     CallPechkin(0, Attackmsg);
