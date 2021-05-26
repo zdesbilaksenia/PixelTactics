@@ -23,12 +23,13 @@ include_directories(DataBase/ Mapper/ /usr/include/mysql /usr/mysql /usr/lib/mys
 add_library(DataBase_lib DataBase/Connection.cpp DataBase/MySQL.cpp Mapper/PowerMapper.cpp)
 include_directories(Request/)
 
-add_library(game src/Game.cpp)
-add_library(position src/position.cpp)
-add_library(deck src/deck.cpp)
-add_library(hero src/hero.cpp)
-add_library(pole src/pole.cpp)
-add_library(player src/player.cpp)
+add_library(game_libs STATIC 
+    src/Game.cpp 
+    src/position.cpp
+    src/deck.cpp
+    src/hero.cpp
+    src/pole.cpp
+    src/player.cpp)
 add_library(request Request/request.cpp)
 add_library(powers Mapper/PowerMapper.cpp src/Powers.cpp)
 add_library(network STATIC
@@ -47,20 +48,27 @@ add_executable(main src/newmain.cpp DataBase/Connection.cpp src/hero.cpp Mapper/
 add_executable(cl src/client.cpp)
 add_executable(serv src/server.cpp)
 
-target_link_libraries(main game)
-target_link_libraries(main position)
-target_link_libraries(main pole)
-target_link_libraries(main deck)
-target_link_libraries(main hero)
-target_link_libraries(main player)
+target_link_libraries(main game_libs)
 target_link_libraries(main DataBase_lib mysqlclient)
 target_link_libraries(main request)
 target_link_libraries(main powers)
 target_link_libraries(cl PUBLIC network ${USED_LIBS})
-target_link_libraries(serv PUBLIC network game position pole deck hero player DataBase_lib mysqlclient request powers ${USED_LIBS})
+target_link_libraries(serv PUBLIC network game_libs DataBase_lib mysqlclient request powers ${USED_LIBS})
 
 
+enable_testing()
+find_package(GTest REQUIRED)
 
+include_directories(${GTEST_INCLUDE_DIRS})
+message(${GTEST_LIBRARIES})
+
+add_executable(tests Tests/MyTests.cpp Tests/main.cpp)
+
+target_link_libraries(tests ${GTEST_LIBRARIES} -lpthread)
+target_link_libraries(tests game_libs)
+target_link_libraries(tests DataBase_lib mysqlclient)
+target_link_libraries(tests request)
+target_link_libraries(tests powers)
 
 
 

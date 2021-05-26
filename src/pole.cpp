@@ -103,106 +103,63 @@ bool Pole::CheckLeader()
 
 std::vector<bool> Pole::CanBeMeleeAttackedRequest(int side)
 {
-    std::vector<bool> CanBeMeleeAttacked;
-    CanBeMeleeAttacked.resize(0);
+    std::vector<bool> CanBeMeleeAttacked(0);
     if (side == 0)
     {
-        for (int itline = 0; itline < 3; itline++)
+        for (int itcell = 0; itcell < 3; itcell++)
         {
-
-            for (int itcell = 0; itcell < 3; itcell++)
+            for (int itline = 0; itline < 3; itline++)
             {
                 Position *position = GetPosition(itcell, itline, 1);
-                if (position->isEmpty() && position->GetHero().IsDead())
-                {
-                    CanBeMeleeAttacked.push_back(false);
-                }
-                else if (itline == 0)
+                if (!(position->isEmpty()) && !(position->GetHero().IsDead()))
                 {
                     CanBeMeleeAttacked.push_back(true);
-                }
-                else if (itline == 1)
-                {
-                    position = GetPosition(itcell, 0, 1);
-                    if (position->isEmpty() && position->GetHero().IsDead())
-                    {
-                        CanBeMeleeAttacked.push_back(true);
-                    }
-                }
-                else if (itline == 2)
-                {
-                    position = GetPosition(itcell, 1, 1);
-                    if (!position->isEmpty() && position->GetHero().IsDead())
+                    for (int j = itline + 1; j < 3; j++)
                     {
                         CanBeMeleeAttacked.push_back(false);
                     }
-                    else
-                    {
-                        position = GetPosition(itcell, 0, 1);
-                        if (position->isEmpty() && position->GetHero().IsDead())
-                        {
-                            CanBeMeleeAttacked.push_back(false);
-                        }
-                        else
-                        {
-                            CanBeMeleeAttacked.push_back(true);
-                        }
-                    }
+                    itline = 3;
+                }
+                else
+                {
+                    CanBeMeleeAttacked.push_back(false);
                 }
             }
         }
     }
     else
     {
-        for (int itline = 0; itline < 3; itline++)
+        for (int itcell = 0; itcell < 3; itcell++)
         {
-
-            for (int itcell = 0; itcell < 3; itcell++)
+            for (int itline = 0; itline < 3; itline++)
             {
                 Position *position = GetPosition(itcell, itline, 0);
-                if (position->isEmpty() && position->GetHero().IsDead())
-                {
-                    CanBeMeleeAttacked.push_back(false);
-                }
-                else if (itline == 0)
+                if (position->isEmpty() == false)
                 {
                     CanBeMeleeAttacked.push_back(true);
-                }
-                else if (itline == 1)
-                {
-                    position = GetPosition(itcell, 0, 0);
-                    if (position->isEmpty() && position->GetHero().IsDead())
-                    {
-                        CanBeMeleeAttacked.push_back(true);
-                    }
-                }
-                else if (itline == 2)
-                {
-                    position = GetPosition(itcell, 1, 0);
-                    if (!position->isEmpty() && position->GetHero().IsDead())
+                    for (int j = itline + 1; j < 3; j++)
                     {
                         CanBeMeleeAttacked.push_back(false);
                     }
-                    else
-                    {
-                        position = GetPosition(itcell, 0, 0);
-                        if (position->isEmpty() && position->GetHero().IsDead())
-                        {
-                            CanBeMeleeAttacked.push_back(false);
-                        }
-                        else
-                        {
-                            CanBeMeleeAttacked.push_back(true);
-                        }
-                    }
+                    itline = 3;
+                }
+                else
+                {
+                    CanBeMeleeAttacked.push_back(false);
                 }
             }
         }
     }
-    return CanBeMeleeAttacked;
+    std::vector<bool> CanBeMeleeAttackedResult(0);
+    for(int i = 0; i < 3; i++){
+        for(int j = 0; j < CanBeMeleeAttacked.size(); j = j + 3){
+            CanBeMeleeAttackedResult.push_back(CanBeMeleeAttacked[i+j]);
+        }
+    }
+    return CanBeMeleeAttackedResult;
 }
-
-Position* Pole::GetLeaderPos(int player) {
-        Position* leader;
-        leader = GetPosition(1,1,player);
+Position *Pole::GetLeaderPos(int player)
+{
+    Position *leader;
+    leader = GetPosition(1, 1, player);
 }

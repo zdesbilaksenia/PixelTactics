@@ -48,4 +48,6 @@ build/
 /build
 
 lib*.a
+/vcpkg
+
 
