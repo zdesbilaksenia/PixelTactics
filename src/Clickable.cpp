@@ -19,11 +19,6 @@ Clickable::~Clickable()
     command = nullptr;
 }
 
-void Clickable::setCommand(Command *_command)
-{
-    this->command = _command;
-}
-
 bool Clickable::hasFocus()
 {
     return rect.getGlobalBounds().contains(mouse.getPosition(window).x, mouse.getPosition(window).y);

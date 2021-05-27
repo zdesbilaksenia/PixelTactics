@@ -191,8 +191,7 @@ int main()
                    cardsManager,
                    background,
                    playerUnits,
-                   opponentUnits,
-                   texturesForUnits);
+                   opponentUnits);
 
     gm.setAttackButton(attackButton);
     gm.setPowerButton(powerButton);
@@ -204,7 +203,6 @@ int main()
 
     while (window.isOpen())
     {
-        cout << "START" << endl;
         if (menu(window, mouse, event, client) == false)
         {
             BOOST_LOG_TRIVIAL(fatal) << "main() : Can't create lobby!";
@@ -214,9 +212,10 @@ int main()
         {
             BOOST_LOG_TRIVIAL(info) << "main() : Game Created!";
         }
+        BOOST_LOG_TRIVIAL(info) << "main() : starting game!";
         setData(client, playerUnits, opponentUnits, cards, texturesForUnits);
         gm.play();
-        cout << "END" << endl;
+        BOOST_LOG_TRIVIAL(info) << "main() : game finished!";
     }
 
     return 0;

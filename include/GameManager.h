@@ -20,36 +20,12 @@ using namespace sf;
 #include <thread>
 #include <mutex>
 
-auto loadPlayerHeroesStats{
+auto loadHeroesStats{
     [](vector<Unit> &_units, vector<Breed> &_breeds, TilesManager &_tilesManager, const bool &_side) {
-        cout << "loadPlayerHeroesStats" << endl;
         for (int i = 0 + 9 * _side; i < 9 + 9 * _side; ++i)
         {
             int x = (i - 9 * _side) / 3;
             int y = i % 3;
-            cout << "ID = " << _breeds[i].cardID << " x, y " << x << " " << y << endl;
-            if (_breeds[i].cardID != -1)
-            {
-                _units[_breeds[i].cardID].setTextAttack(_breeds[i].strength);
-                _units[_breeds[i].cardID].setTextHP(_breeds[i].HP);
-                _tilesManager.setUnit(_units[_breeds[i].cardID], x, y);
-            }
-            else
-            {
-                _tilesManager.deleteUnit(x, y);
-            }
-        }
-        return;
-    }};
-
-auto loadOpponentHeroesStats{
-    [](vector<Unit> &_units, vector<Breed> &_breeds, TilesManager &_tilesManager, const bool &_side) {
-        cout << "loadOppoentHeroesStats" << endl;
-        for (int i = 0 + 9 * (1 - _side); i < 9 + 9 * (1 - _side); ++i)
-        {
-            int x = (i - 9 * (1 - _side)) / 3;
-            int y = i % 3;
-            cout << "ID = " << _breeds[i].cardID << " x, y " << x << " " << y << endl;
             if (_breeds[i].cardID != -1)
             {
                 _units[_breeds[i].cardID].setTextAttack(_breeds[i].strength);
@@ -77,8 +53,7 @@ public:
                 CardsManager &_cardsM,
                 Background &_background,
                 vector<Unit> &_platerUnits,
-                vector<Unit> &_opponentUnits,
-                const vector<Texture> &_textures);
+                vector<Unit> &_opponentUnits);
 
     void setAttackButton(Button &_btnAttack);
     void setPowerButton(Button &_btnPower);
@@ -98,12 +73,10 @@ private:
         msg >> breeds;
         BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : breed loaded!";
 
-        loadPlayerHeroesStats(playerUnits, breeds, playerTilesManager, side);
-        loadOpponentHeroesStats(opponentUnits, breeds, opponentTilesManager, side);
+        loadHeroesStats(playerUnits, breeds, playerTilesManager, side);
+        loadHeroesStats(opponentUnits, breeds, opponentTilesManager, (1 - side));
     }
 
-    //Текстуры для отрисовки противника
-    const vector<Texture> &unitTextures;
     //Юниты противника
     vector<Unit> &playerUnits;
     vector<Unit> &opponentUnits;
@@ -117,7 +90,6 @@ private:
     TilesManager &opponentTilesManager;
     CardsManager &cardsManager;
     Background &background;
-    //Нужно сделать класс "Label", который будет рисовать текст
 
     Button *btnAttack;
     Button *btnPower;
@@ -147,7 +119,6 @@ private:
     void opponentsTurn();
 
     int side;
-    //Вывел циклы для удобства
 
     void _whileForPlay()
     {
@@ -255,16 +226,10 @@ private:
                     BOOST_LOG_TRIVIAL(info) << "GameManager::ForGamesStart() : Got message from opponent!";
 
                     auto msg = client.incoming().popFront().msg;
-                    vector<Breed> breeds;
                     if (msg.header.id == GameMsgTypes::GameHeroesStats)
                     {
-                        BOOST_LOG_TRIVIAL(info) << "GameManager::ForGamesStart() : Trying to load breed!";
-                        msg >> breeds;
-                        BOOST_LOG_TRIVIAL(info) << "GameManager::ForGamesStart() : breed loaded!";
+                        loadBreeds(msg);
                     }
-
-                    loadPlayerHeroesStats(playerUnits, breeds, playerTilesManager, side);
-                    loadOpponentHeroesStats(opponentUnits, breeds, opponentTilesManager, side);
 
                     opponentTilesManager.updateFocus();
                     playerTilesManager.updateFocus();
@@ -283,7 +248,6 @@ private:
     void _whileForOpponentsTurn()
     {
         int moveAmounts = 0;
-
         while (window.isOpen())
         {
             while (window.pollEvent(event))
@@ -388,12 +352,6 @@ private:
     void _whileForPlayersTurn()
     {
         int movesAmount = 0;
-
-        //Если не можем взять карту.
-        if (cardsManager.canTakeCard() == false)
-        {
-            btnTakeCard->disable();
-        }
         if (playerTilesManager.hasBodies() == false)
         {
             btnRemoveBody->disable();
@@ -523,14 +481,7 @@ private:
                         {
                         case GameMsgTypes::GameHeroesStats:
                         {
-                            vector<Breed> breeds;
-                            BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Trying to load breed!";
-                            msg >> breeds;
-                            BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : breed loaded!";
-
-                            loadPlayerHeroesStats(playerUnits, breeds, playerTilesManager, side);
-                            loadOpponentHeroesStats(opponentUnits, breeds, opponentTilesManager, side);
-
+                            loadBreeds(msg);
                             break;
                         }
                         case GameMsgTypes::GameWon:

@@ -11,7 +11,7 @@ DrawableBox::DrawableBox(RenderWindow &_window) : window(_window)
     rect.setFillColor(Color::White);
 }
 
-void DrawableBox::setFillColor(const Color& _color)
+void DrawableBox::setFillColor(const Color &_color)
 {
     rect.setFillColor(_color);
 }
@@ -21,38 +21,43 @@ void DrawableBox::setTexture(Texture *_tx)
     rect.setTexture(_tx);
 }
 
-void DrawableBox::setSize(const int& _width, const int& _height)
+void DrawableBox::setSize(const int &_width, const int &_height)
 {
     this->width = _width;
     this->height = _height;
     rect.setSize(Vector2f(_width, _height));
 }
 
-void DrawableBox::setPosition(const int& _posX, const int& _posY)
+void DrawableBox::setPosition(const int &_posX, const int &_posY)
 {
     this->posX = _posX;
     this->posY = _posY;
     rect.setPosition(_posX, _posY);
 }
 
-const int& DrawableBox::getPosX()
+const int &DrawableBox::getPosX()
 {
     return posX;
 }
 
-const int& DrawableBox::getPosY()
+const int &DrawableBox::getPosY()
 {
     return posY;
 }
 
-const int& DrawableBox::getWidth()
+const int &DrawableBox::getWidth()
 {
     return width;
 }
 
-const int& DrawableBox::getHeight()
+const int &DrawableBox::getHeight()
 {
     return height;
+}
+
+void DrawableBox::setFont(const string &fontPath)
+{
+    font.loadFromFile(fontPath);
 }
 
 DrawableBox::~DrawableBox() {}

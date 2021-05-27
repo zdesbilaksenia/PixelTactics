@@ -17,6 +17,11 @@ void Card::setPosition(const int &_posX, const int &_posY)
 
 void Card::setUnit(Unit *_unit)
 {
+    if (_unit == nullptr)
+    {
+        BOOST_LOG_TRIVIAL(error) << "Card::setUnit() : _unit is nullptr!";
+        return;
+    }
     this->unit = _unit;
 }
 
@@ -71,16 +76,15 @@ CardsManager::CardsManager(RenderWindow &_window, TilesManager &_tilesManager, s
 
 bool CardsManager::takeCard()
 {
-    cout << "Take card, hand" << cardsInHand.size() << endl;
-    if (cardsInStack.size() > 0 && cardsInHand.size() < maxNumberOfCardsInHand)
+    if (canTakeCard())
     {
         cardWasTaken = true;
         cardsInHand.push_back(cardsInStack.top());
         cardsInStack.pop();
         this->updateHand();
-        return 1;
+        return true;
     }
-    return 0;
+    return false;
 }
 
 void CardsManager::updateHand()
@@ -96,36 +100,9 @@ void CardsManager::updateHand()
 
 void CardsManager::updateFocus()
 {
-    switch (status)
+    for (auto cardId = cardsInHand.rbegin(); cardId != cardsInHand.rend(); ++cardId)
     {
-    case CardsManagerStatus::statusGameStarting:
-        for (auto cardId = cardsInHand.rbegin(); cardId != cardsInHand.rend(); ++cardId)
-        {
-            (*cardId)->updateFocus();
-        }
-        break;
-    case CardsManagerStatus::statusNothingHappens:
-        for (auto cardId = cardsInHand.rbegin(); cardId != cardsInHand.rend(); ++cardId)
-        {
-            (*cardId)->updateFocus();
-        }
-        break;
-    case CardsManagerStatus::statusReleasingCard:
-        for (auto cardId = cardsInHand.rbegin(); cardId != cardsInHand.rend(); ++cardId)
-        {
-            (*cardId)->updateFocus();
-        }
-        (*cardToDeleteId)->setFillColor(colorReleasingCard);
-        break;
-    case CardsManagerStatus::statusGameStartingReleasingCard:
-        for (auto cardId = cardsInHand.rbegin(); cardId != cardsInHand.rend(); ++cardId)
-        {
-            (*cardId)->updateFocus();
-        }
-        (*cardToDeleteId)->setFillColor(colorReleasingCard);
-        break;
-    default:
-        break;
+        (*cardId)->updateFocus();
     }
 }
 
@@ -260,7 +237,6 @@ void CardsManager::setCardShirtTexture(Texture *_tx)
 
 bool CardsManager::canTakeCard()
 {
-    cout << "HandSize = " << cardsInHand.size() << endl;
     return (cardsInHand.size() < maxNumberOfCardsInHand && cardsInStack.size() > 0);
 }
 
@@ -272,6 +248,13 @@ void CardsManager::setStatus(CardsManagerStatus _status)
 void CardsManager::setUnitBuffer(Unit *unit)
 {
     unitBuffer = unit;
+}
+
+bool CardsManager::getCardWasTaken()
+{
+    bool result = cardWasTaken;
+    cardWasTaken = false;
+    return result;
 }
 
 CardsManager::~CardsManager() {}

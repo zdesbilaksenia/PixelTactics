@@ -67,14 +67,77 @@ public:
     void updateHand();
     void setCardShirtTexture(Texture *_texture);
     void setStatus(CardsManagerStatus _status);
-    void setUnitBuffer(Unit* unit);
+    void setUnitBuffer(Unit *unit);
     bool canTakeCard();
-    bool getCardWasTaken()
+    bool getCardWasTaken();
+
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    void removeSelectedCard()
     {
-        bool result = cardWasTaken;
-        cardWasTaken = false;
-        return result;
+        if (tilesManager.getStatus() == TilesManagerStatus::statusCardWasJustReleased)
+        {
+            tilesManager.setStatus(TilesManagerStatus::statusNothingHappens);
+            BOOST_LOG_TRIVIAL(info) << "CardsManager::mouseIsPressed() : statusReleasingCard card was just released, removing card from hand!";
+            cardsInHand.erase(cardToDeleteId);
+            this->updateHand();
+            status = CardsManagerStatus::statusNothingHappens;
+        }
     }
+
+    void handleClick(Card &card)
+    {
+        switch (status)
+        {
+        case CardsManagerStatus::statusGameStarting:
+        {
+            vector<bool> activeTiles =
+                {0, 0, 0,
+                 0, 1, 0,
+                 0, 0, 0};
+            tilesManager.setActiveTiles(activeTiles);
+            tilesManager.setUnitBuffer(*(*cardToDeleteId)->unit);
+            BOOST_LOG_TRIVIAL(info) << "CardsManager::mouseIsPressed() : statusGameStarting Card was clicked!";
+            break;
+        }
+        case CardsManagerStatus::statusNothingHappens:
+        {
+            if (tilesManager.hasEmptyTiles() == false)
+            {
+                BOOST_LOG_TRIVIAL(info) << "CardsManager::mouseIsPressed() : statusNothingHappens Card was clicked!";
+                cardToDeleteId;
+                tilesManager.setUnitBuffer(*(*cardToDeleteId)->unit);
+            }
+            break;
+        }
+        case CardsManagerStatus::statusReleasingCard:
+        {
+            tilesManager.setUnitBuffer(*(*cardToDeleteId)->unit);
+            break;
+        }
+        case CardsManagerStatus::statusGameStartingReleasingCard:
+        {
+            tilesManager.setUnitBuffer(*(*cardToDeleteId)->unit);
+            break;
+        }
+        }
+        return;
+    }
+
+    //Аналог mouseIsPressed().
+    //Надо сделать setActiveTiles для авангарда, фланга и тыла
+    void mouseClicked()
+    {
+        for (auto card = cardsInHand.begin(); card != cardsInHand.end(); card++)
+        {
+            if ((*card)->hasFocus())
+            {
+                cardToDeleteId = card;
+                handleClick(*(*card));
+                return;
+            }
+        }
+    }
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     ~CardsManager();
 
@@ -91,7 +154,6 @@ private:
 
     //В буфер tilesManager будем складывать юнита
     TilesManager &tilesManager;
-    //unique_ptr
 
     RectangleShape cardShirtRect;
 

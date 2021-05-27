@@ -61,7 +61,6 @@ void ButtonsManager::updateFocus()
 
 void ButtonsManager::mouseIsPressed()
 {
-    // Смотрим, на какую кнопку нажали
     for (auto button : buttons)
     {
         if (button->hasFocus() && button->isEnabled())

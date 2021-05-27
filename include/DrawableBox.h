@@ -20,10 +20,7 @@ public:
     const int &getWidth();
     const int &getHeight();
 
-    virtual void setFont(const string& fontPath)
-    {
-        font.loadFromFile(fontPath);
-    }
+    virtual void setFont(const string& fontPath);
 
     virtual void draw() = 0;
     ~DrawableBox();

@@ -604,6 +604,48 @@ bool TilesManager::hasEmptyTiles()
     return 0;
 }
 
+void TilesManager::deleteUnit(int x, int y)
+{
+    switch (x)
+    {
+    case (0):
+    {
+        tilesAvangard[y]->deleteUnit();
+        break;
+    }
+    case (1):
+    {
+        tilesFlank[y]->deleteUnit();
+        break;
+    }
+    case (2):
+    {
+        tilesRear[y]->deleteUnit();
+        break;
+    }
+    default:
+        break;
+    }
+}
+
+void TilesManager::setUnit(Unit &unit, int coordX, int coordY)
+{
+    switch (coordX)
+    {
+    case 0:
+        tilesAvangard[coordY]->setUnit(unit);
+        break;
+    case 1:
+        tilesFlank[coordY]->setUnit(unit);
+        break;
+    case 2:
+        tilesRear[coordY]->setUnit(unit);
+        break;
+    default:
+        break;
+    }
+}
+
 TilesManager::~TilesManager()
 {
     unitBuffer = nullptr;

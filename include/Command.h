@@ -10,7 +10,6 @@ class Command
 {
 public:
     Command();
-    //void setCommandManager(CommandManager &_cmdManager);
     virtual void execute() = 0;
     ~Command();
 

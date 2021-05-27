@@ -11,7 +11,6 @@ class Clickable : public DrawableBox
 public:
     Clickable(RenderWindow &_window, Mouse &_mouse);
     Clickable(RenderWindow &_window, Mouse &_mouse, Command *_command);
-    void setCommand(Command *_command);
 
     bool hasFocus();
     virtual void updateFocus();
@@ -32,7 +31,6 @@ public:
 
 protected:
     const Mouse &mouse;
-    //bool wasClicked;
     Command *command;
 
     bool isInFocus;
