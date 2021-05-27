@@ -100,7 +100,6 @@ void Game::StartGame() {
     // FirstPlayer.StartingHand();
     // SecondPlayer.StartingHand();
 
-
     currentside = 0;
     Player *CurrentPlayer = FirstPlayer;
     int MovesAmount = 2;
@@ -213,9 +212,6 @@ void Game::StartGame() {
                 auto Attackmsg = Message<GameMsgTypes>(GameMsgTypes::GameCanBeAttacked);
                 Attackmsg << CanBeMeleeAttacked;
                 CallPechkin(currentside, Attackmsg);
-                for (int i = 0; i < 9; i++)
-                    cout << CanBeMeleeAttacked[i] << " ";
-                cout << std::endl;
 
                 Position *YourHero = pole.GetPosition(cell, line, CurrentPlayer->GetSide());
                 int EnemySide;
@@ -246,8 +242,8 @@ void Game::StartGame() {
                     cout << "ПОСЛЕ АТАКИ " << "ХП " << EnemyHero->GetHero().GetCurHealth() << " Сила атакующего "
                          << YourHero->GetHero().GetCurStrength() << std::endl;
                     pole.SetPosition(EnemyHero);
-
-                    SendBreeds(pole, 3);
+                    if (pole.CheckLeader() != 0 && pole.CheckLeader() != 1)
+                        SendBreeds(pole, 3);
                     MovesAmount--;
                 } else {
                     std::cout << "СПЕРЕДИ СТОИТ ДРУГОЙ ГЕРОЙ. НЕЛЬЗЯ АТАКОВАТЬ!!" << std::endl;
@@ -288,7 +284,6 @@ void Game::StartGame() {
                 break;
             }
             case (GameMsgTypes::GamePowerRequest): {
-
                 int cell, line;
                 std::cout << " СПОСОБНОСТЬ " << std::endl;
 
@@ -319,19 +314,45 @@ void Game::StartGame() {
                 MovesAmount--;
                 break;
             }
-            case (GameMsgTypes::GameRemoveBody): {
+            case (GameMsgTypes::GameRemoveBodyRequest): {
+                vector<bool> dead = SendAllDeadFriends(NULL, pole, currentside);
+                vector<bool> send;
+                send.resize(9);
+                if (currentside == 0) {
+                    for (int i = 0; i < 9; i++) {
+                        send[i] = dead[i];
+                        cout << send[i] << " ";
+                    }
+                } else {
+                    for (int i = 9; i < 18; i++) {
+                        send[i] = dead[i];
+                        cout << send[i] << " ";
+                    }
+                }
+
+                Message<GameMsgTypes> d(GameMsgTypes::GameRemoveBody);
+                d << send;
+                CallPechkin(0, d);
+
                 std::cout << "УБРАТЬ ТЕЛО" << std::endl;
                 int line = 0;
                 int cell = 0;
-                msg >> choice >> line >> cell;
+
+                if (!WaitForMessage()) return;
+
+                auto remove = lobby->incoming().popFront().msg;
+                if (remove.header.id == GameMsgTypes::GameRemoveBody)
+                    remove >> choice >> line >> cell;
+
                 cout << " CHOICE " << choice << " CELL " << cell << " LINE " << line << std::endl;
 
-                Position *kletka = pole.GetPosition(cell, line, CurrentPlayer->GetSide());
+                Position *kletka = pole.GetPosition(cell, line, currentside);
                 kletka->RemoveHero();
 
                 SendBreeds(pole, 3);
 
                 MovesAmount--;
+                break;
             }
             default: {
                 break;

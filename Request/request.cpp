@@ -506,9 +506,6 @@ vector<bool> SendAllAliveFriends(Position *position, Pole &pole_, int friendlysi
 }
 
 vector<bool> SendAllDeadFriends(Position *position, Pole &pole_, int friendlyside) {
-    std::vector<Hero *> heroes;
-    heroes.resize(0);
-    heroes.push_back(&(position->GetHero()));
     std::vector<bool> HeroesAlive;
     HeroesAlive.resize(0);
     int count = 0;

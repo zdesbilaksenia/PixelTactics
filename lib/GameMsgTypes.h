@@ -34,6 +34,7 @@ enum class GameMsgTypes : uint32_t {
     GamePowerRequest,
     GamePowerAnswer,
     GameBeforeHeroStats,
+    GameRemoveBodyRequest,
     GameRemoveBody,
     GameCardReleased,
     GameReject,

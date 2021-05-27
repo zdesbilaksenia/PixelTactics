@@ -274,7 +274,7 @@ Powers::Powers() {
     frontLinePowerMap.insert(pair<string, FrontLinePower>("Маг-дракон", &Castling));
     frontLinePowerMap.insert(pair<string, FrontLinePower>("Зверолов", &PlusStrengthMinusHP));
     frontLinePowerMap.insert(pair<string, FrontLinePower>("Оракул", &Interception));
-    frontLinePowerMap.insert(pair<string, FrontLinePower>("Паладин", &LeaderMakeDistantAttack));
+    frontLinePowerMap.insert(pair<string, FrontLinePower>("Паладин", &MakeDistantAttack));
 
     middleLinePowerMap.insert(pair<string, MiddleLinePower>("Рыцарь", &PlusPowerInCloseAttack));
     middleLinePowerMap.insert(pair<string, MiddleLinePower>("Ведьма", &ResurrectAndGetDamage));
