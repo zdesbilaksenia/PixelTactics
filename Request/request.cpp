@@ -24,6 +24,7 @@ void HPFromDead(Position *position, Pole &pole_) {
     for (int i = 0; i < pole_.GetVector().size(); i++) {
         if (pole_.GetVector()[i]->GetHero().IsDead()) {
             heroes.push_back(&(position->GetHero()));
+            break;
         }
     }
     if (heroes.size() > 1) {
@@ -63,7 +64,7 @@ void PlusStrMinusHP(Position *position, Pole &pole_) {
     //Степе отправляется массив из 18 полей (в каждом поле хп и сила героя)
 }
 
-void PlusPower(Position *position, Pole &pole_, int friendlyside) {
+/*void PlusPower(Position *position, Pole &pole_, int friendlyside) {
     std::vector<Hero *> heroes;
     heroes.resize(0);
     heroes.push_back(&(position->GetHero()));
@@ -93,9 +94,9 @@ void PlusPower(Position *position, Pole &pole_, int friendlyside) {
     //в вектор vector<Hero*> heroes добавить 0)персонажа, чью спсобность используем 1)персонажа, которого выбрал Степа
     //персонаж_чью_способность_используем->frontLinePower(heroes);
     //Степе отправляется массив из 18 полей (в каждом поле хп и сила героя)
-}
+}*/
 
-void AttackDamageToHP(Position *position, Pole &pole_, int friendlyside) {
+/*void AttackDamageToHP(Position *position, Pole &pole_, int friendlyside) {
     std::vector<Hero *> heroes;
     heroes.resize(0);
     heroes.push_back(&(position->GetHero()));
@@ -123,9 +124,9 @@ void AttackDamageToHP(Position *position, Pole &pole_, int friendlyside) {
     //в вектор vector<Hero*> heroes добавить 0)персонажа, чью спсобность используем 1)персонажа, которого выбрал Степа
     //персонаж_чью_способность_используем->frontLinePower(heroes);
     //Степе отправляется массив из 18 полей (в каждом поле хп и сила героя)
-}
+}*/
 
-void TransferDamage(Position *position, Pole &pole_, int friendlyside) {
+/*void TransferDamage(Position *position, Pole &pole_, int friendlyside) {
     std::vector<Hero *> heroes;
     heroes.resize(0);
     heroes.push_back(&(position->GetHero()));
@@ -155,9 +156,9 @@ void TransferDamage(Position *position, Pole &pole_, int friendlyside) {
     //в вектор vector<Hero*> heroes добавить 0)персонажа, чью спсобность используем 1)персонажа, которого выбрал Степа
     //персонаж_чью_способность_используем->frontLinePower(heroes);
     //Степе отправляется массив из 18 полей (в каждом поле хп и сила героя)
-}
+}*/
 
-void Resurrect(Position *position, Pole &pole_, int friendlyside) {
+/*void Resurrect(Position *position, Pole &pole_, int friendlyside) {
     std::vector<Hero *> heroes;
     heroes.resize(0);
     heroes.push_back(&(position->GetHero()));
@@ -186,9 +187,9 @@ void Resurrect(Position *position, Pole &pole_, int friendlyside) {
     //в вектор vector<Hero*> heroes добавить 0)персонажа, чью спсобность используем 1)персонажа, которого выбрал Степа
     //персонаж_чью_способность_используем->frontLinePower(heroes);
     //Степе отправляется массив из 18 полей (в каждом поле хп и сила героя)
-}
+}*/
 
-void Castling(Position *position, Pole &pole_, int friendlyside) {
+/*void Castling(Position *position, Pole &pole_, int friendlyside) {
     std::vector<Hero *> heroes;
     heroes.resize(0);
     heroes.push_back(&(position->GetHero()));
@@ -216,9 +217,9 @@ void Castling(Position *position, Pole &pole_, int friendlyside) {
     //в вектор vector<Hero*> heroes добавить 0)персонажа, чью спсобность используем 1)персонажа, которого выбрал Степа
     //персонаж_чью_способность_используем->frontLinePower(heroes);
     //Степе отправляется массив из 18 полей (в каждом поле хп и сила героя)
-}
+}*/
 
-void LeaderMakeDistantAttack(Position *position, Pole &pole_, int friendlyside) {
+/*void LeaderMakeDistantAttack(Position *position, Pole &pole_, int friendlyside) {
     std::vector<Hero *> heroes;
     heroes.resize(0);
     heroes.push_back(&(position->GetHero()));
@@ -250,7 +251,7 @@ void LeaderMakeDistantAttack(Position *position, Pole &pole_, int friendlyside) 
     //Степе отправляется массив из 18 полей (в каждом поле хп и сила героя)
 
     //Исправить: добавить в массив ЖИВЫХ
-}
+}*/
 
 void HitAvangard(Position *position, Pole &pole_, int friendlyside) {
     std::vector<Hero *> heroes;
@@ -260,7 +261,8 @@ void HitAvangard(Position *position, Pole &pole_, int friendlyside) {
         Position *chosen_pos = pole_.GetPosition(i, 0, friendlyside ? 0 : 1);
         heroes.push_back(&(chosen_pos->GetHero()));
     }
-    position->GetHero().middleLinePower(heroes);
+    if (heroes.size() > 1)
+        position->GetHero().middleLinePower(heroes);
 //    std::vector<Breed> request = ReturnRequest(pole_);
     //в вектор vector<Hero*> heroes добавить 0)персонажа, чью спсобность используем 1-4)персонажей из авангарда противника
     //персонаж_чью_способность_используем->middleLinePower(heroes);
@@ -275,7 +277,7 @@ void PlusPowerByDead(Position *position, Pole &pole_, int friendlyside) {
         if ((pole_.GetVector()[i]->GetHero().IsDead()) && (pole_.GetVector()[i]->GetSide() == friendlyside)) {
             Position *chosen_pos = pole_.GetPosition(pole_.GetVector()[i]->GetCell(), pole_.GetVector()[i]->GetLine(),
                                                      friendlyside);
-            heroes.push_back(&(position->GetHero()));
+            heroes.push_back(&(chosen_pos->GetHero()));
         }
     }
     position->GetHero().middleLinePower(heroes);
@@ -290,22 +292,30 @@ void FrontAndBackGetDamage(Position *position, Pole &pole_, int friendlyside) {
     heroes.resize(0);
     heroes.push_back(&(position->GetHero()));
     Position *push_pos;
-    push_pos = pole_.GetPosition(position->GetCell(), position->GetLine() - 1, position->GetSide());
-    if ((!push_pos->isEmpty()) && !(push_pos->GetHero().IsDead())) {
-        heroes.push_back(&(push_pos->GetHero()));
+
+    if (position->GetLine() != 0) {
+        push_pos = pole_.GetPosition(position->GetCell(), position->GetLine() - 1, position->GetSide());
+        if ((!push_pos->isEmpty()) && !(push_pos->GetHero().IsDead())) {
+            heroes.push_back(&(push_pos->GetHero()));
+        }
     }
-    push_pos = pole_.GetPosition(position->GetCell(), position->GetLine() + 1, position->GetSide());
-    if ((!push_pos->isEmpty()) && !(push_pos->GetHero().IsDead())) {
-        heroes.push_back(&(push_pos->GetHero()));
+
+    if (position->GetLine() != 2) {
+        push_pos = pole_.GetPosition(position->GetCell(), position->GetLine() + 1, position->GetSide());
+        if ((!push_pos->isEmpty()) && !(push_pos->GetHero().IsDead())) {
+            heroes.push_back(&(push_pos->GetHero()));
+        }
     }
-    position->GetHero().middleLinePower(heroes);
+
+    if (heroes.size() > 1)
+        position->GetHero().middleLinePower(heroes);
 //    std::vector<Breed> request = ReturnRequest(pole_);
     //в вектор vector<Hero*> heroes добавить 0)персонажа, чью спсобность используем 1)позади стоящего 2)впереди стоящего
     //персонаж_чью_способность_используем->middleLinePower(heroes);
     //Степе отправляется массив из 18 полей (в каждом поле хп и сила героя)
 }
 
-void PlusPowerInCloseAttack(Position *position, Pole &pole_, int friendlyside) {
+/*void PlusPowerInCloseAttack(Position *position, Pole &pole_, int friendlyside) {
     std::vector<Hero *> heroes;
     heroes.resize(0);
     heroes.push_back(&(position->GetHero()));
@@ -333,9 +343,9 @@ void PlusPowerInCloseAttack(Position *position, Pole &pole_, int friendlyside) {
     //персонаж_чью_способность_используем->middleLinePower(heroes);
     //Степе отправляется массив из 18 полей (в каждом поле хп и сила героя)
 
-}
+}*/
 
-void ResAndGetDamage(Position *position, Pole &pole_, int friendlyside) {
+/*void ResAndGetDamage(Position *position, Pole &pole_, int friendlyside) {
     std::vector<Hero *> heroes;
     heroes.resize(0);
     heroes.push_back(&(position->GetHero()));
@@ -353,9 +363,9 @@ void ResAndGetDamage(Position *position, Pole &pole_, int friendlyside) {
     //в вектор vector<Hero*> heroes добавить 0)персонажа, чью спсобность используем 1)персонажа, которого выбрал Степа
     //персонаж_чью_способность_используем->middleLinePower(heroes);
     //Степе отправляется массив из 18 полей (в каждом поле хп и сила героя)
-}
+}*/
 
-void KillWthDamage(Position *position, Pole &pole_, int friendlyside) {
+/*void KillWthDamage(Position *position, Pole &pole_, int friendlyside) {
     std::vector<Hero *> heroes;
     heroes.resize(0);
     heroes.push_back(&(position->GetHero()));
@@ -382,31 +392,22 @@ void KillWthDamage(Position *position, Pole &pole_, int friendlyside) {
     //в вектор vector<Hero*> heroes добавить 0)персонажа, чью спсобность используем 1)персонажа, которого выбрал Степа
     //персонаж_чью_способность_используем->middleLinePower(heroes);
     //Степе отправляется массив из 18 полей (в каждом поле хп и сила героя)
-}
+}*/
 
-void MakeDistantAttack(Position *position, Pole &pole_, int friendlyside) {
-    std::vector<Hero *> heroes;
-    heroes.resize(0);
-    heroes.push_back(&(position->GetHero()));
+vector<bool> MakeDistantAttack(Pole &pole_, int friendlyside) {
     std::vector<bool> HeroesCanBeAttackedDistantly;
     HeroesCanBeAttackedDistantly.resize(0);
     int count = 0;
     for (int i = 0; i < pole_.GetVector().size(); i++) {
-        if ((pole_.GetVector()[i]->GetHero().IsDead()) && (!pole_.GetVector()[i]->isEmpty()) &&
-            pole_.GetVector()[1]->GetHero().CanBeAttackedDistantly()) {
+        if (!(pole_.GetVector()[i]->GetHero().IsDead()) && (!pole_.GetVector()[i]->isEmpty()) &&
+            pole_.GetVector()[1]->GetHero().CanBeAttackedDistantly() &&
+            pole_.GetVector()[i]->GetSide() != friendlyside) {
             HeroesCanBeAttackedDistantly.push_back(true);
         } else {
             HeroesCanBeAttackedDistantly.push_back(false);
         }
     }
-    //return HeroesAlive;
-    //GetCoordinates
-    int xCoord = 0;
-    int yCoord = 0;
-    std::cin >> xCoord >> yCoord;
-    Position *chosen_pos = pole_.GetPosition(xCoord, yCoord, friendlyside);
-    heroes.push_back(&(chosen_pos->GetHero()));
-    position->GetHero().frontLinePower(heroes);
+    return HeroesCanBeAttackedDistantly;
 //    std::vector<Breed> request = ReturnRequest(pole_);
     //отправить Степе массив bool, среди которых 1 живые персонажи на поле противника, у которых CanBeAttackedFromDistant вернул true
     //СТепа вернет координаты выбранного персонажа
@@ -415,7 +416,7 @@ void MakeDistantAttack(Position *position, Pole &pole_, int friendlyside) {
     //Степе отправляется массив из 18 полей (в каждом поле хп и сила героя)
 }
 
-void CastlingWithDead(Position *position, Pole &pole_, int friendlyside) {
+/*void CastlingWithDead(Position *position, Pole &pole_, int friendlyside) {
     std::vector<Hero *> heroes;
     heroes.resize(0);
     heroes.push_back(&(position->GetHero()));
@@ -434,9 +435,9 @@ void CastlingWithDead(Position *position, Pole &pole_, int friendlyside) {
     //персонаж_чью_способность_используем->middleLinePower(heroes);
     //Степе отправляется массив из 18 полей (в каждом поле хп и сила героя)
 
-}
+}*/
 
-void DamageTwoRows(Position *position, Pole &pole_, int friendlyside) {
+/*void DamageTwoRows(Position *position, Pole &pole_, int friendlyside) {
     std::vector<Hero *> heroes;
     heroes.resize(0);
     heroes.push_back(&(position->GetHero()));
@@ -466,7 +467,7 @@ void DamageTwoRows(Position *position, Pole &pole_, int friendlyside) {
     //персонаж_чью_способность_используем->middleLinePower(heroes);
     //Степе отправляется массив из 18 полей (в каждом поле хп и сила героя)
 
-}
+}*/
 
 vector<bool> SendAllAliveEnemies(Position *position, Pole &pole_, int friendlyside) {
     std::vector<Hero *> heroes;
@@ -520,10 +521,6 @@ vector<bool> SendAllDeadFriends(Position *position, Pole &pole_, int friendlysid
         }
     }
     return HeroesAlive;
-    std::cout << "   Отправила всех мертвых своих" << std::endl;
-    for (int i = 0; i < HeroesAlive.size(); i++) {
-        std::cout << HeroesAlive[i] << " ";
-    }
 }
 
 void DoubleStrengthAgainstLeader(Position *position, Pole &pole_, int friendlyside) {
@@ -545,12 +542,12 @@ void HitFrontRowHeroes(Position *position, Pole &pole_, int friendlyside) {
     heroes.push_back(&(position->GetHero()));
     std::vector<bool> ToAnalyse;
     int enemyside = friendlyside ? 0 : 1;
-    ToAnalyse = AttackRequest(pole_, enemyside);
-    for (int i = (9 * enemyside), j = 0; i < (9 * enemyside) + 9; i++, j++) {
-        if (ToAnalyse[i] == true) {
-            heroes.push_back(&(pole_.GetVector()[i]->GetHero()));
-        }
-    }
+//    ToAnalyse = AttackRequest(pole_, enemyside);
+    /* for (int i = (9 * enemyside), j = 0; i < (9 * enemyside) + 9; i++, j++) {
+         if (ToAnalyse[i] == true) {
+             heroes.push_back(&(pole_.GetVector()[i]->GetHero()));
+         }
+     }*/
     position->GetHero().backLinePower(heroes);
 //    std::vector<Breed> request = ReturnRequest(pole_);
     //в вектор vector<Hero*> heroes добавить 0)персонажа, чью спсобность используем 1-4)всех героев в ближнем бою

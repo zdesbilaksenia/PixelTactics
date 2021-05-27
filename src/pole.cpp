@@ -84,21 +84,21 @@ void Pole::InfoPosition(Position *position)
     }
 }
 
-bool Pole::CheckLeader()
+int Pole::CheckLeader()
 {
     Position *FirstPlayerLeader = GetPosition(1, 1, 0);
-    if (FirstPlayerLeader->isEmpty())
+    if (FirstPlayerLeader->GetHero().IsDead())
     {
         std::cout << "Победил второй игрок!!!!!!";
-        return false;
+        return 1;
     }
     Position *SecondPlayerLeader = GetPosition(1, 1, 1);
-    if (SecondPlayerLeader->isEmpty())
+    if (SecondPlayerLeader->GetHero().IsDead())
     {
         std::cout << "Победил первый игрок!!!!!!";
-        return false;
+        return 0;
     }
-    return true;
+    return -1;
 }
 
 std::vector<bool> Pole::CanBeMeleeAttackedRequest(int side)

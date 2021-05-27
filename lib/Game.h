@@ -36,11 +36,18 @@ public:
     void SendBreeds(Pole &pole, int numOfPlayers);
 
     void FrontRequest(Position *friendPosition);
+
     void MiddleRequest(Position *friendPosition);
+
     void BackRequest(Position *friendPosition);
+
     bool WaitForMessage();
-    void RecieveTarget(int &line, int &cell) ;
-    void ReleasePower(int type, Position* position);
+
+    void RecieveTarget(int &line, int &cell);
+
+    void ReleasePower(int type, Position *position, int side);
+
+    void SendBeforeHeroStats();
 
 private:
     int currentside;

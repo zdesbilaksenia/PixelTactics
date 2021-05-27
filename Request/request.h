@@ -69,7 +69,7 @@ void DamageTwoRows(Position *position, Pole &pole_, int friendlyside);
 
 void FrontAndBackGetDamage(Position *position, Pole &pole_, int friendlyside);
 
-void MakeDistantAttack(Position *position, Pole &pole_, int friendlyside);
+vector<bool> MakeDistantAttack(Pole &pole_, int friendlyside);
 
 vector<bool> SendAllDeadFriends(Position *position, Pole &pole_, int friendlySide);
 

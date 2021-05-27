@@ -15,7 +15,7 @@ public:
     Position* GetPosition(int cell, int line, int side);
     void SetPosition(Position* position);
     void InfoPosition(Position* position);
-    bool CheckLeader();
+    int CheckLeader();
     std::vector<bool> CanBeMeleeAttackedRequest(int side);
     Position* GetLeaderPos(int player);
 private:
