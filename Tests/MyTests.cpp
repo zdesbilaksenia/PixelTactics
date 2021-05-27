@@ -38,6 +38,7 @@ TEST(CanBeAttackedMeleeRequest,Test_2){
 
     Position* test_pos = pole.GetPosition(1,0,1);
     test_pos->SetHero(FirstPlayer.GetDeck().GetVector().back());
+    mapper.MapPowers(test_pos->GetHero());
     pole.SetPosition(test_pos);
 
     test_pos = pole.GetPosition(1,1,1);
