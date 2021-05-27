@@ -34,11 +34,11 @@ void Game::StartGame() {
 
     MySQL sql;
     Deck allCards;
-    Deck CheatDeck;
+    //Deck CheatDeck;
     allCards = sql.GetCards();
-    CheatDeck.push_back(allCards.GetVector()[10]);
-    Deck FirstPlayerDeck(CheatDeck.GetVector());
-    Deck SecondPlayerDeck(CheatDeck.GetVector());
+    //CheatDeck.push_back(allCards.GetVector()[10]);
+    Deck FirstPlayerDeck(allCards.GetVector());
+    Deck SecondPlayerDeck(allCards.GetVector());
     Player *FirstPlayer = new Player(FirstPlayerDeck, 0);
     Player *SecondPlayer = new Player(SecondPlayerDeck, 1);
     std::vector<Player *> Players(0);
