@@ -70,7 +70,7 @@ void GameManager::draw()
 void GameManager::play()
 {
     stage = GameStage::stageStart;
-    round = RoundType::roundNoType;
+    round = RoundType::roundAvangard;
     gameStart();
     stage = GameStage::stagePlayersTurn;
 

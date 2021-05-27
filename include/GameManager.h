@@ -147,15 +147,9 @@ private:
                 case (RoundType::roundRear):
                     round = RoundType::roundAvangard;
                     break;
-                default:
-                    break;
                 }
                 stage = GameStage::stageOpponentsTurn;
                 break;
-                if (stage == GameStage::stageWon)
-                {
-                    return;
-                }
             }
             default:
                 break;

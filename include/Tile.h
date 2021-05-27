@@ -98,7 +98,6 @@ enum class Side
 
 enum class RoundType
 {
-    roundNoType,
     roundAvangard,
     roundFlank,
     roundRear
