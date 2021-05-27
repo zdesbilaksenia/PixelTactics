@@ -478,7 +478,7 @@ vector<bool> SendAllAliveEnemies(Position *position, Pole &pole_, int friendlysi
     int count = 0;
     for (int i = 0; i < pole_.GetVector().size(); i++) {
         if (!(pole_.GetVector()[i]->GetHero().IsDead()) &&
-            (!pole_.GetVector()[i]->isEmpty() && (pole_.GetVector()[i]->GetSide() != friendlyside))) {
+            (!pole_.GetVector()[i]->isEmpty() && (pole_.GetVector()[i]->GetSide() != friendlyside)) && !(pole_.GetVector()[i]->GetHero().IsLeader())) {
             HeroesAlive.push_back(true);
         } else {
             HeroesAlive.push_back(false);
@@ -495,8 +495,8 @@ vector<bool> SendAllAliveFriends(Position *position, Pole &pole_, int friendlysi
     HeroesAlive.resize(0);
     int count = 0;
     for (int i = 0; i < pole_.GetVector().size(); i++) {
-        if (!(pole_.GetVector()[i]->GetHero().IsDead()) && (!pole_.GetVector()[i]->isEmpty()) &&
-            (pole_.GetVector()[i]->GetSide() == friendlyside)) {
+        if (!(pole_.GetVector()[i]->GetHero().IsDead()) && !(pole_.GetVector()[i]->isEmpty()) &&
+            (pole_.GetVector()[i]->GetSide() == friendlyside) && !(pole_.GetVector()[i]->GetHero().IsLeader())) {
             HeroesAlive.push_back(true);
         } else {
             HeroesAlive.push_back(false);
