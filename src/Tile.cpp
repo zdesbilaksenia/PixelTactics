@@ -16,9 +16,15 @@ Tile::Tile(RenderWindow &_window, Mouse &_mouse) : Clickable(_window, _mouse)
 void Tile::setUnit(Unit &_unit)
 {
     this->unit = &_unit;
-    this->status = TileStatus::statusHasUnit;
+    if (unit->getHealth() == 0)
+    {
+        this->status = TileStatus::statusHasDeadBody;
+    }
+    else
+    {
+        this->status = TileStatus::statusHasUnit;
+    }
     unit->setPosition(this->rect.getPosition().x, this->rect.getPosition().y);
-    BOOST_LOG_TRIVIAL(info) << "Tiles::setUnit() : Unit = " << unit->getId();
 }
 
 void Tile::setStatus(TileStatus _status)
@@ -108,12 +114,6 @@ TilesManager::TilesManager(RenderWindow &_window, Mouse &_mouse, const Side &sid
         initializeTilesLayer(_window, _mouse, tilesAvangard, tiles, 0, Side::sideOpponent);
         initializeTilesLayer(_window, _mouse, tilesFlank, tiles, 1, Side::sideOpponent);
         initializeTilesLayer(_window, _mouse, tilesRear, tiles, 2, Side::sideOpponent);
-
-        //УДАЛИТЬ, ЗАГЛУШКА!!!
-        for (auto tile : tiles)
-        {
-            tile->setStatus(TileStatus::statusHasUnit);
-        }
     }
 }
 
@@ -284,7 +284,7 @@ bool TilesManager::mouseIsPressed()
     case TilesManagerStatus::statusWaitingForAttack:
         for (auto tile : tiles)
         {
-            if (tile->hasFocus() && tile->getStatus() == TileStatus::statusHasUnit)
+            if (tile->hasFocus() && activeTiles[tile->getCoordX()][tile->getCoordY()] == true)
             {
                 BOOST_LOG_TRIVIAL(info) << "TilesManager::mouseIsPressed(): Tile was attacked, sending attacked pos!";
                 BOOST_LOG_TRIVIAL(info) << "TilesManager::mouseIsPressed(): Attacker: " << this->tileBuffer->getCoordX() << " " << this->tileBuffer->getCoordY();
@@ -391,7 +391,7 @@ bool TilesManager::mouseIsPressed()
                 this->setStatus(TilesManagerStatus::statusBodyRemoved);
 
                 isPressed = true;
-                return true;
+                return false;
             }
         }
         break;

@@ -18,16 +18,17 @@ void CommandRemoveBody::execute()
     {
         BOOST_LOG_TRIVIAL(info) << "CommandRemoveBody::execute(): Trying to load active tiles!";
         msg >> activeTiles;
-        cout<<endl<<"size = "<<activeTiles.size()<<endl;
-        for(int i = 0; i<9; ++i)
+        cout << endl << "size = " << activeTiles.size() << endl;
+        for (int i = 0; i < 9; ++i)
         {
-            cout<<activeTiles[i]<<" ";
+            cout << activeTiles[i] << " ";
         }
-        cout<<endl;
+        cout << endl;
         BOOST_LOG_TRIVIAL(info) << "CommandRemoveBody::execute(): active tiles loaded!";
         playerTilesManager.setActiveTiles(activeTiles);
         //Сама обработка запроса будет происходить уже в buttonIsPressed в объекте opponentTilesManager.
         playerTilesManager.setStatus(TilesManagerStatus::statusWaitingForRemovingBody);
+        playerTilesManager.updateFocus();
         break;
     }
     case GameMsgTypes::GameReject:

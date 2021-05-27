@@ -52,7 +52,10 @@ void ButtonsManager::updateFocus()
     // Смотрим, какие кнопки в фокусе, что бы их соответствующим образом отрисовывать
     for (auto button : buttons)
     {
-        button->updateFocus();
+        if (button->isEnabled())
+        {
+            button->updateFocus();
+        }
     }
 }
 
@@ -61,7 +64,7 @@ void ButtonsManager::mouseIsPressed()
     // Смотрим, на какую кнопку нажали
     for (auto button : buttons)
     {
-        if (button->hasFocus())
+        if (button->hasFocus() && button->isEnabled())
         {
             button->click();
         }

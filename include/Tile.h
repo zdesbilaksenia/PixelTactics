@@ -34,6 +34,11 @@ public:
     Unit *getUnit();
     int &getCoordX();
     int &getCoordY();
+    void deleteUnit()
+    {
+        status = TileStatus::statusIsEmpty;
+        unit = nullptr;
+    }
 
     //coordX - столбец
     //coordY - строка
@@ -125,6 +130,39 @@ public:
     void setActiveTiles(vector<bool> &_activeTiles);
     void resetActiveTiles();
 
+    bool removedBody()
+    {
+        if (status == TilesManagerStatus::statusBodyRemoved)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    void deleteUnit(int x, int y)
+    {
+        switch (x)
+        {
+        case (0):
+        {
+            tilesAvangard[y]->deleteUnit();
+            break;
+        }
+        case (1):
+        {
+            tilesFlank[y]->deleteUnit();
+            break;
+        }
+        case (2):
+        {
+            tilesRear[y]->deleteUnit();
+            break;
+        }
+        default:
+            break;
+        }
+    }
+
     //В том случае, если TilesManager - для отрисовки тайлов оппонента
     void setUnit(Unit &unit, RoundType round, int coordY)
     {
@@ -166,6 +204,18 @@ public:
         default:
             break;
         }
+    }
+
+    bool hasBodies()
+    {
+        for (auto tile : tiles)
+        {
+            if (tile->getStatus() == TileStatus::statusHasDeadBody)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     ~TilesManager();

@@ -22,16 +22,21 @@ using namespace sf;
 
 auto loadPlayerHeroesStats{
     [](vector<Unit> &_units, vector<Breed> &_breeds, TilesManager &_tilesManager, const bool &_side) {
+        cout << "loadPlayerHeroesStats" << endl;
         for (int i = 0 + 9 * _side; i < 9 + 9 * _side; ++i)
         {
-            int x = (i - 9 * (1 - _side)) / 3;
+            int x = (i - 9 * _side) / 3;
             int y = i % 3;
+            cout << "ID = " << _breeds[i].cardID << " x, y " << x << " " << y << endl;
             if (_breeds[i].cardID != -1)
             {
                 _units[_breeds[i].cardID].setTextAttack(_breeds[i].strength);
                 _units[_breeds[i].cardID].setTextHP(_breeds[i].HP);
-                cout << "unit ID = " << _breeds[i].cardID << " ___ ";
                 _tilesManager.setUnit(_units[_breeds[i].cardID], x, y);
+            }
+            else
+            {
+                _tilesManager.deleteUnit(x, y);
             }
         }
         return;
@@ -39,16 +44,21 @@ auto loadPlayerHeroesStats{
 
 auto loadOpponentHeroesStats{
     [](vector<Unit> &_units, vector<Breed> &_breeds, TilesManager &_tilesManager, const bool &_side) {
+        cout << "loadOppoentHeroesStats" << endl;
         for (int i = 0 + 9 * (1 - _side); i < 9 + 9 * (1 - _side); ++i)
         {
             int x = (i - 9 * (1 - _side)) / 3;
             int y = i % 3;
+            cout << "ID = " << _breeds[i].cardID << " x, y " << x << " " << y << endl;
             if (_breeds[i].cardID != -1)
             {
                 _units[_breeds[i].cardID].setTextAttack(_breeds[i].strength);
                 _units[_breeds[i].cardID].setTextHP(_breeds[i].HP);
-                cout << "unit ID = " << _breeds[i].cardID << " ___ ";
                 _tilesManager.setUnit(_units[_breeds[i].cardID], x, y);
+            }
+            else
+            {
+                _tilesManager.deleteUnit(x, y);
             }
         }
         return;
@@ -309,13 +319,7 @@ private:
                 {
                 case GameMsgTypes::GameHeroesStats:
                 {
-                    vector<Breed> breeds;
-                    BOOST_LOG_TRIVIAL(info) << "GameManager::opponentsTurn() : Trying to load breed!";
-                    msg >> breeds;
-                    BOOST_LOG_TRIVIAL(info) << "GameManager::opponentsTurn() : breed loaded!";
-
-                    loadPlayerHeroesStats(playerUnits, breeds, playerTilesManager, side);
-                    loadOpponentHeroesStats(opponentUnits, breeds, opponentTilesManager, side);
+                    loadBreeds(msg);
 
                     playerTilesManager.updateFocus();
                     opponentTilesManager.updateFocus();
@@ -374,7 +378,7 @@ private:
 
     void _whileForPlayersTurn()
     {
-        int movesCount = 0;
+        int movesAmount = 0;
 
         while (window.isOpen())
         {
@@ -382,6 +386,10 @@ private:
             if (cardsManager.canTakeCard() == false)
             {
                 btnTakeCard->disable();
+            }
+            if (playerTilesManager.hasBodies() == false)
+            {
+                btnRemoveBody->disable();
             }
 
             while (window.pollEvent(event))
@@ -404,15 +412,15 @@ private:
                     if (btnTakeCard->isEnabled() && btnTakeCard->hasFocus())
                     {
                         BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Card was taken!";
-                        movesCount++;
-                        BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Moves count = " << movesCount;
+                        movesAmount++;
+                        BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Moves count = " << movesAmount;
                     }
                     //Если реализовали карту
                     if (playerTilesManager.mouseIsPressed())
                     {
                         BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Card was released!";
-                        movesCount++;
-                        BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Moves count = " << movesCount;
+                        movesAmount++;
+                        BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Moves count = " << movesAmount;
                         playerTilesManager.setStatus(TilesManagerStatus::statusCardWasJustReleased);
                         //Это должно быть в этой строчке, поскольку функция отлавливает факт того, что карта была выложена на стол.
                         cardsManager.mouseIsPressed();
@@ -420,25 +428,28 @@ private:
                         playerTilesManager.setStatus(TilesManagerStatus::statusAttackingUnit);
                         playerTilesManager.updateFocus();
                     }
-                    //Если нажали на тайл (Чтобы атаковать)
-                    if (playerTilesManager.getPressed())
+
+                    if (playerTilesManager.removedBody())
                     {
-                        //Здесь баг, кнопка активируется, если нажмём в другом месте
-                        btnRemoveBody->disable();
-                        btnTakeCard->disable();
-                    }
-                    else
-                    {
-                        btnRemoveBody->enable();
-                        btnTakeCard->enable();
+                        BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Body was removed!";
+                        movesAmount++;
+                        BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Moves count = " << movesAmount;
+                        client.incoming().wait();
+                        auto msg = client.incoming().popFront().msg;
+                        if (msg.header.id == GameMsgTypes::GameHeroesStats)
+                        {
+                            loadBreeds(msg);
+                        }
+                        playerTilesManager.setStatus(TilesManagerStatus::statusAttackingUnit);
+                        playerTilesManager.updateFocus();
                     }
 
                     //Если атаковали противника
                     if (opponentTilesManager.mouseIsPressed())
                     {
                         BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Opponent's tile was attacked succesfully!";
-                        movesCount++;
-                        BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Moves count = " << movesCount;
+                        movesAmount++;
+                        BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Moves count = " << movesAmount;
 
                         //Мб не while
                         while (client.incoming().empty())
@@ -467,7 +478,7 @@ private:
                         }
                         }
 
-                        BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Moves count = " << movesCount;
+                        BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Moves count = " << movesAmount;
                         opponentTilesManager.setStatus(TilesManagerStatus::statusNothingHappens);
                         opponentTilesManager.updateFocus();
                         playerTilesManager.setStatus(TilesManagerStatus::statusAttackingUnit);
@@ -504,7 +515,7 @@ private:
             this->draw();
             /////////////////////////
 
-            if (movesCount == 2)
+            if (movesAmount == 2)
             {
                 BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn(): Ended!";
                 stage = GameStage::stageOpponentsTurn;
