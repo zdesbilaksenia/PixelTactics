@@ -74,11 +74,12 @@ void CopyPower(vector<Hero *> &heroes) {
 void Interception(vector<Hero *> &heroes) {
     if (heroes.size() == 2 && !heroes[1]->IsDead()) {
         heroes[1]->ForbidDistantAttack();
+        std::cout<<"Сработал перехват "<< heroes[1]->CanBeAttackedDistantly() << std::endl;
     }
 }
 
 void HPFromDead(vector<Hero *> &heroes) {
-    if (heroes.size() == 1) {
+    if (heroes.size() == 2) {
         heroes[0]->SetCurHealth(heroes[0]->GetCurHealth() + 1);
     }
 }
@@ -206,6 +207,7 @@ void InterceptionAndPlusPower(vector<Hero *> &heroes) {
     if (heroes.size() == 2 && !heroes[0]->IsDead() && !heroes[1]->IsDead()) {
         heroes[0]->SetCurStrength(heroes[0]->GetCurStrength() + 2);
         heroes[1]->ForbidDistantAttack();
+        std::cout<<"Сработал перехват "<< heroes[1]->CanBeAttackedDistantly() << std::endl;
     }
 }
 

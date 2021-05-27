@@ -28,36 +28,7 @@ void Game::SetLeader(std::vector<Player *> &players, int playerside, int choice,
     }
 }
 
-void Game::SendBreeds(Pole &pole, int numOfPlayers) {
-    std::vector<Breed> allStats;
-    allStats.resize(0);
-    for (int i = 0; i < pole.GetVector().size(); i++) {
-        Breed stats;
-        stats.HP = pole.GetVector()[i]->GetHero().GetCurHealth();
-        stats.Strength = pole.GetVector()[i]->GetHero().GetCurStrength();
-        stats.ID = pole.GetVector()[i]->GetHero().GetID();
-        allStats.push_back(stats);
-    }
-
-    Message<GameMsgTypes> statsMsg(GameMsgTypes::GameHeroesStats);
-    statsMsg << allStats;
-    if (numOfPlayers == 0) {
-        CallPechkin(0, statsMsg);
-        cout << "Бреды отправлены первому" << std::endl;
-    } else if (numOfPlayers == 1) {
-        CallPechkin(1, statsMsg);
-        cout << "Бреды отправлены второму" << std::endl;
-    } else {
-        CallPechkin(0, statsMsg);
-        CallPechkin(1, statsMsg);
-        cout << "Бреды отправлены обоим" << std::endl;
-    }
-}
-
-
 void Game::StartGame() {
-    Pole pole;
-
     Position FirstPlayerLeader(1, 1, 0);
     Position SecondPlayerLeader(1, 1, 1);
 
@@ -66,11 +37,11 @@ void Game::StartGame() {
     allCards = sql.GetCards();
     Deck FirstPlayerDeck(allCards.GetVector());
     Deck SecondPlayerDeck(allCards.GetVector());
-    Player FirstPlayer(FirstPlayerDeck, 0);
-    Player SecondPlayer(SecondPlayerDeck, 1);
+    Player *FirstPlayer = new Player(FirstPlayerDeck, 0);
+    Player *SecondPlayer = new Player(SecondPlayerDeck, 1);
     std::vector<Player *> Players(0);
-    Players.push_back(&(FirstPlayer));
-    Players.push_back(&(SecondPlayer));
+    Players.push_back(FirstPlayer);
+    Players.push_back(SecondPlayer);
     std::vector<Card> StepaFirstAllCards = FirstPlayerDeck.GetVector();
     auto msg = Message<GameMsgTypes>(GameMsgTypes::GameDeck);
     msg << StepaFirstAllCards;
@@ -91,18 +62,6 @@ void Game::StartGame() {
 
     PowerMapper mapper;
 
-    std::cout << "Выбери лидера Первый игрок" << std::endl;
-    for (int i = 17; i < FirstPlayerDeck.GetVector().size(); i++) {
-        std::cout << FirstPlayerDeck.GetVector()[i].name << " " << "Здоровье Героя:"
-                  << FirstPlayerDeck.GetVector()[i].HP << " " << "Атака Героя:"
-                  << FirstPlayerDeck.GetVector()[i].strength << std::endl;
-    }
-    std::cout << "Выбери лидера Второй игрок" << std::endl;
-    for (int i = 17; i < SecondPlayerDeck.GetVector().size(); i++) {
-        std::cout << SecondPlayerDeck.GetVector()[i].name << " " << "Здоровье Героя:"
-                  << SecondPlayerDeck.GetVector()[i].HP << " " << "Атака Героя:"
-                  << SecondPlayerDeck.GetVector()[i].strength << std::endl;
-    }
     int choice, playerside;
     int x, y;
     std::cout << "////" << std::endl;
@@ -114,6 +73,7 @@ void Game::StartGame() {
         std::cout << "Error in leader choice!\n";
         return;
     }
+
     std::cout << "CHOICE " << choice << " PLAYERSIDE " << playerside << std::endl;
     SetLeader(Players, playerside, choice, pole, mapper);
 
@@ -141,12 +101,12 @@ void Game::StartGame() {
     // SecondPlayer.StartingHand();
 
 
-    int currentside = 0;
-    Player CurrentPlayer = FirstPlayer;
+    currentside = 0;
+    Player *CurrentPlayer = FirstPlayer;
     int MovesAmount = 2;
     int Phase = 0;
 
-    while (pole.CheckLeader()) {
+    while (pole.CheckLeader() != 0 && pole.CheckLeader() != 1) {
         if (MovesAmount == 0) {
             if (currentside == 0) {
                 std::cout << "Ход переходит ко второму игроку" << std::endl;
@@ -199,10 +159,16 @@ void Game::StartGame() {
         cout << "ПРИШЛО" << std::endl;
         switch (msg.header.id) {
             case (GameMsgTypes::GameTakeCard): {
-                if (CurrentPlayer.GetHand().GetVector().size() < 5) {
-                    CurrentPlayer.DrawCard();
+                if (CurrentPlayer->GetHand().GetVector().size() < 5) {
+                    CurrentPlayer->DrawCard();
                     MovesAmount--;
-                    cout << " ВЗЯЛ КАРТУ " << std::endl << CurrentPlayer.GetHand().GetVector().back().name << std::endl;
+                    cout << " ВЗЯЛ КАРТУ " << std::endl << CurrentPlayer->GetHand().GetVector().back().name << " "
+                         << CurrentPlayer->GetHand().GetVector().back().ID <<
+                         std::endl;
+                    for (int i = 0; i < CurrentPlayer->GetHand().GetVector().size(); i++) {
+                        cout << CurrentPlayer->GetHand().GetVector()[i].ID << " ";
+                    }
+                    cout << std::endl;
                     auto cardTookMsg = Message<GameMsgTypes>(GameMsgTypes::GameTakeCard);
                     CallPechkin(currentside ? 0 : 1, cardTookMsg);
                     cout << " Отправлено в ответ на взятие карты " << std::endl;
@@ -210,7 +176,7 @@ void Game::StartGame() {
                 break;
             }
                 /*case (2): {
-                    CurrentPlayer.GetHand().ShowDeck();
+                    CurrentPlayerGetHand().ShowDeck();
                     std::cout << "//////////////////////////" << std::endl;
                     break;
                 }*/
@@ -251,9 +217,9 @@ void Game::StartGame() {
                     cout << CanBeMeleeAttacked[i] << " ";
                 cout << std::endl;
 
-                Position *YourHero = pole.GetPosition(cell, line, CurrentPlayer.GetSide());
+                Position *YourHero = pole.GetPosition(cell, line, CurrentPlayer->GetSide());
                 int EnemySide;
-                if (CurrentPlayer.GetSide() == 0) {
+                if (CurrentPlayer->GetSide() == 0) {
                     EnemySide = 1;
                 } else {
                     EnemySide = 0;
@@ -271,7 +237,7 @@ void Game::StartGame() {
                     cout << "АТАКОВАННЫЙ " << line << " " << cell << " " << EnemyHero->GetHero().GetName() << std::endl;
                 }
 
-                if (CurrentPlayer.MeleeAttackCheck(EnemyHero, pole)) {
+                if (CurrentPlayer->MeleeAttackCheck(EnemyHero, pole)) {
                     cout << "ДО АТАКИ " << "ХП " << EnemyHero->GetHero().GetCurHealth() << " Сила атакующего "
                          << YourHero->GetHero().GetCurStrength() << std::endl;
 
@@ -282,83 +248,433 @@ void Game::StartGame() {
                     pole.SetPosition(EnemyHero);
 
                     SendBreeds(pole, 3);
+                    MovesAmount--;
                 } else {
                     std::cout << "СПЕРЕДИ СТОИТ ДРУГОЙ ГЕРОЙ. НЕЛЬЗЯ АТАКОВАТЬ!!" << std::endl;
+                    Message<GameMsgTypes> error(GameMsgTypes::GameReject);
+                    CallPechkin(currentside, error);
                 }
-                MovesAmount--;
                 break;
             }
-                /*case (5): {
-                    pole.Show();
-                    std::vector<bool> Test;
-                    Test = pole.CanBeMeleeAttackedRequest(CurrentPlayer.GetSide());
-                    for (int i = 0; i < Test.size(); i++) {
-                        std::cout << std::boolalpha << Test[i] << " ";
-                    }
-                    break;
-                }*/
             case (GameMsgTypes::GameCardFromHandChoice): {
                 std::cout << "РЕАЛИЗАЦИЯ КАРТЫ" << std::endl;
                 int line = 0;
                 int cell = 0;
                 msg >> choice >> line >> cell;
                 cout << " CHOICE " << choice << " CELL " << cell << " LINE " << line << std::endl;
-                Card ChosenCard = CurrentPlayer.ChooseCard(choice);
-
+                //Card ChosenCard = CurrentPlayerChooseCard(choice);
                 Position *kletka = pole.GetPosition(cell, line, currentside);
-                kletka->SetHero(ChosenCard);
+
+                for (int i = 0; i < CurrentPlayer->GetHand().GetVector().size(); i++) {
+                    if (CurrentPlayer->GetHand().GetVector()[i].ID == choice) {
+                        kletka->SetHero(CurrentPlayer->GetHand().GetVector()[i]);
+                        CurrentPlayer->GetHand().GetVector().erase(CurrentPlayer->GetHand().GetVector().begin() + i);
+                    }
+                }
                 mapper.MapPowers(kletka->GetHero());
                 pole.SetPosition(kletka);
+                cout << kletka->GetHero().GetID() << std::endl;
                 MovesAmount--;
+                for (int i = 0; i < CurrentPlayer->GetHand().GetVector().size(); i++) {
+                    cout << CurrentPlayer->GetHand().GetVector()[i].ID << " ";
+                }
                 pole.Show();
-                SendBreeds(pole, currentside ? 0 : 1);
+
+
+                Message<GameMsgTypes> released(GameMsgTypes::GameCardReleased);
+                released << kletka->GetHero().GetID() << kletka->GetHero().GetCurHealth()
+                         << kletka->GetHero().GetCurStrength() << line << cell;
+                CallPechkin(currentside ? 0 : 1, released);
                 break;
             }
             case (GameMsgTypes::GamePowerRequest): {
 
                 int cell, line;
-                std::cout << "Введите клетку и линию вашего героя: " << std::endl;
+                std::cout << " СПОСОБНОСТЬ " << std::endl;
 
-                msg >> choice >> line >> cell;
+                msg >> line >> cell;
                 Position *Hero = pole.GetPosition(cell, line, currentside);
                 switch (Phase) {
                     case (0): {
                         cout << "\nИмя: " << Hero->GetHero().GetName() << "\nСпособность авангарда: "
-                             << allCards.GetVector()[Hero->GetHero().GetID() - 1].frontLinePower << "\n";
-                        FrontRequest(Hero, pole, currentside);
+                             << allCards.GetVector()[Hero->GetHero().GetTexture() - 1].frontLinePower << "\n";
+                        FrontRequest(Hero);
                         break;
                     }
                     case (1): {
                         cout << "\nИмя: " << Hero->GetHero().GetName() << "\nСпособность фланга: "
-                             << allCards.GetVector()[Hero->GetHero().GetID() - 1].middleLinePower << "\n";
-                        MiddleRequest(Hero, pole, currentside);
+                             << allCards.GetVector()[Hero->GetHero().GetTexture() - 1].middleLinePower << "\n";
+                        MiddleRequest(Hero);
                         break;
                     }
                     case (2): {
                         cout << "\nИмя: " << Hero->GetHero().GetName() << "\nСпособность тыла: "
-                             << allCards.GetVector()[Hero->GetHero().GetID() - 1].backLinePower << "\n";
-                        BackRequest(Hero, pole, currentside);
+                             << allCards.GetVector()[Hero->GetHero().GetTexture() - 1].backLinePower << "\n";
+                        BackRequest(Hero);
                         break;;
                     }
                     default:
                         break;
                 }
+                MovesAmount--;
+                break;
             }
-                /*case (8): {
-                    int line, cell = 0;
-                    std::cout << "Введите клетку и линию вашего трупа: " << std::endl;
-                    LobbyShortCoordinates(line, cell);
+            case (GameMsgTypes::GameRemoveBody): {
+                std::cout << "УБРАТЬ ТЕЛО" << std::endl;
+                int line = 0;
+                int cell = 0;
+                msg >> choice >> line >> cell;
+                cout << " CHOICE " << choice << " CELL " << cell << " LINE " << line << std::endl;
 
-                    Position *kletka = pole.GetPosition(cell, line, CurrentPlayer.GetSide());
-                    kletka->RemoveHero();
-                }*/
+                Position *kletka = pole.GetPosition(cell, line, CurrentPlayer->GetSide());
+                kletka->RemoveHero();
+
+                SendBreeds(pole, 3);
+
+                MovesAmount--;
+            }
             default: {
                 break;
             }
         }
     }
+
+    int winner = pole.CheckLeader();
+
+    if (winner == 0) {
+        Message<GameMsgTypes> won(GameMsgTypes::GameWon);
+        CallPechkin(0, won);
+        Message<GameMsgTypes> lost(GameMsgTypes::GameLost);
+        CallPechkin(1, lost);
+    } else if (winner == 1) {
+        Message<GameMsgTypes> won(GameMsgTypes::GameWon);
+        CallPechkin(1, won);
+        Message<GameMsgTypes> lost(GameMsgTypes::GameLost);
+        CallPechkin(0, lost);
+    }
+
 }
 
 void Game::CallPechkin(int playerId, const Message<GameMsgTypes> &msg) {
     lobby->sendToPlayer(playerId, msg);
 }
+
+void Game::SendBeforeHeroStats() {
+    Message<GameMsgTypes> statsMsg(GameMsgTypes::GameBeforeHeroStats);
+    CallPechkin(currentside, statsMsg);
+}
+
+void Game::SendBreeds(Pole &pole, int numOfPlayers) {
+    std::vector<Breed> allStats;
+    allStats.resize(0);
+    for (int i = 0; i < pole.GetVector().size(); i++) {
+        Breed stats;
+        stats.HP = pole.GetVector()[i]->GetHero().GetCurHealth();
+        stats.Strength = pole.GetVector()[i]->GetHero().GetCurStrength();
+        stats.ID = pole.GetVector()[i]->GetHero().GetID();
+        allStats.push_back(stats);
+    }
+
+    for (int i = 0; i < allStats.size(); i++) {
+        cout << allStats[i].ID << " ";
+    }
+    cout << std::endl;
+    Message<GameMsgTypes> statsMsg(GameMsgTypes::GameHeroesStats);
+    statsMsg << allStats;
+
+    if (numOfPlayers == 0) {
+        CallPechkin(0, statsMsg);
+        cout << "Бреды отправлены первому" << std::endl;
+    } else if (numOfPlayers == 1) {
+        CallPechkin(1, statsMsg);
+        cout << "Бреды отправлены второму" << std::endl;
+    } else {
+        CallPechkin(0, statsMsg);
+        CallPechkin(1, statsMsg);
+        cout << "Бреды отправлены обоим" << std::endl;
+    }
+}
+
+void Game::RecieveTarget(int &line, int &cell) {
+    if (!WaitForMessage()) return;
+    auto choiceMsg = lobby->incoming().popFront().msg;
+
+    if (choiceMsg.header.id == GameMsgTypes::GamePowerRequest) {
+        cout << "Получил координаты челика " << std::endl;
+        choiceMsg >> line >> cell;
+    }
+
+}
+
+void Game::ReleasePower(int type, Position *position, int side) {
+    vector<Hero *> heroes;
+    heroes.push_back(&position->GetHero());
+    cout << "В вектор добавлен свой " << std::endl;
+    int line, cell;
+    RecieveTarget(line, cell);
+    cout << " Пришел челик " << line << " " << cell << std::endl;
+    Position *chosen_pos = pole.GetPosition(cell, line, side);
+    cout << " ХП И СИЛА ДО СПОСОБНОСТИ " << chosen_pos->GetHero().GetCurHealth() << " "
+         << chosen_pos->GetHero().GetCurStrength() << std::endl;
+    heroes.push_back(&(chosen_pos->GetHero()));
+    cout << "В вектор добавлен противник " << std::endl;
+    switch (type) {
+        case 0: {
+            position->GetHero().frontLinePower(heroes);
+            break;
+        }
+        case 1: {
+            position->GetHero().middleLinePower(heroes);
+            break;
+        }
+        case 2: {
+            position->GetHero().backLinePower(heroes);
+            break;
+        }
+        default:
+            break;
+    }
+
+    cout << " ХП И СИЛА ПОСЛЕ СПОСОБНОСТИ " << chosen_pos->GetHero().GetCurHealth() << " "
+         << chosen_pos->GetHero().GetCurStrength() << std::endl;
+    SendBreeds(pole, 3);
+}
+
+void Game::FrontRequest(Position *friendPosition) {
+    switch (friendPosition->GetHero().GetTexture()) {
+        case (5): {
+            vector<bool> result = SendAllAliveEnemies(friendPosition, pole, currentside);
+            Message<GameMsgTypes> aliveMsg(GameMsgTypes::GamePowerAnswer);
+            aliveMsg << result;
+            CallPechkin(currentside, aliveMsg);
+
+            std::cout << "   Отправила всех живых врагов" << std::endl;
+            for (auto &&i : result) {
+                std::cout << i << " ";
+            }
+            std::cout << std::endl;
+
+            ReleasePower(0, friendPosition, currentside ? 0 : 1);
+            break;
+        }
+        case (11): {
+            vector<bool> result = MakeDistantAttack(pole, currentside);
+            Message<GameMsgTypes> aliveMsg(GameMsgTypes::GamePowerAnswer);
+            aliveMsg << result;
+            CallPechkin(currentside, aliveMsg);
+
+            std::cout << "   Отправила всех живых врагов" << std::endl;
+            for (auto &&i : result) {
+                std::cout << i << " ";
+            }
+            std::cout << std::endl;
+
+            ReleasePower(0, friendPosition, currentside ? 0 : 1);
+            break;
+        }
+        case (6, 8, 3): {
+            vector<bool> result = SendAllAliveFriends(friendPosition, pole, currentside);
+            Message<GameMsgTypes> aliveMsg(GameMsgTypes::GamePowerAnswer);
+            aliveMsg << result;
+            CallPechkin(currentside, aliveMsg);
+
+            std::cout << "   Отправила всех живых своих" << std::endl;
+            for (auto &&i : result) {
+                std::cout << i << " ";
+            }
+            std::cout << std::endl;
+
+            ReleasePower(0, friendPosition, currentside);
+            break;
+        }
+        case (7): {
+            vector<bool> result = SendAllDeadFriends(friendPosition, pole, currentside);
+            Message<GameMsgTypes> aliveMsg(GameMsgTypes::GamePowerAnswer);
+            aliveMsg << result;
+            CallPechkin(currentside, aliveMsg);
+
+            std::cout << "   Отправила всех мертвых своих" << std::endl;
+            for (auto &&i : result) {
+                std::cout << i << " ";
+            }
+            std::cout << std::endl;
+
+            ReleasePower(0, friendPosition, currentside);
+            break;;
+        }
+        case (1): {
+            Interception(friendPosition, pole);
+            SendBeforeHeroStats();
+            SendBreeds(pole, 3);
+            break;
+        }
+        case (2): {
+            HPFromDead(friendPosition, pole);
+            SendBeforeHeroStats();
+            SendBreeds(pole, 3);
+            break;
+        }
+        case (4): {
+            InterceptionPlusPower(friendPosition, pole);
+            SendBeforeHeroStats();
+            SendBreeds(pole, 3);
+            break;
+        }
+        case (9): {
+            PlusStrMinusHP(friendPosition, pole);
+            SendBeforeHeroStats();
+            SendBreeds(pole, 3);
+            break;
+        }
+        case (10): {
+            Interception(friendPosition, pole);
+            SendBeforeHeroStats();
+            SendBreeds(pole, 3);
+            break;
+        }
+    }
+
+}
+
+void Game::MiddleRequest(Position *friendPosition) {
+    switch (friendPosition->GetHero().GetTexture()) {
+        case (2, 6): {
+            vector<bool> result = SendAllDeadFriends(friendPosition, pole, currentside);
+            Message<GameMsgTypes> aliveMsg(GameMsgTypes::GamePowerAnswer);
+            aliveMsg << result;
+            CallPechkin(currentside, aliveMsg);
+
+            std::cout << "   Отправила всех мертвых своих" << std::endl;
+            for (auto &&i : result) {
+                std::cout << i << " ";
+            }
+            std::cout << std::endl;
+
+            ReleasePower(1, friendPosition, currentside);
+            break;
+        }
+        case (1, 3, 8): {
+            vector<bool> result = SendAllAliveEnemies(friendPosition, pole, currentside);
+            Message<GameMsgTypes> aliveMsg(GameMsgTypes::GamePowerAnswer);
+            aliveMsg << result;
+            CallPechkin(currentside, aliveMsg);
+
+            std::cout << "   Отправила всех живых врагов" << std::endl;
+            for (auto &&i : result) {
+                std::cout << i << " ";
+            }
+            std::cout << std::endl;
+
+            ReleasePower(0, friendPosition, currentside ? 0 : 1);
+            break;
+        }
+        case (4, 11): {
+            vector<bool> result = MakeDistantAttack(pole, currentside);
+            Message<GameMsgTypes> aliveMsg(GameMsgTypes::GamePowerAnswer);
+            aliveMsg << result;
+            CallPechkin(currentside, aliveMsg);
+
+            std::cout << "   Отправила всех живых врагов" << std::endl;
+            for (auto &&i : result) {
+                std::cout << i << " ";
+            }
+            std::cout << std::endl;
+
+            ReleasePower(1, friendPosition, currentside ? 0 : 1);
+            break;
+        }
+            /*case (1): {
+                PlusPowerInCloseAttack(friendPosition, pole, currentside);
+                SendBeforeHeroStats();
+                SendBreeds(pole, 3);
+                break;
+            }*/
+        case (5): {
+            HitAvangard(friendPosition, pole, currentside);
+            SendBeforeHeroStats();
+            SendBreeds(pole, 3);
+            break;
+        }
+        case (9): {
+            InterceptionPlusPower(friendPosition, pole);
+            SendBeforeHeroStats();
+            SendBreeds(pole, 3);
+            break;
+        }
+        case (10): {
+            FrontAndBackGetDamage(friendPosition, pole, currentside);
+            SendBeforeHeroStats();
+            SendBreeds(pole, 3);
+            break;
+        }
+    }
+}
+
+void Game::BackRequest(Position *friendPosition) {
+    switch (friendPosition->GetHero().GetTexture()) {
+        case (3, 5): {
+            vector<bool> result = SendAllAliveEnemies(friendPosition, pole, currentside);
+            Message<GameMsgTypes> aliveMsg(GameMsgTypes::GamePowerAnswer);
+            aliveMsg << result;
+            CallPechkin(currentside, aliveMsg);
+
+            std::cout << "   Отправила всех живых врагов" << std::endl;
+            for (auto &&i : result) {
+                std::cout << i << " ";
+            }
+            std::cout << std::endl;
+
+            ReleasePower(2, friendPosition, currentside ? 0 : 1);
+            break;
+        }
+        case (2, 9, 10): {
+            vector<bool> result = MakeDistantAttack(pole, currentside);
+            Message<GameMsgTypes> aliveMsg(GameMsgTypes::GamePowerAnswer);
+            aliveMsg << result;
+            CallPechkin(currentside, aliveMsg);
+
+            std::cout << "   Отправила всех живых врагов" << std::endl;
+            for (auto &&i : result) {
+                std::cout << i << " ";
+            }
+            std::cout << std::endl;
+
+            ReleasePower(0, friendPosition, currentside ? 0 : 1);
+            break;
+        }
+        case (4, 6, 7, 11): {
+            vector<bool> result = SendAllAliveFriends(friendPosition, pole, currentside);
+            Message<GameMsgTypes> aliveMsg(GameMsgTypes::GamePowerAnswer);
+            aliveMsg << result;
+            CallPechkin(currentside, aliveMsg);
+
+            std::cout << "   Отправила всех живых своих" << std::endl;
+            for (auto &&i : result) {
+                std::cout << i << " ";
+            }
+            std::cout << std::endl;
+
+            ReleasePower(2, friendPosition, currentside);
+            break;
+        }
+        case (1): {
+            DoubleStrengthAgainstLeader(friendPosition, pole, currentside);
+            SendBeforeHeroStats();
+            SendBreeds(pole, 3);
+            break;
+        }
+        case (8): {
+            HitFrontRowHeroes(friendPosition, pole, currentside);
+            SendBeforeHeroStats();
+            SendBreeds(pole, 3);
+            break;
+        }
+            /*case (11): {
+                PlusPower(friendPosition, pole, currentside);
+                SendBeforeHeroStats();
+                SendBreeds(pole, 3);
+                break;
+            }*/
+    }
+}
+
