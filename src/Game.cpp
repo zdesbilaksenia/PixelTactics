@@ -141,17 +141,6 @@ void Game::StartGame() {
             }
         }
 
-        /* std::cout << "//////////////////////////" << std::endl;
-         std::cout << "Взять карту(1)" << std::endl;
-         std::cout << "Посмотреть руку(2)" << std::endl;
-         std::cout << "Получить информацию о герое на поле(3)" << std::endl;
-         std::cout << "Атаковать своим героем врага(4)" << std::endl;
-         std::cout << "Посмотреть поле(5)" << std::endl;
-         std::cout << "Поставить героя(6)" << std::endl;
-         std::cout << "Способность(7)" << std::endl;
-         std::cout << "Убрать труп(8)" << std::endl;
-         std::cout << "//////////////////////////" << std::endl;*/
-
         choice = 0;
         if (!WaitForMessage()) return;
         msg = lobby->incoming().popFront().msg;
@@ -174,30 +163,6 @@ void Game::StartGame() {
                 }
                 break;
             }
-                /*case (2): {
-                    CurrentPlayerGetHand().ShowDeck();
-                    std::cout << "//////////////////////////" << std::endl;
-                    break;
-                }*/
-                /*case (3): {
-                    std::cout << "Введите клетку и линию и сторону" << std::endl;
-                    int line = 0;
-                    int cell = 0;
-                    int side = 0;
-                    if(!WaitForMessage()) return;
-                    msg = lobby->incoming().popFront().msg;
-                    if (msg.header.id == GameMsgTypes::GameFullCoordinates) {
-                        msg >> line >> cell >> side;
-                    } else {
-                        std::cout << "Error in Full Coordinates!\n";
-                        return;
-                    }
-                    std::cin >> cell >> line >> side;
-                    Position *kletka = pole.GetPosition(cell, line, side);
-                    kletka->InfoPosition();
-                    std::cout << "//////////////////////////" << std::endl;
-                    break;
-                }*/
             case (GameMsgTypes::GameAttackRequest): {
                 pole.Show();
                 std::cout << "ВЫБРАНА АТАКА" << std::endl;
@@ -209,9 +174,15 @@ void Game::StartGame() {
                 std::vector<bool> CanBeMeleeAttacked;
                 CanBeMeleeAttacked = pole.CanBeMeleeAttackedRequest(currentside);
 
-                auto Attackmsg = Message<GameMsgTypes>(GameMsgTypes::GameCanBeAttacked);
-                Attackmsg << CanBeMeleeAttacked;
-                CallPechkin(currentside, Attackmsg);
+                if (CanBeMeleeAttacked.size() != 0) {
+                    auto Attackmsg = Message<GameMsgTypes>(GameMsgTypes::GameCanBeAttacked);
+                    Attackmsg << CanBeMeleeAttacked;
+                    CallPechkin(currentside, Attackmsg);
+                } else {
+                    auto Attackmsg = Message<GameMsgTypes>(GameMsgTypes::GameReject);
+                    CallPechkin(currentside, Attackmsg);
+                    break;
+                }
 
                 Position *YourHero = pole.GetPosition(cell, line, CurrentPlayer->GetSide());
                 int EnemySide;
@@ -233,23 +204,18 @@ void Game::StartGame() {
                     cout << "АТАКОВАННЫЙ " << line << " " << cell << " " << EnemyHero->GetHero().GetName() << std::endl;
                 }
 
-                if (CurrentPlayer->MeleeAttackCheck(EnemyHero, pole)) {
-                    cout << "ДО АТАКИ " << "ХП " << EnemyHero->GetHero().GetCurHealth() << " Сила атакующего "
-                         << YourHero->GetHero().GetCurStrength() << std::endl;
+                cout << "ДО АТАКИ " << "ХП " << EnemyHero->GetHero().GetCurHealth() << " Сила атакующего "
+                     << YourHero->GetHero().GetCurStrength() << std::endl;
 
-                    YourHero->GetHero().Attack(EnemyHero->GetHero(), YourHero->GetHero().GetCurStrength());
+                YourHero->GetHero().Attack(EnemyHero->GetHero(), YourHero->GetHero().GetCurStrength());
 
-                    cout << "ПОСЛЕ АТАКИ " << "ХП " << EnemyHero->GetHero().GetCurHealth() << " Сила атакующего "
-                         << YourHero->GetHero().GetCurStrength() << std::endl;
-                    pole.SetPosition(EnemyHero);
-                    if (pole.CheckLeader() != 0 && pole.CheckLeader() != 1)
-                        SendBreeds(pole, 3);
-                    MovesAmount--;
-                } else {
-                    std::cout << "СПЕРЕДИ СТОИТ ДРУГОЙ ГЕРОЙ. НЕЛЬЗЯ АТАКОВАТЬ!!" << std::endl;
-                    Message<GameMsgTypes> error(GameMsgTypes::GameReject);
-                    CallPechkin(currentside, error);
-                }
+                cout << "ПОСЛЕ АТАКИ " << "ХП " << EnemyHero->GetHero().GetCurHealth() << " Сила атакующего "
+                     << YourHero->GetHero().GetCurStrength() << std::endl;
+                pole.SetPosition(EnemyHero);
+                if (pole.CheckLeader() != 0 && pole.CheckLeader() != 1)
+                    SendBreeds(pole, 3);
+                MovesAmount--;
+
                 break;
             }
             case (GameMsgTypes::GameCardFromHandChoice): {
@@ -275,8 +241,6 @@ void Game::StartGame() {
                     cout << CurrentPlayer->GetHand().GetVector()[i].ID << " ";
                 }
                 pole.Show();
-
-
                 Message<GameMsgTypes> released(GameMsgTypes::GameCardReleased);
                 released << kletka->GetHero().GetID() << kletka->GetHero().GetCurHealth()
                          << kletka->GetHero().GetCurStrength() << line << cell;
@@ -316,23 +280,29 @@ void Game::StartGame() {
             }
             case (GameMsgTypes::GameRemoveBodyRequest): {
                 vector<bool> dead = SendAllDeadFriends(NULL, pole, currentside);
+
+                for (int i = 0; i < dead.size(); i++) {
+                    cout << dead[i] << " ";
+                }
+
+                cout << std::endl;
                 vector<bool> send;
-                send.resize(9);
+                send.clear();
+
                 if (currentside == 0) {
                     for (int i = 0; i < 9; i++) {
-                        send[i] = dead[i];
-                        cout << send[i] << " ";
+                        send.push_back(dead[i]);
                     }
                 } else {
                     for (int i = 9; i < 18; i++) {
-                        send[i] = dead[i];
-                        cout << send[i] << " ";
+                        send.push_back(dead[i]);
                     }
                 }
 
                 Message<GameMsgTypes> d(GameMsgTypes::GameRemoveBody);
                 d << send;
-                CallPechkin(0, d);
+                CallPechkin(currentside, d);
+
 
                 std::cout << "УБРАТЬ ТЕЛО" << std::endl;
                 int line = 0;
@@ -342,9 +312,9 @@ void Game::StartGame() {
 
                 auto remove = lobby->incoming().popFront().msg;
                 if (remove.header.id == GameMsgTypes::GameRemoveBody)
-                    remove >> choice >> line >> cell;
+                    remove >> line >> cell;
 
-                cout << " CHOICE " << choice << " CELL " << cell << " LINE " << line << std::endl;
+                cout << " CELL " << cell << " LINE " << line << std::endl;
 
                 Position *kletka = pole.GetPosition(cell, line, currentside);
                 kletka->RemoveHero();
@@ -465,6 +435,11 @@ void Game::FrontRequest(Position *friendPosition) {
     switch (friendPosition->GetHero().GetTexture()) {
         case (5): {
             vector<bool> result = SendAllAliveEnemies(friendPosition, pole, currentside);
+            if (result.empty()) {
+                auto Attackmsg = Message<GameMsgTypes>(GameMsgTypes::GameReject);
+                CallPechkin(currentside, Attackmsg);
+                break;
+            }
             Message<GameMsgTypes> aliveMsg(GameMsgTypes::GamePowerAnswer);
             aliveMsg << result;
             CallPechkin(currentside, aliveMsg);
@@ -480,6 +455,11 @@ void Game::FrontRequest(Position *friendPosition) {
         }
         case (11): {
             vector<bool> result = MakeDistantAttack(pole, currentside);
+            if (result.empty()) {
+                auto Attackmsg = Message<GameMsgTypes>(GameMsgTypes::GameReject);
+                CallPechkin(currentside, Attackmsg);
+                break;
+            }
             Message<GameMsgTypes> aliveMsg(GameMsgTypes::GamePowerAnswer);
             aliveMsg << result;
             CallPechkin(currentside, aliveMsg);
@@ -495,6 +475,11 @@ void Game::FrontRequest(Position *friendPosition) {
         }
         case (6, 8, 3): {
             vector<bool> result = SendAllAliveFriends(friendPosition, pole, currentside);
+            if (result.empty()) {
+                auto Attackmsg = Message<GameMsgTypes>(GameMsgTypes::GameReject);
+                CallPechkin(currentside, Attackmsg);
+                break;
+            }
             Message<GameMsgTypes> aliveMsg(GameMsgTypes::GamePowerAnswer);
             aliveMsg << result;
             CallPechkin(currentside, aliveMsg);
@@ -510,6 +495,11 @@ void Game::FrontRequest(Position *friendPosition) {
         }
         case (7): {
             vector<bool> result = SendAllDeadFriends(friendPosition, pole, currentside);
+            if (result.empty()) {
+                auto Attackmsg = Message<GameMsgTypes>(GameMsgTypes::GameReject);
+                CallPechkin(currentside, Attackmsg);
+                break;
+            }
             Message<GameMsgTypes> aliveMsg(GameMsgTypes::GamePowerAnswer);
             aliveMsg << result;
             CallPechkin(currentside, aliveMsg);
@@ -561,6 +551,11 @@ void Game::MiddleRequest(Position *friendPosition) {
     switch (friendPosition->GetHero().GetTexture()) {
         case (2, 6): {
             vector<bool> result = SendAllDeadFriends(friendPosition, pole, currentside);
+            if (result.empty()) {
+                auto Attackmsg = Message<GameMsgTypes>(GameMsgTypes::GameReject);
+                CallPechkin(currentside, Attackmsg);
+                break;
+            }
             Message<GameMsgTypes> aliveMsg(GameMsgTypes::GamePowerAnswer);
             aliveMsg << result;
             CallPechkin(currentside, aliveMsg);
@@ -576,6 +571,11 @@ void Game::MiddleRequest(Position *friendPosition) {
         }
         case (1, 3, 8): {
             vector<bool> result = SendAllAliveEnemies(friendPosition, pole, currentside);
+            if (result.empty()) {
+                auto Attackmsg = Message<GameMsgTypes>(GameMsgTypes::GameReject);
+                CallPechkin(currentside, Attackmsg);
+                break;
+            }
             Message<GameMsgTypes> aliveMsg(GameMsgTypes::GamePowerAnswer);
             aliveMsg << result;
             CallPechkin(currentside, aliveMsg);
@@ -591,6 +591,11 @@ void Game::MiddleRequest(Position *friendPosition) {
         }
         case (4, 11): {
             vector<bool> result = MakeDistantAttack(pole, currentside);
+            if (result.empty()) {
+                auto Attackmsg = Message<GameMsgTypes>(GameMsgTypes::GameReject);
+                CallPechkin(currentside, Attackmsg);
+                break;
+            }
             Message<GameMsgTypes> aliveMsg(GameMsgTypes::GamePowerAnswer);
             aliveMsg << result;
             CallPechkin(currentside, aliveMsg);
@@ -635,6 +640,11 @@ void Game::BackRequest(Position *friendPosition) {
     switch (friendPosition->GetHero().GetTexture()) {
         case (3, 5): {
             vector<bool> result = SendAllAliveEnemies(friendPosition, pole, currentside);
+            if (result.empty()) {
+                auto Attackmsg = Message<GameMsgTypes>(GameMsgTypes::GameReject);
+                CallPechkin(currentside, Attackmsg);
+                break;
+            }
             Message<GameMsgTypes> aliveMsg(GameMsgTypes::GamePowerAnswer);
             aliveMsg << result;
             CallPechkin(currentside, aliveMsg);
@@ -650,6 +660,11 @@ void Game::BackRequest(Position *friendPosition) {
         }
         case (2, 9, 10): {
             vector<bool> result = MakeDistantAttack(pole, currentside);
+            if (result.empty()) {
+                auto Attackmsg = Message<GameMsgTypes>(GameMsgTypes::GameReject);
+                CallPechkin(currentside, Attackmsg);
+                break;
+            }
             Message<GameMsgTypes> aliveMsg(GameMsgTypes::GamePowerAnswer);
             aliveMsg << result;
             CallPechkin(currentside, aliveMsg);
@@ -665,6 +680,11 @@ void Game::BackRequest(Position *friendPosition) {
         }
         case (4, 6, 7, 11): {
             vector<bool> result = SendAllAliveFriends(friendPosition, pole, currentside);
+            if (result.empty()) {
+                auto Attackmsg = Message<GameMsgTypes>(GameMsgTypes::GameReject);
+                CallPechkin(currentside, Attackmsg);
+                break;
+            }
             Message<GameMsgTypes> aliveMsg(GameMsgTypes::GamePowerAnswer);
             aliveMsg << result;
             CallPechkin(currentside, aliveMsg);
@@ -685,9 +705,18 @@ void Game::BackRequest(Position *friendPosition) {
             break;
         }
         case (8): {
-            HitFrontRowHeroes(friendPosition, pole, currentside);
-            SendBeforeHeroStats();
-            SendBreeds(pole, 3);
+            vector<bool> result = pole.CanBeMeleeAttackedRequest(currentside);
+            Message<GameMsgTypes> aliveMsg(GameMsgTypes::GamePowerAnswer);
+            aliveMsg << result;
+            CallPechkin(currentside, aliveMsg);
+
+            std::cout << "   Отправила всех живых врагов" << std::endl;
+            for (auto &&i : result) {
+                std::cout << i << " ";
+            }
+            std::cout << std::endl;
+
+            ReleasePower(2, friendPosition, currentside ? 0 : 1);
             break;
         }
             /*case (11): {

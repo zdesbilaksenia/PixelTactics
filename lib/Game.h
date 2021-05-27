@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <vector>
+#include <algorithm>
 #include "../lib/pole.h"
 #include "../lib/player.h"
 #include "../DataBase/MySQL.h"
