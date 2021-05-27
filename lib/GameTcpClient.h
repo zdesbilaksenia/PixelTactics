@@ -20,6 +20,8 @@ public:
     void sendPowerUserPos(const int, const int) const;
     void sendPowerTargetPos(const int, const int) const;
     void sendTakeCard();
+    void sendRemoveBodyRequest();
+    void sendRemovedBody(const int, const int) const;
 
     //.......
     //

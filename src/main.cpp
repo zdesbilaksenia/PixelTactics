@@ -16,6 +16,7 @@ using namespace sf;
 #include "Commands/CommandAttack.h"
 #include "Commands/CommandPower.h"
 #include "Commands/CommandTakeCard.h"
+#include "Commands/CommandRemoveBody.h"
 #include "Card.h"
 #include "Tile.h"
 #include "Background.h"
@@ -165,9 +166,9 @@ int main()
     cancelButton.setColors(Color::White, Color(240, 200, 150), Color(190, 70, 80), Color(200, 200, 200));
     cancelButton.setPosition(300, 130);
 
-    CommandStringTest cmdtest4("CommandStringTest::execute(): Remove body!");
-    Button removeBodyButton(window, mouse, &cmdtest4);
-    removeBodyButton.setColors(Color::White, Color(240, 200, 150), Color(190, 70, 80), Color(200, 200, 200));
+    CommandRemoveBody cmdremovebody(playerTilesManager, client);
+    Button removeBodyButton(window, mouse, &cmdremovebody);
+    removeBodyButton.setColors(Color::Cyan, Color(240, 200, 150), Color(190, 70, 80), Color(200, 200, 200));
     removeBodyButton.setPosition(500, 130);
 
     vector<Button *> buttons = {&buttonTakeCard, &attackButton, &powerButton, &cancelButton, &removeBodyButton};

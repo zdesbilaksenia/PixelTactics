@@ -79,3 +79,17 @@ void GameTcpClient::setSide(bool isFirst)
 {
     side = isFirst;
 }
+
+void GameTcpClient::sendRemoveBodyRequest()
+{
+    Message<GameMsgTypes> msg(GameMsgTypes::GameRemoveBodyRequest);
+    send(msg);
+    cout << "msg sent" << endl;
+}
+
+void GameTcpClient::sendRemovedBody(const int posX, const int posY) const
+{
+    Message<GameMsgTypes> msg(GameMsgTypes::GameRemoveBody);
+    msg << posY << posX;
+    send(msg);
+}

@@ -10,7 +10,7 @@ GameManager::GameManager(RenderWindow &_window,
                          TilesManager &_opponentTM,
                          CardsManager &_cardsM,
                          Background &_background,
-                         vector<Unit>& _playerUnits,
+                         vector<Unit> &_playerUnits,
                          vector<Unit> &_opponentUnits,
                          const vector<Texture> &_textures) : window(_window),
                                                              mouse(_mouse),
@@ -86,6 +86,17 @@ void GameManager::play()
     round = RoundType::roundAvangard;
 
     _whileForPlay();
+
+    if (stage == GameStage::stageLost)
+    {
+        BOOST_LOG_TRIVIAL(info) << "GameManager::play(): You lost!";
+        return;
+    }
+    else
+    {
+        BOOST_LOG_TRIVIAL(info) << "GameManager::play(): You won!";
+        return;
+    }
 }
 
 void GameManager::gameStart()

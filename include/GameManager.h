@@ -30,6 +30,7 @@ auto loadPlayerHeroesStats{
             {
                 _units[_breeds[i].cardID].setTextAttack(_breeds[i].strength);
                 _units[_breeds[i].cardID].setTextHP(_breeds[i].HP);
+                cout << "unit ID = " << _breeds[i].cardID << " ___ ";
                 _tilesManager.setUnit(_units[_breeds[i].cardID], x, y);
             }
         }
@@ -46,6 +47,7 @@ auto loadOpponentHeroesStats{
             {
                 _units[_breeds[i].cardID].setTextAttack(_breeds[i].strength);
                 _units[_breeds[i].cardID].setTextHP(_breeds[i].HP);
+                cout << "unit ID = " << _breeds[i].cardID << " ___ ";
                 _tilesManager.setUnit(_units[_breeds[i].cardID], x, y);
             }
         }
@@ -121,7 +123,9 @@ private:
         stageAttack,
         stagePower,
         stageGameOver,
-        stageReleasingCard
+        stageReleasingCard,
+        stageLost,
+        stageWon
     };
 
     GameStage stage;
@@ -137,7 +141,7 @@ private:
 
     void _whileForPlay()
     {
-        while (window.isOpen() && stage != GameStage::stageGameOver)
+        while (window.isOpen() && stage != GameStage::stageWon && stage != GameStage::stageLost)
         {
             switch (stage)
             {
@@ -163,6 +167,10 @@ private:
                 }
                 stage = GameStage::stageOpponentsTurn;
                 break;
+                if (stage == GameStage::stageWon)
+                {
+                    return;
+                }
             }
             default:
                 break;
@@ -224,8 +232,6 @@ private:
                 opponentTilesManager.updateFocus();
                 buttonsManager.updateFocus();
 
-                cout << "HERE" << endl;
-
                 if (client.incoming().empty())
                 {
                     this->draw();
@@ -243,6 +249,7 @@ private:
                         BOOST_LOG_TRIVIAL(info) << "GameManager::ForGamesStart() : breed loaded!";
                     }
 
+                    loadPlayerHeroesStats(playerUnits, breeds, playerTilesManager, side);
                     loadOpponentHeroesStats(opponentUnits, breeds, opponentTilesManager, side);
 
                     opponentTilesManager.updateFocus();
@@ -339,6 +346,13 @@ private:
                     opponentUnits[ID].setTextHP(HP);
                     opponentTilesManager.setUnit(opponentUnits[ID], posX, posY);
                     opponentTilesManager.updateFocus();
+                    break;
+                }
+                case GameMsgTypes::GameLost:
+                {
+                    BOOST_LOG_TRIVIAL(info) << "GameManager::opponentsTurn() : You lost!";
+                    stage = GameStage::stageLost;
+                    return;
                     break;
                 }
                 default:

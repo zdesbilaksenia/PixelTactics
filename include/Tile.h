@@ -82,7 +82,11 @@ enum class TilesManagerStatus
     //Когда используем силу на тайлы противника
     statusWaitingForPower,
     //Когда была использована способность, которая сразу меняет статы
-    statusWhenThePowerWhichChangesStatsImmidiatelyWasActivated
+    statusWhenThePowerWhichChangesStatsImmidiatelyWasActivated,
+    //Когда ждём, что уберут тело
+    statusWaitingForRemovingBody,
+    //Когда тело убрали
+    statusBodyRemoved
 };
 
 enum class Side

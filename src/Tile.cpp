@@ -377,6 +377,26 @@ bool TilesManager::mouseIsPressed()
         break;
     }
 
+    case TilesManagerStatus::statusWaitingForRemovingBody:
+    {
+        for (auto tile : tiles)
+        {
+            if (tile->hasFocus() && activeTiles[tile->getCoordX()][tile->getCoordY()] == true)
+            {
+                BOOST_LOG_TRIVIAL(info) << "TilesManager::mouseIsPressed(): Removing Body!";
+                BOOST_LOG_TRIVIAL(info) << "TilesManager::mouseIsPressed(): Body: " << tile->getCoordX() << " " << tile->getCoordY();
+
+                client.sendRemovedBody(tile->getCoordX(), tile->getCoordY());
+                //Эту инфа будет отлавливаться в PlayersTurn
+                this->setStatus(TilesManagerStatus::statusBodyRemoved);
+
+                isPressed = true;
+                return true;
+            }
+        }
+        break;
+    }
+
     default:
         //return false;
         break;
@@ -470,6 +490,15 @@ void TilesManager::updateFocus()
         updateFocusOnLine(tilesAvangard, activeTiles, colorInFocus, colorBasic, colorDisabled, 0);
         updateFocusOnLine(tilesFlank, activeTiles, colorInFocus, colorBasic, colorDisabled, 1);
         updateFocusOnLine(tilesRear, activeTiles, colorInFocus, colorBasic, colorDisabled, 2);
+
+        break;
+    }
+
+    case TilesManagerStatus::statusWaitingForRemovingBody:
+    {
+        updateFocusOnLine(tilesAvangard, activeTiles, colorInFocus, Color::Blue, colorDisabled, 0);
+        updateFocusOnLine(tilesFlank, activeTiles, colorInFocus, Color::Blue, colorDisabled, 1);
+        updateFocusOnLine(tilesRear, activeTiles, colorInFocus, Color::Blue, colorDisabled, 2);
 
         break;
     }
