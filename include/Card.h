@@ -69,10 +69,17 @@ public:
     void setStatus(CardsManagerStatus _status);
     void setUnitBuffer(Unit* unit);
     bool canTakeCard();
+    bool getCardWasTaken()
+    {
+        bool result = cardWasTaken;
+        cardWasTaken = false;
+        return result;
+    }
 
     ~CardsManager();
 
 private:
+    bool cardWasTaken;
     Unit *unitBuffer;
     RenderWindow &window;
     CardsManagerStatus status;

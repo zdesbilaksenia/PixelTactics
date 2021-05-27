@@ -10,8 +10,9 @@ CommandTakeCard::CommandTakeCard(CardsManager &_cardsManager, GameTcpClient& _cl
 void CommandTakeCard::execute()
 {
     //Доделать отправку серверу инфы о взятии карты
-    if (cardsManager.takeCard())
+    if (cardsManager.canTakeCard())
     {
+        cardsManager.takeCard();
         BOOST_LOG_TRIVIAL(info) << "CommandTakeCard::execute():: Card was taken!";
         client.sendTakeCard();
     }

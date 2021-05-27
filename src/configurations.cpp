@@ -2,6 +2,10 @@
 const int windowHeight = 720;
 const int windowWidth = 1080;
 
+//Menu
+const int playButtonWidth = 300;
+const int playButtonHeight = 80;
+
 //Buttons
 const int buttonWidth = 200;
 const int buttonHeight = 40;

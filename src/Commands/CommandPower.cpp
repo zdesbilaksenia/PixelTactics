@@ -26,9 +26,7 @@ void CommandPower::execute()
 
         client.sendPowerUserPos(playerTilesManager.getTileBuffer()->getCoordX(), playerTilesManager.getTileBuffer()->getCoordY());
 
-        cout << "HERE" << endl;
         client.incoming().wait();
-        cout << "HERE" << endl;
         auto msg = client.incoming().popFront().msg;
         switch (msg.header.id)
         {
@@ -63,8 +61,6 @@ void CommandPower::execute()
             {
                 opponentActiveTiles.push_back(activeTiles[i]);
             }
-
-            
 
             opponentTilesManager.setActiveTiles(opponentActiveTiles);
             playerTilesManager.setActiveTiles(playerActiveTiles);

@@ -24,7 +24,7 @@ void Tile::setUnit(Unit &_unit)
     {
         this->status = TileStatus::statusHasUnit;
     }
-    unit->setPosition(this->rect.getPosition().x, this->rect.getPosition().y);
+    unit->setPosition(this->rect.getPosition().x + 20, this->rect.getPosition().y - 40);
 }
 
 void Tile::setStatus(TileStatus _status)
@@ -63,7 +63,7 @@ void Tile::draw()
     window.draw(rect);
     if (this->unit != nullptr)
     {
-        unit->draw();
+        unit->draw(mouse);
     }
 }
 

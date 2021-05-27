@@ -76,7 +76,7 @@ void GameManager::play()
     gameStart();
     stage = GameStage::stagePlayersTurn;
 
-    //Если второй игрок
+    //Если второй игрокvoid
     if (side == 1)
     {
         //Ждём здесь, пока ответ о конце хода противника не придёт:
@@ -157,6 +157,11 @@ void GameManager::playersTurn()
     buttonsManager.updateFocus();
 
     _whileForPlayersTurn();
+
+    if (stage == GameStage::stageWon)
+    {
+        return;
+    }
 }
 
 GameManager::~GameManager()

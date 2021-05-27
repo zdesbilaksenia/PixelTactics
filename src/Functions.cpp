@@ -128,30 +128,29 @@ bool menu(RenderWindow &window,
     RectangleShape backgroundRect;
     backgroundRect.setSize(Vector2f(windowWidth, windowHeight));
     backgroundRect.setTexture(&backgroundTx);
-    backgroundRect.setPosition(Vector2f(0, -100));
     backgroundRect.setPosition(Vector2f(0, 0));
+
+    Texture tacticsTx;
+    tacticsTx.loadFromFile("../img/tactics.png");
+    RectangleShape tacticsRect;
+    tacticsRect.setSize(Vector2f(700, 320));
+    tacticsRect.setTexture(&tacticsTx);
+    tacticsRect.setPosition(Vector2f((windowWidth - 700)/2, 100));
 
     bool lobbyWasCreated = false;
     CommandConnectToLobby cmdConnectToLobby(client, lobbyWasCreated);
 
     Texture txMakeLobby;
-    txMakeLobby.loadFromFile("../img/make_lobby.png");
+    txMakeLobby.loadFromFile("../img/play.png");
     Button btnConnectToLobby(window, mouse, &cmdConnectToLobby);
     btnConnectToLobby.setTexture(&txMakeLobby);
-    btnConnectToLobby.setColors(Color::Blue, Color::Magenta, Color::Green);
-    btnConnectToLobby.setPosition(100, 100);
+    btnConnectToLobby.setColors(Color::White, Color(140, 20, 230), Color::Green);
+    btnConnectToLobby.setSize(playButtonWidth, playButtonHeight);
+    btnConnectToLobby.setPosition((windowWidth - playButtonWidth) / 2, 600);
 
     vector<Button *> buttons = {&btnConnectToLobby};
     ButtonsManager buttonsManager;
     buttonsManager.setButtons(buttons);
-
-    //////////////////
-    Font font;
-    font.loadFromFile("../src/pixel.ttf");
-    Text text("Hello", font, 20);
-    text.setColor(Color::Blue);
-    text.setPosition(400, 400);
-    ///////////////////
 
     while (window.isOpen())
     {
@@ -192,9 +191,8 @@ bool menu(RenderWindow &window,
         window.clear();
 
         window.draw(backgroundRect);
+        window.draw(tacticsRect);
         buttonsManager.draw();
-
-        window.draw(text);
 
         window.display();
     }

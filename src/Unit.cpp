@@ -28,15 +28,18 @@ int Unit::getAttack()
     return this->attack;
 }
 
-void Unit::draw()
+void Unit::draw(const Mouse &mouse)
 {
-    window.draw(rect);
-    textName.setPosition(Vector2f(this->getPosX(), this->getPosY() - 20));
     textHP.setPosition(Vector2f(this->getPosX() - 20, this->getPosY() + tileHeight + 10));
-    textAttack.setPosition(Vector2f(this->getPosX() + 40, this->getPosY() + 20));
-    //window.draw(textName);
+    textAttack.setPosition(Vector2f(this->getPosX() + 40, this->getPosY() + tileHeight + 10));
+    window.draw(rect);
+    if (rect.getGlobalBounds().contains(mouse.getPosition(window).x, mouse.getPosition(window).y))
+    {
+        window.draw(textName);
+    }
+
     window.draw(textHP);
-    //window.draw(textAttack);
+    window.draw(textAttack);
 }
 
 Unit::~Unit() {}

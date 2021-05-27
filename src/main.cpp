@@ -58,17 +58,6 @@ int main()
 
 #endif //SERVER_CONNECTING
 
-#if SERVER_CONNECTING == 0
-    RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "SFML works!");
-
-    Mouse mouse;
-    Event event;
-#endif //SERVER_CONNECTING
-
-#if SERVER_CONNECTING == 0
-    GameTcpClient client;
-#endif //SERVER_CONNECTING
-
 #if GAME_ELEMENTS == 1
 
     TilesManager playerTilesManager(window, mouse, Side::sidePlayer, client);
@@ -148,6 +137,8 @@ int main()
     Texture powerButtonTx;
     powerButtonTx.loadFromFile("../img/power.png");
     Texture cancelButtonTx;
+    Texture removeBodyButtonTx;
+    removeBodyButtonTx.loadFromFile("../img/remove.png");
 
     CommandAttack cmdattack(playerTilesManager, opponentTilesManager, client);
     Button attackButton(window, mouse, &cmdattack);
@@ -168,10 +159,12 @@ int main()
 
     CommandRemoveBody cmdremovebody(playerTilesManager, client);
     Button removeBodyButton(window, mouse, &cmdremovebody);
+    removeBodyButton.setTexture(&removeBodyButtonTx);
     removeBodyButton.setColors(Color::Cyan, Color(240, 200, 150), Color(190, 70, 80), Color(200, 200, 200));
     removeBodyButton.setPosition(500, 130);
 
-    vector<Button *> buttons = {&buttonTakeCard, &attackButton, &powerButton, &cancelButton, &removeBodyButton};
+    //vector<Button *> buttons = {&buttonTakeCard, &attackButton, &powerButton, &cancelButton, &removeBodyButton};
+    vector<Button *> buttons = {&buttonTakeCard, &attackButton, &powerButton, &removeBodyButton};
     ButtonsManager buttonsManager;
     buttonsManager.setButtons(buttons);
 
@@ -208,5 +201,23 @@ int main()
     gm.setRemoveBodyButton(removeBodyButton);
 
     gm.play();
+
+    while (window.isOpen())
+    {
+        cout << "START" << endl;
+        if (menu(window, mouse, event, client) == false)
+        {
+            BOOST_LOG_TRIVIAL(fatal) << "main() : Can't create lobby!";
+            return 0;
+        }
+        else
+        {
+            BOOST_LOG_TRIVIAL(info) << "main() : Game Created!";
+        }
+        setData(client, playerUnits, opponentUnits, cards, texturesForUnits);
+        gm.play();
+        cout << "END" << endl;
+    }
+
     return 0;
 }

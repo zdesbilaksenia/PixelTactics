@@ -32,7 +32,13 @@ public:
     int getHealth();
     int getAttack();
 
-    void draw() override;
+    void draw(const Mouse &_mouse);
+
+    void draw()
+    {
+        window.draw(rect);
+    }
+
     int getId()
     {
         return Id;
@@ -44,9 +50,10 @@ public:
         textName.setFont(font);
         textHP.setFont(font);
         textAttack.setFont(font);
-        textAttack.setCharacterSize(40);
+        textAttack.setCharacterSize(20);
         textName.setCharacterSize(40);
-        textHP.setCharacterSize(40);
+        textName.setPosition(Vector2f(500, 400));
+        textHP.setCharacterSize(20);
     }
     //==================================
     void setTextName(const string &str)
@@ -58,7 +65,7 @@ public:
     void setTextHP(const int HP)
     {
         health = HP;
-        textHP.setColor(Color::Red);
+        textHP.setColor(Color(255, 30, 90));
         string str = "HP: " + to_string(HP);
         textHP.setString(str);
     }
@@ -66,7 +73,7 @@ public:
     void setTextAttack(const int &attack)
     {
         this->attack = attack;
-        textAttack.setColor(Color::Magenta);
+        textAttack.setColor(Color::Black);
         string str = "Attack: " + to_string(attack);
         textAttack.setString(str);
     }

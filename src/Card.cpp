@@ -49,8 +49,7 @@ void Card::draw()
     }
 
     unit->setPosition(rect.getPosition().x + 10, rect.getPosition().y + 10);
-
-    unit->draw();
+    unit->draw(mouse);
 }
 
 Card::~Card()
@@ -72,8 +71,10 @@ CardsManager::CardsManager(RenderWindow &_window, TilesManager &_tilesManager, s
 
 bool CardsManager::takeCard()
 {
+    cout << "Take card, hand" << cardsInHand.size() << endl;
     if (cardsInStack.size() > 0 && cardsInHand.size() < maxNumberOfCardsInHand)
     {
+        cardWasTaken = true;
         cardsInHand.push_back(cardsInStack.top());
         cardsInStack.pop();
         this->updateHand();
@@ -259,7 +260,8 @@ void CardsManager::setCardShirtTexture(Texture *_tx)
 
 bool CardsManager::canTakeCard()
 {
-    return (cardsInHand.size() < maxNumberOfCardsInHand) && (cardsInStack.size() > 0);
+    cout << "HandSize = " << cardsInHand.size() << endl;
+    return (cardsInHand.size() < maxNumberOfCardsInHand && cardsInStack.size() > 0);
 }
 
 void CardsManager::setStatus(CardsManagerStatus _status)
@@ -267,7 +269,7 @@ void CardsManager::setStatus(CardsManagerStatus _status)
     status = _status;
 }
 
-void CardsManager::setUnitBuffer(Unit* unit)
+void CardsManager::setUnitBuffer(Unit *unit)
 {
     unitBuffer = unit;
 }
