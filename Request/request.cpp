@@ -22,7 +22,7 @@ void HPFromDead(Position *position, Pole &pole_) {
     heroes.resize(0);
     heroes.push_back(&(position->GetHero()));
     for (int i = 0; i < pole_.GetVector().size(); i++) {
-        if (pole_.GetVector()[i]->GetHero().IsDead()) {
+        if ((pole_.GetVector()[i]->GetHero().IsDead()) && !(pole_.GetVector()[i]->isEmpty())) {
             heroes.push_back(&(position->GetHero()));
             break;
         }
@@ -166,7 +166,7 @@ void Resurrect(Position *position, Pole &pole_, int friendlyside) {
     HeroesDead.resize(0);
     int count = 0;
     for (int i = 0; i < pole_.GetVector().size(); i++) {
-        if ((pole_.GetVector()[i]->GetHero().IsDead()) && (!pole_.GetVector()[i]->isEmpty())) {
+        if ((pole_.GetVector()[i]->GetHero().IsDead()) && !(pole_.GetVector()[i]->isEmpty())) {
             HeroesDead.push_back(true);
             count++;
         } else {
