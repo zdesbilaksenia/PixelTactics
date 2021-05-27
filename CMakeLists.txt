@@ -62,7 +62,7 @@ find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
 message(${GTEST_LIBRARIES})
 
-add_executable(tests Tests/MyTests.cpp Tests/main.cpp)
+add_executable(tests  Tests/Perehvat.cpp Tests/MyTests.cpp Tests/main.cpp)
 
 target_link_libraries(tests ${GTEST_LIBRARIES} -lpthread)
 target_link_libraries(tests game_libs)
