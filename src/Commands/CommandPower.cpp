@@ -21,9 +21,8 @@ void CommandPower::execute()
     }
     else
     {
-        BOOST_LOG_TRIVIAL(info) << "CommandPower::execute(): Attacking!";
-        //Сделать statusWaitingForPower (чтобы другими цветами рисовать)
-        opponentTilesManager.setStatus(TilesManagerStatus::statusWaitingForAttack);
+        BOOST_LOG_TRIVIAL(info) << "CommandPower::execute(): Using power!";
+        cout << "X = " << playerTilesManager.getTileBuffer()->getCoordX() << " Y = " << playerTilesManager.getTileBuffer()->getCoordY() << endl;
 
         client.sendPowerUserPos(playerTilesManager.getTileBuffer()->getCoordX(), playerTilesManager.getTileBuffer()->getCoordY());
 
@@ -31,13 +30,19 @@ void CommandPower::execute()
         auto msg = client.incoming().popFront().msg;
         switch (msg.header.id)
         {
-        case GameMsgTypes::GameHeroesStats:
+        case GameMsgTypes::GameReject:
         {
-
+            BOOST_LOG_TRIVIAL(info) << "CommandPower::execute(): Can't use power!";
+            return;
+        }
+        case GameMsgTypes::GameBeforeHeroesStats:
+        {
+            opponentTilesManager.setStatus(TilesManagerStatus::statusWhenThePowerWhichChangesStatsImmidiatelyWasActivated);
             break;
         }
         case GameMsgTypes::GamePowerAnswer:
         {
+            opponentTilesManager.setStatus(TilesManagerStatus::statusWaitingForAttack);
             opponentTilesManager.setTileBuffer(playerTilesManager.getTileBuffer());
             vector<bool> activeTiles;
             BOOST_LOG_TRIVIAL(info) << "CommandAttack::execute(): Trying to load active tiles!";
@@ -50,10 +55,28 @@ void CommandPower::execute()
             }
             cout << endl;
 
-            opponentTilesManager.setActiveTiles(activeTiles);
+            vector<bool> playerActiveTiles;
+            vector<bool> opponentActiveTiles;
+
+            bool side = client.getSide();
+            for (int i = 0 + 9 * side; i < 9 + 9 * side; ++i)
+            {
+                playerActiveTiles.push_back(activeTiles[i]);
+            }
+            for (int i = 0 + 9 * (1 - side); i < 9 + 9 * (1 - side); ++i)
+            {
+                opponentActiveTiles.push_back(activeTiles[i]);
+            }
+
+            opponentTilesManager.setActiveTiles(opponentActiveTiles);
+            playerTilesManager.setActiveTiles(playerActiveTiles);
+            opponentTilesManager.setStatus(TilesManagerStatus::statusWaitingForPower);
 
             break;
         }
+        default:
+            cout << "Other type" << endl;
+            break;
         }
 
         //Здесь это, вроде не нужно, нужно менять потом.

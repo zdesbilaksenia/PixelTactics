@@ -48,7 +48,7 @@ private:
     int coordX;
     int coordY;
 
-    Unit* unit;
+    Unit *unit;
     //Unit *unit;
     TileStatus status;
     const Color colorForAttack = Color(255, 111, 0);
@@ -80,7 +80,9 @@ enum class TilesManagerStatus
     //Когда атакуем тайлы противника
     statusWaitingForAttack,
     //Когда используем силу на тайлы противника
-    statusWaitngForPower,
+    statusWaitingForPower,
+    //Когда была использована способность, которая сразу меняет статы
+    statusWhenThePowerWhichChangesStatsImmidiatelyWasActivated
 };
 
 enum class Side
@@ -178,7 +180,7 @@ private:
     void setNormalColors();
 
     //Какую карту мы хотим вывести в игру
-    Unit* unitBuffer;
+    Unit *unitBuffer;
 
     //Какой тайл будет атаковать/использовать способность
     Tile *tileBuffer;

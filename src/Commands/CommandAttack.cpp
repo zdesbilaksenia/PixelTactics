@@ -22,9 +22,6 @@ void CommandAttack::execute()
         else
         {
                 BOOST_LOG_TRIVIAL(info) << "CommandAttack::execute(): Attacking!";
-                //Сама обработка запроса будет происходить уже в buttonIsPressed в объекте opponentTilesManager.
-                opponentTilesManager.setTileBuffer(playerTilesManager.getTileBuffer());
-                opponentTilesManager.setStatus(TilesManagerStatus::statusWaitingForAttack);
 
                 //opponentTilesManager.updateFocus();
 
@@ -36,14 +33,25 @@ void CommandAttack::execute()
                 client.incoming().wait();
                 auto msg = client.incoming().popFront().msg;
                 vector<bool> activeTiles;
-                if (msg.header.id == GameMsgTypes::GameCanBeAttacked)
+                switch (msg.header.id)
+                {
+                case GameMsgTypes::GameCanBeAttacked:
                 {
                         BOOST_LOG_TRIVIAL(info) << "CommandAttack::execute(): Trying to load active tiles!";
                         msg >> activeTiles;
                         BOOST_LOG_TRIVIAL(info) << "CommandAttack::execute(): active tiles loaded!";
+                        opponentTilesManager.setActiveTiles(activeTiles);
+                        //Сама обработка запроса будет происходить уже в buttonIsPressed в объекте opponentTilesManager.
+                        opponentTilesManager.setTileBuffer(playerTilesManager.getTileBuffer());
+                        opponentTilesManager.setStatus(TilesManagerStatus::statusWaitingForAttack);
+                        break;
                 }
-
-                opponentTilesManager.setActiveTiles(activeTiles);
+                case GameMsgTypes::GameReject:
+                {
+                        BOOST_LOG_TRIVIAL(info) << "CommandAttack::execute(): Can't attack!";
+                        return;
+                }
+                }
 
                 opponentTilesManager.updateFocus();
 

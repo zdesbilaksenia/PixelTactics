@@ -21,7 +21,7 @@ using namespace sf;
 #include <mutex>
 
 auto loadPlayerHeroesStats{
-    [](vector<Unit> &_units, vector<Breed> &_breeds, TilesManager &_tilesManager, const int &_side) {
+    [](vector<Unit> &_units, vector<Breed> &_breeds, TilesManager &_tilesManager, const bool &_side) {
         for (int i = 0 + 9 * _side; i < 9 + 9 * _side; ++i)
         {
             int x = (i - 9 * (1 - _side)) / 3;
@@ -37,7 +37,7 @@ auto loadPlayerHeroesStats{
     }};
 
 auto loadOpponentHeroesStats{
-    [](vector<Unit> &_units, vector<Breed> &_breeds, TilesManager &_tilesManager, const int &_side) {
+    [](vector<Unit> &_units, vector<Breed> &_breeds, TilesManager &_tilesManager, const bool &_side) {
         for (int i = 0 + 9 * (1 - _side); i < 9 + 9 * (1 - _side); ++i)
         {
             int x = (i - 9 * (1 - _side)) / 3;
@@ -79,6 +79,17 @@ public:
     ~GameManager();
 
 private:
+    void loadBreeds(Message<GameMsgTypes> &msg)
+    {
+        vector<Breed> breeds;
+        BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Trying to load breed!";
+        msg >> breeds;
+        BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : breed loaded!";
+
+        loadPlayerHeroesStats(playerUnits, breeds, playerTilesManager, side);
+        loadOpponentHeroesStats(opponentUnits, breeds, opponentTilesManager, side);
+    }
+
     //Текстуры для отрисовки противника
     const vector<Texture> &unitTextures;
     //Юниты противника
@@ -224,26 +235,15 @@ private:
                     BOOST_LOG_TRIVIAL(info) << "GameManager::ForGamesStart() : Got message from opponent!";
 
                     auto msg = client.incoming().popFront().msg;
-                    vector<Breed> breed;
+                    vector<Breed> breeds;
                     if (msg.header.id == GameMsgTypes::GameHeroesStats)
                     {
                         BOOST_LOG_TRIVIAL(info) << "GameManager::ForGamesStart() : Trying to load breed!";
-                        msg >> breed;
+                        msg >> breeds;
                         BOOST_LOG_TRIVIAL(info) << "GameManager::ForGamesStart() : breed loaded!";
                     }
 
-                    //1-му игроку - от 9 до 18, второму - наоборот
-                    for (int i = 0 + 9 * (1 - side); i < 9 + 9 * (1 - side); ++i)
-                    {
-                        int x = (i - 9 * (1 - side)) / 3;
-                        int y = i % 3;
-                        if (breed[i].cardID != -1)
-                        {
-                            opponentUnits[breed[i].cardID].setTextAttack(breed[i].strength);
-                            opponentUnits[breed[i].cardID].setTextHP(breed[i].HP);
-                            opponentTilesManager.setUnit(opponentUnits[breed[i].cardID], x, y);
-                        }
-                    }
+                    loadOpponentHeroesStats(opponentUnits, breeds, opponentTilesManager, side);
 
                     opponentTilesManager.updateFocus();
                     playerTilesManager.updateFocus();
@@ -298,11 +298,11 @@ private:
                 BOOST_LOG_TRIVIAL(info) << client.getSide() << " GameManager::opponentsTurn() : Got message from opponent!";
 
                 auto msg = client.incoming().popFront().msg;
-                vector<Breed> breeds;
                 switch (msg.header.id)
                 {
                 case GameMsgTypes::GameHeroesStats:
                 {
+                    vector<Breed> breeds;
                     BOOST_LOG_TRIVIAL(info) << "GameManager::opponentsTurn() : Trying to load breed!";
                     msg >> breeds;
                     BOOST_LOG_TRIVIAL(info) << "GameManager::opponentsTurn() : breed loaded!";
@@ -310,8 +310,8 @@ private:
                     loadPlayerHeroesStats(playerUnits, breeds, playerTilesManager, side);
                     loadOpponentHeroesStats(opponentUnits, breeds, opponentTilesManager, side);
 
-                    opponentTilesManager.updateFocus();
                     playerTilesManager.updateFocus();
+                    opponentTilesManager.updateFocus();
                     buttonsManager.updateFocus();
 
                     break;
@@ -320,6 +320,25 @@ private:
                 case GameMsgTypes::GameTakeCard:
                 {
                     BOOST_LOG_TRIVIAL(info) << "GameManager::opponentsTurn() : Opponent took card!";
+                    break;
+                }
+                case GameMsgTypes::GameCardReleased:
+                {
+                    int posY;
+                    msg >> posY;
+                    int posX;
+                    msg >> posX;
+                    int attack;
+                    msg >> attack;
+                    int HP;
+                    msg >> HP;
+                    int ID;
+                    msg >> ID;
+                    cout << "ID = " << ID << " posX = " << posX << " posY = " << posY << endl;
+                    opponentUnits[ID].setTextAttack(attack);
+                    opponentUnits[ID].setTextHP(HP);
+                    opponentTilesManager.setUnit(opponentUnits[ID], posX, posY);
+                    opponentTilesManager.updateFocus();
                     break;
                 }
                 default:
@@ -422,18 +441,8 @@ private:
                             msg >> breeds;
                             BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : breed loaded!";
 
-                            //1-му игроку - от 9 до 18, второму - наоборот
-                            for (int i = 0 + 9 * (1 - side); i < 9 + 9 * (1 - side); ++i)
-                            {
-                                int x = (i - 9 * (1 - side)) / 3;
-                                int y = i % 3;
-                                if (breeds[i].cardID != -1)
-                                {
-                                    opponentUnits[breeds[i].cardID].setTextAttack(breeds[i].strength);
-                                    opponentUnits[breeds[i].cardID].setTextHP(breeds[i].HP);
-                                    opponentTilesManager.setUnit(opponentUnits[breeds[i].cardID], x, y);
-                                }
-                            }
+                            loadPlayerHeroesStats(playerUnits, breeds, playerTilesManager, side);
+                            loadOpponentHeroesStats(opponentUnits, breeds, opponentTilesManager, side);
 
                             break;
                         }

@@ -67,14 +67,13 @@ public:
     void updateHand();
     void setCardShirtTexture(Texture *_texture);
     void setStatus(CardsManagerStatus _status);
-    void setUnitBuffer(Unit &_unit);
+    void setUnitBuffer(Unit* unit);
     bool canTakeCard();
 
     ~CardsManager();
 
 private:
-    //Unit *unitBuffer;
-    unique_ptr<Unit> unitBuffer;
+    Unit *unitBuffer;
     RenderWindow &window;
     CardsManagerStatus status;
     //Заменить на умные указатели!

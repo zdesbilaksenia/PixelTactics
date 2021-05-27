@@ -61,6 +61,13 @@ void GameTcpClient::sendAttackedPos(const int posX, const int posY) const
     send(msg);
 }
 
+void GameTcpClient::sendPowerTargetPos(const int posX, const int posY) const
+{
+    Message<GameMsgTypes> msg(GameMsgTypes::GamePowerRequest);
+    msg << posY << posX;
+    send(msg);
+}
+
 void GameTcpClient::sendTakeCard()
 {
     Message<GameMsgTypes> msg(GameMsgTypes::GameTakeCard);

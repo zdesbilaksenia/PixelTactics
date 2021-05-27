@@ -266,9 +266,9 @@ void CardsManager::setStatus(CardsManagerStatus _status)
     status = _status;
 }
 
-void CardsManager::setUnitBuffer(Unit &_unit)
+void CardsManager::setUnitBuffer(Unit* unit)
 {
-    unitBuffer = make_unique<Unit>(_unit);
+    unitBuffer = unit;
 }
 
 CardsManager::~CardsManager() {}

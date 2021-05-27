@@ -18,7 +18,7 @@ void Tile::setUnit(Unit &_unit)
     this->unit = &_unit;
     this->status = TileStatus::statusHasUnit;
     unit->setPosition(this->rect.getPosition().x, this->rect.getPosition().y);
-    BOOST_LOG_TRIVIAL(info) << "Tiles::setUnit() : Unit = " << unit;
+    BOOST_LOG_TRIVIAL(info) << "Tiles::setUnit() : Unit = " << unit->getId();
 }
 
 void Tile::setStatus(TileStatus _status)
@@ -316,7 +316,7 @@ bool TilesManager::mouseIsPressed()
 
                 BOOST_LOG_TRIVIAL(info) << "TilesManager::mouseIsPressed()::ReleasingCard ID = " << unitBuffer->getId();
                 client.sendCardReleased(unitBuffer->getId(), tile->getCoordX(), tile->getCoordY());
-                
+
                 unitBuffer = nullptr;
                 return true;
             }
@@ -353,6 +353,30 @@ bool TilesManager::mouseIsPressed()
             break;
         }
     }
+
+    case TilesManagerStatus::statusWaitingForPower:
+        for (auto tile : tiles)
+        {
+            if (tile->hasFocus() && tile->getStatus() == TileStatus::statusHasUnit)
+            {
+                BOOST_LOG_TRIVIAL(info) << "TilesManager::mouseIsPressed(): Used power on tile, sending coordinates!";
+                BOOST_LOG_TRIVIAL(info) << "TilesManager::mouseIsPressed(): Power user: " << this->tileBuffer->getCoordX() << " " << this->tileBuffer->getCoordY();
+                BOOST_LOG_TRIVIAL(info) << "TilesManager::mouseIsPressed(): Power target: " << tile->getCoordX() << " " << tile->getCoordY();
+
+                client.sendPowerTargetPos(tile->getCoordX(), tile->getCoordY());
+
+                isPressed = true;
+                return true;
+            }
+        }
+        break;
+
+    case TilesManagerStatus::statusWhenThePowerWhichChangesStatsImmidiatelyWasActivated:
+    {
+        return true;
+        break;
+    }
+
     default:
         //return false;
         break;
@@ -432,6 +456,16 @@ void TilesManager::updateFocus()
     }
 
     case TilesManagerStatus::statusWaitingForAttack:
+    {
+        updateFocusOnLine(tilesAvangard, activeTiles, colorInFocus, colorBasic, colorDisabled, 0);
+        updateFocusOnLine(tilesFlank, activeTiles, colorInFocus, colorBasic, colorDisabled, 1);
+        updateFocusOnLine(tilesRear, activeTiles, colorInFocus, colorBasic, colorDisabled, 2);
+
+        break;
+    }
+
+    //Поменять цвета
+    case TilesManagerStatus::statusWaitingForPower:
     {
         updateFocusOnLine(tilesAvangard, activeTiles, colorInFocus, colorBasic, colorDisabled, 0);
         updateFocusOnLine(tilesFlank, activeTiles, colorInFocus, colorBasic, colorDisabled, 1);
