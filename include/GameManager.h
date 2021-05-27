@@ -119,11 +119,11 @@ private:
     Background &background;
     //Нужно сделать класс "Label", который будет рисовать текст
 
-    unique_ptr<Button> btnAttack;
-    unique_ptr<Button> btnPower;
-    unique_ptr<Button> btnCancel;
-    unique_ptr<Button> btnTakeCard;
-    unique_ptr<Button> btnRemoveBody;
+    Button *btnAttack;
+    Button *btnPower;
+    Button *btnCancel;
+    Button *btnTakeCard;
+    Button *btnRemoveBody;
 
     enum class GameStage
     {
@@ -380,17 +380,18 @@ private:
     {
         int movesAmount = 0;
 
+        //Если не можем взять карту.
+        if (cardsManager.canTakeCard() == false)
+        {
+            btnTakeCard->disable();
+        }
+        if (playerTilesManager.hasBodies() == false)
+        {
+            btnRemoveBody->disable();
+        }
+
         while (window.isOpen())
         {
-            //Если не можем взять карту.
-            if (cardsManager.canTakeCard() == false)
-            {
-                btnTakeCard->disable();
-            }
-            if (playerTilesManager.hasBodies() == false)
-            {
-                btnRemoveBody->disable();
-            }
 
             while (window.pollEvent(event))
             {
@@ -425,6 +426,26 @@ private:
                         //Это должно быть в этой строчке, поскольку функция отлавливает факт того, что карта была выложена на стол.
                         cardsManager.mouseIsPressed();
                         //Чтобы отрисовывались только те тайлы, которыми мы можем управлять.
+                        playerTilesManager.setStatus(TilesManagerStatus::statusAttackingUnit);
+                        playerTilesManager.updateFocus();
+
+                        if (cardsManager.canTakeCard())
+                        {
+                            btnTakeCard->enable();
+                        }
+                    }
+
+                    if (playerTilesManager.powerWasUsed())
+                    {
+                        BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Power was used!";
+                        movesAmount++;
+                        BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Moves count = " << movesAmount;
+                        client.incoming().wait();
+                        auto msg = client.incoming().popFront().msg;
+                        if (msg.header.id == GameMsgTypes::GameHeroesStats)
+                        {
+                            loadBreeds(msg);
+                        }
                         playerTilesManager.setStatus(TilesManagerStatus::statusAttackingUnit);
                         playerTilesManager.updateFocus();
                     }

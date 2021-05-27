@@ -26,7 +26,9 @@ void CommandPower::execute()
 
         client.sendPowerUserPos(playerTilesManager.getTileBuffer()->getCoordX(), playerTilesManager.getTileBuffer()->getCoordY());
 
+        cout << "HERE" << endl;
         client.incoming().wait();
+        cout << "HERE" << endl;
         auto msg = client.incoming().popFront().msg;
         switch (msg.header.id)
         {
@@ -49,12 +51,6 @@ void CommandPower::execute()
             msg >> activeTiles;
             BOOST_LOG_TRIVIAL(info) << "CommandAttack::execute(): active tiles loaded!";
 
-            for (int i = 0; i < 9; ++i)
-            {
-                cout << activeTiles[i] << " ";
-            }
-            cout << endl;
-
             vector<bool> playerActiveTiles;
             vector<bool> opponentActiveTiles;
 
@@ -68,8 +64,12 @@ void CommandPower::execute()
                 opponentActiveTiles.push_back(activeTiles[i]);
             }
 
+            
+
             opponentTilesManager.setActiveTiles(opponentActiveTiles);
             playerTilesManager.setActiveTiles(playerActiveTiles);
+
+            playerTilesManager.setStatus(TilesManagerStatus::statusWaitingForPower);
             opponentTilesManager.setStatus(TilesManagerStatus::statusWaitingForPower);
 
             break;

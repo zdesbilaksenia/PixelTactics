@@ -203,6 +203,18 @@ void TilesManager::resetActiveTiles()
     }
 }
 
+bool TilesManager::hasBodies()
+{
+    for (auto tile : tiles)
+    {
+        if (tile->getStatus() == TileStatus::statusHasDeadBody)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 void TilesManager::setUnitBuffer(Unit &_unit)
 {
     this->unitBuffer = &_unit;
@@ -355,21 +367,24 @@ bool TilesManager::mouseIsPressed()
     }
 
     case TilesManagerStatus::statusWaitingForPower:
+    {
         for (auto tile : tiles)
         {
-            if (tile->hasFocus() && tile->getStatus() == TileStatus::statusHasUnit)
+            if (tile->hasFocus() && activeTiles[tile->getCoordX()][tile->getCoordY()] == true)
             {
                 BOOST_LOG_TRIVIAL(info) << "TilesManager::mouseIsPressed(): Used power on tile, sending coordinates!";
-                BOOST_LOG_TRIVIAL(info) << "TilesManager::mouseIsPressed(): Power user: " << this->tileBuffer->getCoordX() << " " << this->tileBuffer->getCoordY();
                 BOOST_LOG_TRIVIAL(info) << "TilesManager::mouseIsPressed(): Power target: " << tile->getCoordX() << " " << tile->getCoordY();
 
                 client.sendPowerTargetPos(tile->getCoordX(), tile->getCoordY());
 
+                this->setStatus(TilesManagerStatus::statusPowerWasUsed);
+
                 isPressed = true;
-                return true;
+                return false;
             }
         }
         break;
+    }
 
     case TilesManagerStatus::statusWhenThePowerWhichChangesStatsImmidiatelyWasActivated:
     {

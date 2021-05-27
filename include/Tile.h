@@ -23,11 +23,9 @@ enum class TileStatus
 };
 
 class Tile : public Clickable
-//class Tile : public DrawableBox
 {
 public:
     Tile(RenderWindow &_window, Mouse &_mouse);
-    //Tile(RenderWindow& _window);
     void setUnit(Unit &_unit);
     void setStatus(TileStatus _status);
     void draw() override;
@@ -47,14 +45,10 @@ public:
     ~Tile();
 
 private:
-    //Button *buttonAttack;
-    //Button *buttonPower;
-
     int coordX;
     int coordY;
 
     Unit *unit;
-    //Unit *unit;
     TileStatus status;
     const Color colorForAttack = Color(255, 111, 0);
 
@@ -91,7 +85,9 @@ enum class TilesManagerStatus
     //Когда ждём, что уберут тело
     statusWaitingForRemovingBody,
     //Когда тело убрали
-    statusBodyRemoved
+    statusBodyRemoved,
+    //Когда была использована магия
+    statusPowerWasUsed
 };
 
 enum class Side
@@ -133,6 +129,15 @@ public:
     bool removedBody()
     {
         if (status == TilesManagerStatus::statusBodyRemoved)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    bool powerWasUsed()
+    {
+        if (status == TilesManagerStatus::statusPowerWasUsed)
         {
             return true;
         }
@@ -206,17 +211,7 @@ public:
         }
     }
 
-    bool hasBodies()
-    {
-        for (auto tile : tiles)
-        {
-            if (tile->getStatus() == TileStatus::statusHasDeadBody)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
+    bool hasBodies();
 
     ~TilesManager();
 

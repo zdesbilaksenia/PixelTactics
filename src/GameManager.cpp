@@ -33,27 +33,27 @@ GameManager::GameManager(RenderWindow &_window,
 
 void GameManager::setAttackButton(Button &_btnAttack)
 {
-    btnAttack = make_unique<Button>(_btnAttack);
+    btnAttack = &_btnAttack;
 }
 
 void GameManager::setPowerButton(Button &_btnPower)
 {
-    btnPower = make_unique<Button>(_btnPower);
+    btnPower = &_btnPower;
 }
 
 void GameManager::setCancelButton(Button &_btnCancel)
 {
-    btnCancel = make_unique<Button>(_btnCancel);
+    btnCancel = &_btnCancel;
 }
 
 void GameManager::setTakeCardButton(Button &_btnTakeCard)
 {
-    btnTakeCard = make_unique<Button>(_btnTakeCard);
+    btnTakeCard = &_btnTakeCard;
 }
 
 void GameManager::setRemoveBodyButton(Button &_btnRemoveBody)
 {
-    btnRemoveBody = make_unique<Button>(_btnRemoveBody);
+    btnRemoveBody = &_btnRemoveBody;
 }
 
 void GameManager::draw()
@@ -161,8 +161,10 @@ void GameManager::playersTurn()
 
 GameManager::~GameManager()
 {
-    //if (graphicsThr.joinable())
-    {
-        // graphicsThr.join();
-    }
+
+    btnAttack = nullptr;
+    btnPower = nullptr;
+    btnCancel = nullptr;
+    btnTakeCard = nullptr;
+    btnRemoveBody = nullptr;
 }

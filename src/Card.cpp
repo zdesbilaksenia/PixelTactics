@@ -176,6 +176,7 @@ bool CardsManager::mouseIsPressed()
                 return true;
             }
         }
+        return false;
         break;
     }
 

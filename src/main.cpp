@@ -35,7 +35,7 @@ int main()
 
     GameTcpClient client;
 
-    if (!connectToServer(client, "10.147.17.71"))
+    if (!connectToServer(client, "10.147.17.200"))
     {
         BOOST_LOG_TRIVIAL(fatal) << "main() : error!";
         return 0;
