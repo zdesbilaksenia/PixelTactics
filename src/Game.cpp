@@ -276,6 +276,7 @@ void Game::StartGame() {
                         break;
                 }
                 MovesAmount--;
+
                 break;
             }
             case (GameMsgTypes::GameRemoveBodyRequest): {
