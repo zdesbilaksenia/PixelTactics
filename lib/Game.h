@@ -44,7 +44,7 @@ public:
 
     bool WaitForMessage();
 
-    void RecieveTarget(int &line, int &cell);
+    void ReceiveTarget(int &line, int &cell);
 
     void ReleasePower(int type, Position *position, int side);
 
@@ -54,6 +54,7 @@ private:
     int currentSide;
     MySQL sql;
     Deck allCards;
+    int winner = -1;
     PowerMapper mapper;
     Pole pole;
     Lobby *lobby;

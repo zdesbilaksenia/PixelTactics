@@ -36,6 +36,7 @@ bool GameTcpServer::onClientConnect(boost::shared_ptr<TcpConnection<GameMsgTypes
 void GameTcpServer::onClientDisconnect(boost::shared_ptr<TcpConnection<GameMsgTypes>> client) {
     auto it = players.find(client);
     if (it != players.end()) {
+        std::cout << "removinf player: " << client->getID() << std::endl;
         Message<GameMsgTypes> msg(GameMsgTypes::LobbyLeave);
         messageToLobby(msg, client);
         players.erase(it);
@@ -47,6 +48,9 @@ void GameTcpServer::onMessage(boost::shared_ptr<TcpConnection<GameMsgTypes>> cli
         case GameMsgTypes::ConnectToLobby: {
             removeDisconnectedClients();
             if (lobbies.size() == 0 || lobbies[lobbyIDs].isFull()) {
+                if (lobbies.size() == 0) {
+                    std::cout << "No lobbies FOR NOW!!\n";
+                }
                 if (lobbies.size() == maxLobbiesNum) {
                     Message<GameMsgTypes> outMsg(GameMsgTypes::ErrorMessage);
                     std::string err = "All lobbies are busy.\n";
@@ -63,31 +67,11 @@ void GameTcpServer::onMessage(boost::shared_ptr<TcpConnection<GameMsgTypes>> cli
             lobbies[lobbyIDs].addPlayer(std::move(client));
             break;
         }
-        case GameMsgTypes::ServerPing: {
-            std::cout << "[" << client->getID() << "]: Server Ping\n";
-            client->send(msg);
-            break;
-        }
-        case GameMsgTypes::MessageAll: {
-            std::cout << "[" << client->getID() << "]: Message All\n";
-            Message<GameMsgTypes> msgOut;
-            msgOut.header.id = GameMsgTypes::ServerMessage;
-            msgOut << client->getID();
-            messageAllClients(msgOut, client);
-            break;
-        }
         case GameMsgTypes::LobbyFull: {
             uint16_t lobbyID = 0;
             std::cout << "Trying to take lobbyID\n";
             msg >> lobbyID;
             std::cout << "[Lobby#" << lobbyID << "]: Lobby Full\n";
-            break;
-        }
-        case GameMsgTypes::LobbyKill: {
-            uint16_t lobbyID = 0;
-            msg >> lobbyID;
-            std::cout << "[Lobby#" << lobbyID << "]: Lobby destructed\n";
-            lobbies.erase(lobbyID);
             break;
         }
         case GameMsgTypes::LobbyLeave: {
@@ -99,8 +83,7 @@ void GameTcpServer::onMessage(boost::shared_ptr<TcpConnection<GameMsgTypes>> cli
             uint16_t lobbyID = 0;
             msg >> lobbyID;
             std::cout << "[Lobby#" << lobbyID << "]: Game Over\n";
-            std::cout << "[Lobby#" << lobbyID << "]: Lobby destructed\n";
-            lobbies.erase(lobbyID);
+            killLobby(lobbyID);
             break;
         }
         default: {
@@ -111,4 +94,16 @@ void GameTcpServer::onMessage(boost::shared_ptr<TcpConnection<GameMsgTypes>> cli
 
 void GameTcpServer::messageToLobby(Message<GameMsgTypes> msg, boost::shared_ptr<TcpConnection<GameMsgTypes>> client) {
     lobbies[players[client]].addMessage({client, msg});
+}
+
+// Have to make this method, because if I add MsgType and send msg,
+// lobby won't destruct immediately
+void GameTcpServer::killLobby(uint16_t lobbyID) {
+    std::cout << "Tryin to erase lobby w/ id=" << lobbyID << "\n";
+    auto it = lobbies.find(lobbyID);
+    if (it != lobbies.end()) {
+        std::cout << "found lobby to erase\n";
+        lobbies.erase(lobbyID);
+    }
+    std::cout << "[Lobby#" << lobbyID << "]: Lobby destructed\n";
 }

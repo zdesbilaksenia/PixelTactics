@@ -2,7 +2,7 @@
 
 bool for_each(vector<Hero *> heroes, bool statement(Hero *hero)) {
     for (auto &hero : heroes) {
-        if (statement(hero))
+        if (!statement(hero))
             return false;
     }
     return true;
@@ -142,7 +142,7 @@ void ResurrectAndGetDamage(vector<Hero *> &heroes) {
 
 void HitAvangard(vector<Hero *> &heroes) {
     if (heroes.size() <= 4) {
-        for_each(heroes,
+        for_each(heroes.begin(), heroes.end(),
                  [](Hero *hero) { hero->ReduceHealth(4); });
     }
 }
@@ -225,7 +225,7 @@ void MakeDistantAttack(vector<Hero *> &heroes) {
 }
 
 void FrontAndBackGetDamage(vector<Hero *> &heroes) {
-    if (heroes.size() <= 3 && for_each(heroes.begin(), heroes.end(),
+    if (heroes.size() <= 3 && for_each(heroes,
                                        [](Hero *hero) -> bool { return !hero->IsDead(); })) {
         heroes[0]->SetCurStrength(heroes[0]->GetCurStrength() + 1);
         for_each(heroes.begin() + 1, heroes.end(),
@@ -262,7 +262,7 @@ void LeaderMakeDistantAttack(vector<Hero *> &heroes) {
 
 void ForbidDistantAttackForThreeHeroes(vector<Hero *> &heroes) {
     if (heroes.size() == 4 && heroes[0]->IsLeader() && heroes[0]->CanUseLeaderPower() &&
-        for_each(heroes.begin(), heroes.end(),
+        for_each(heroes,
                  [](Hero *hero) -> bool { return !hero->IsDead(); })) {
         for_each(heroes.begin(), heroes.end(),
                  [](Hero *hero) -> bool { hero->ForbidDistantAttack(); });
