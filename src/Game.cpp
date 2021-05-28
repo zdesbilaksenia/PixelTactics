@@ -34,7 +34,9 @@ void Game::StartGame() {
 
     MySQL sql;
     Deck allCards;
+    //Deck CheatDeck;
     allCards = sql.GetCards();
+    //CheatDeck.push_back(allCards.GetVector()[10]);
     Deck FirstPlayerDeck(allCards.GetVector());
     Deck SecondPlayerDeck(allCards.GetVector());
     Player *FirstPlayer = new Player(FirstPlayerDeck, 0);
@@ -252,6 +254,7 @@ void Game::StartGame() {
                 std::cout << " СПОСОБНОСТЬ " << std::endl;
 
                 msg >> line >> cell;
+                std::cout <<"x,y " << line << cell << std::endl;
                 Position *Hero = pole.GetPosition(cell, line, currentside);
                 switch (Phase) {
                     case (0): {
@@ -270,7 +273,7 @@ void Game::StartGame() {
                         cout << "\nИмя: " << Hero->GetHero().GetName() << "\nСпособность тыла: "
                              << allCards.GetVector()[Hero->GetHero().GetTexture() - 1].backLinePower << "\n";
                         BackRequest(Hero);
-                        break;;
+                        break;
                     }
                     default:
                         break;
@@ -474,7 +477,13 @@ void Game::FrontRequest(Position *friendPosition) {
             ReleasePower(0, friendPosition, currentside ? 0 : 1);
             break;
         }
-        case (6, 8, 3): {
+        case(6):{
+
+        }
+        case(8):{
+
+        }
+        case (3): {
             vector<bool> result = SendAllAliveFriends(friendPosition, pole, currentside);
             if (result.empty()) {
                 auto Attackmsg = Message<GameMsgTypes>(GameMsgTypes::GameReject);
@@ -512,7 +521,7 @@ void Game::FrontRequest(Position *friendPosition) {
             std::cout << std::endl;
 
             ReleasePower(0, friendPosition, currentside);
-            break;;
+            break;
         }
         case (1): {
             Interception(friendPosition, pole);
@@ -549,8 +558,12 @@ void Game::FrontRequest(Position *friendPosition) {
 }
 
 void Game::MiddleRequest(Position *friendPosition) {
+    std::cout << "MiddleReq" << friendPosition->GetHero().GetTexture() << std::endl;
     switch (friendPosition->GetHero().GetTexture()) {
-        case (2, 6): {
+        case(2):{
+
+        }
+        case (6): {
             vector<bool> result = SendAllDeadFriends(friendPosition, pole, currentside);
             if (result.empty()) {
                 auto Attackmsg = Message<GameMsgTypes>(GameMsgTypes::GameReject);
@@ -570,13 +583,22 @@ void Game::MiddleRequest(Position *friendPosition) {
             ReleasePower(1, friendPosition, currentside);
             break;
         }
-        case (1, 3, 8): {
+        case(1):{
+
+        }
+        case(3):{
+
+        }
+        case (8): {
+            std::cout<< "Зашёл в метод" << std::endl;
             vector<bool> result = SendAllAliveEnemies(friendPosition, pole, currentside);
             if (result.empty()) {
+                std::cout << "Пустой вектор" << std::endl;
                 auto Attackmsg = Message<GameMsgTypes>(GameMsgTypes::GameReject);
                 CallPechkin(currentside, Attackmsg);
                 break;
             }
+            std::cout << "Перед отправкой" << std::endl;
             Message<GameMsgTypes> aliveMsg(GameMsgTypes::GamePowerAnswer);
             aliveMsg << result;
             CallPechkin(currentside, aliveMsg);
@@ -587,10 +609,13 @@ void Game::MiddleRequest(Position *friendPosition) {
             }
             std::cout << std::endl;
 
-            ReleasePower(0, friendPosition, currentside ? 0 : 1);
+            ReleasePower(1, friendPosition, currentside ? 0 : 1);
             break;
         }
-        case (4, 11): {
+        case(4):{
+
+        }
+        case (11): {
             vector<bool> result = MakeDistantAttack(pole, currentside);
             if (result.empty()) {
                 auto Attackmsg = Message<GameMsgTypes>(GameMsgTypes::GameReject);
@@ -610,12 +635,6 @@ void Game::MiddleRequest(Position *friendPosition) {
             ReleasePower(1, friendPosition, currentside ? 0 : 1);
             break;
         }
-            /*case (1): {
-                PlusPowerInCloseAttack(friendPosition, pole, currentside);
-                SendBeforeHeroStats();
-                SendBreeds(pole, 3);
-                break;
-            }*/
         case (5): {
             HitAvangard(friendPosition, pole, currentside);
             SendBeforeHeroStats();
@@ -639,7 +658,10 @@ void Game::MiddleRequest(Position *friendPosition) {
 
 void Game::BackRequest(Position *friendPosition) {
     switch (friendPosition->GetHero().GetTexture()) {
-        case (3, 5): {
+        case(3):{
+
+        }
+        case (5): {
             vector<bool> result = SendAllAliveEnemies(friendPosition, pole, currentside);
             if (result.empty()) {
                 auto Attackmsg = Message<GameMsgTypes>(GameMsgTypes::GameReject);
@@ -659,7 +681,13 @@ void Game::BackRequest(Position *friendPosition) {
             ReleasePower(2, friendPosition, currentside ? 0 : 1);
             break;
         }
-        case (2, 9, 10): {
+        case(2):{
+
+        }
+        case(9):{
+
+        }
+        case (10): {
             vector<bool> result = MakeDistantAttack(pole, currentside);
             if (result.empty()) {
                 auto Attackmsg = Message<GameMsgTypes>(GameMsgTypes::GameReject);
@@ -679,7 +707,16 @@ void Game::BackRequest(Position *friendPosition) {
             ReleasePower(0, friendPosition, currentside ? 0 : 1);
             break;
         }
-        case (4, 6, 7, 11): {
+        case(4):{
+
+        }
+        case(6):{
+
+        }
+        case(7):{
+
+        }
+        case (11): {
             vector<bool> result = SendAllAliveFriends(friendPosition, pole, currentside);
             if (result.empty()) {
                 auto Attackmsg = Message<GameMsgTypes>(GameMsgTypes::GameReject);
@@ -720,12 +757,6 @@ void Game::BackRequest(Position *friendPosition) {
             ReleasePower(2, friendPosition, currentside ? 0 : 1);
             break;
         }
-            /*case (11): {
-                PlusPower(friendPosition, pole, currentside);
-                SendBeforeHeroStats();
-                SendBreeds(pole, 3);
-                break;
-            }*/
     }
 }
 
