@@ -51,7 +51,10 @@ public:
     void SendBeforeHeroStats();
 
 private:
-    int currentside;
+    int currentSide;
+    MySQL sql;
+    Deck allCards;
+    PowerMapper mapper;
     Pole pole;
     Lobby *lobby;
 };

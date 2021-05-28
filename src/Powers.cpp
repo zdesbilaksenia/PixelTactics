@@ -1,5 +1,13 @@
 #include "Powers.h"
 
+bool for_each(vector<Hero *> heroes, bool statement(Hero *hero)) {
+    for (auto &hero : heroes) {
+        if (statement(hero))
+            return false;
+    }
+    return true;
+}
+
 void PlusPower(vector<Hero *> &heroes) {
     if (heroes.size() == 2) {
         if (!heroes[1]->IsDead()) {
@@ -24,20 +32,19 @@ void Castling(vector<Hero *> &heroes) {
             temp.middleLinePower = heroes[0]->middleLinePower;
             temp.backLinePower = heroes[0]->backLinePower;
             *heroes[0] = *heroes[1];
-            heroes[0]->frontLinePower=heroes[1]->frontLinePower;
-            heroes[0]->middleLinePower=heroes[1]->middleLinePower;
-            heroes[0]->backLinePower=heroes[1]->backLinePower;
+            heroes[0]->frontLinePower = heroes[1]->frontLinePower;
+            heroes[0]->middleLinePower = heroes[1]->middleLinePower;
+            heroes[0]->backLinePower = heroes[1]->backLinePower;
             *heroes[1] = temp;
-            heroes[1]->frontLinePower=temp.frontLinePower;
-            heroes[1]->middleLinePower=temp.middleLinePower;
-            heroes[1]->backLinePower=temp.backLinePower;
+            heroes[1]->frontLinePower = temp.frontLinePower;
+            heroes[1]->middleLinePower = temp.middleLinePower;
+            heroes[1]->backLinePower = temp.backLinePower;
         }
     }
 }
 
 void HitFrontRowHeroes(vector<Hero *> &heroes) {
-    if (heroes.size() == 4 &&
-        for_each(heroes.begin() + 1, heroes.end(), [](Hero *hero) -> bool { return !hero->IsDead(); })) {
+    if (heroes.size() == 4 && for_each(heroes, [](Hero *hero) -> bool { return !hero->IsDead(); })) {
         for_each(heroes.begin() + 1, heroes.end(), [](Hero *hero) {
             hero->ReduceHealth(3);
         });
@@ -46,7 +53,7 @@ void HitFrontRowHeroes(vector<Hero *> &heroes) {
 
 void TransferDamage(vector<Hero *> &heroes) {
     if (heroes.size() == 3 &&
-        for_each(heroes.begin() + 1, heroes.end(),
+        for_each(heroes,
                  [](Hero *hero) -> bool { return !hero->IsDead() && !hero->IsLeader(); })) {
         if (heroes[2]->IsDamaged()) {
             heroes[2]->SetCurHealth(heroes[2]->GetCurHealth() + 2);
@@ -74,7 +81,7 @@ void CopyPower(vector<Hero *> &heroes) {
 void Interception(vector<Hero *> &heroes) {
     if (heroes.size() == 2 && !heroes[1]->IsDead()) {
         heroes[1]->ForbidDistantAttack();
-        std::cout<<"Сработал перехват "<< heroes[1]->CanBeAttackedDistantly() << std::endl;
+        std::cout << "Сработал перехват " << heroes[1]->CanBeAttackedDistantly() << std::endl;
     }
 }
 
@@ -91,7 +98,7 @@ void PlusPowerInCloseAttack(vector<Hero *> &heroes) {
 }
 
 void PlusPowerByDead(vector<Hero *> &heroes) {
-    if (for_each(heroes.begin() + 1, heroes.end(),
+    if (for_each(heroes,
                  [](Hero *hero) -> bool { return hero->IsDead(); })) {
         if (!heroes[0]->IsDead())
             heroes[0]->SetCurHealth(heroes.size() - 1 + heroes[0]->GetCurHealth());
@@ -113,13 +120,13 @@ void CastlingWithDead(vector<Hero *> &heroes) {
             temp.middleLinePower = heroes[0]->middleLinePower;
             temp.backLinePower = heroes[0]->backLinePower;
             *heroes[0] = *heroes[1];
-            heroes[0]->frontLinePower=heroes[1]->frontLinePower;
-            heroes[0]->middleLinePower=heroes[1]->middleLinePower;
-            heroes[0]->backLinePower=heroes[1]->backLinePower;
+            heroes[0]->frontLinePower = heroes[1]->frontLinePower;
+            heroes[0]->middleLinePower = heroes[1]->middleLinePower;
+            heroes[0]->backLinePower = heroes[1]->backLinePower;
             *heroes[1] = temp;
-            heroes[1]->frontLinePower=temp.frontLinePower;
-            heroes[1]->middleLinePower=temp.middleLinePower;
-            heroes[1]->backLinePower=temp.backLinePower;
+            heroes[1]->frontLinePower = temp.frontLinePower;
+            heroes[1]->middleLinePower = temp.middleLinePower;
+            heroes[1]->backLinePower = temp.backLinePower;
         }
     }
 }
@@ -135,20 +142,20 @@ void ResurrectAndGetDamage(vector<Hero *> &heroes) {
 
 void HitAvangard(vector<Hero *> &heroes) {
     if (heroes.size() <= 4) {
-        for_each(heroes.begin() + 1, heroes.end(),
+        for_each(heroes,
                  [](Hero *hero) { hero->ReduceHealth(4); });
     }
 }
 
 void MakeAttack(vector<Hero *> &heroes) {
-    if (heroes.size() == 3 && for_each(heroes.begin(), heroes.end(),
+    if (heroes.size() == 3 && for_each(heroes,
                                        [](Hero *hero) -> bool { return !hero->IsDead(); })) {
         heroes[0]->Attack(*heroes[2], heroes[1]->GetStrength());
     }
 }
 
 void KillWithDamage(vector<Hero *> &heroes) {
-    if (heroes.size() == 2 && for_each(heroes.begin(), heroes.end(),
+    if (heroes.size() == 2 && for_each(heroes,
                                        [](Hero *hero) -> bool { return !hero->IsDead() && !hero->IsLeader(); })) {
         heroes[0]->ReduceHealth(3);
         heroes[1]->Die();
@@ -156,7 +163,7 @@ void KillWithDamage(vector<Hero *> &heroes) {
 }
 
 void DoubleStrengthAgainstLeader(vector<Hero *> &heroes) {
-    if (heroes.size() == 2 && for_each(heroes.begin(), heroes.end(),
+    if (heroes.size() == 2 && for_each(heroes,
                                        [](Hero *hero) -> bool { return !hero->IsDead(); })) {
         if (heroes[1]->IsLeader())
             heroes[0]->Attack(*heroes[1], heroes[0]->GetCurStrength() * 2);
@@ -178,7 +185,7 @@ void DieAndAttack(vector<Hero *> &heroes) {
 }
 
 void DamageTwoColsInBothSquad(vector<Hero *> &heroes) {
-    if (heroes.size() <= 7 && for_each(heroes.begin(), heroes.end(),
+    if (heroes.size() <= 7 && for_each(heroes,
                                        [](Hero *hero) -> bool { return !hero->IsDead(); })) {
         for_each(heroes.begin() + 1, heroes.end(),
                  [](Hero *hero) { hero->ReduceHealth(1); });
@@ -187,7 +194,7 @@ void DamageTwoColsInBothSquad(vector<Hero *> &heroes) {
 
 
 void DamageTwoRowsInBothSquad(vector<Hero *> &heroes) {
-    if (heroes.size() <= 7 && for_each(heroes.begin(), heroes.end(),
+    if (heroes.size() <= 7 && for_each(heroes,
                                        [](Hero *hero) -> bool { return !hero->IsDead(); })) {
         for_each(heroes.begin() + 1, heroes.end(),
                  [](Hero *hero) { hero->ReduceHealth(1); });
@@ -207,7 +214,7 @@ void InterceptionAndPlusPower(vector<Hero *> &heroes) {
     if (heroes.size() == 2 && !heroes[0]->IsDead() && !heroes[1]->IsDead()) {
         heroes[0]->SetCurStrength(heroes[0]->GetCurStrength() + 2);
         heroes[1]->ForbidDistantAttack();
-        std::cout<<"Сработал перехват "<< heroes[1]->CanBeAttackedDistantly() << std::endl;
+        std::cout << "Сработал перехват " << heroes[1]->CanBeAttackedDistantly() << std::endl;
     }
 }
 
