@@ -10,10 +10,7 @@ class GameTcpClient : public TcpClient<GameMsgTypes>
 {
 public:
     GameTcpClient();
-    void getHeroesStats() const;
     void connectToLobby() const;
-    void pingServer() const;
-    void messageAll() const;
     void sendCardReleased(const int, const int, const int) const;
     void sendAttackerPos(const int, const int) const;
     void sendAttackedPos(const int, const int) const;
@@ -22,10 +19,6 @@ public:
     void sendTakeCard();
     void sendRemoveBodyRequest();
     void sendRemovedBody(const int, const int) const;
-
-    //.......
-    //
-
     void setLobbyID(uint16_t lobbyID_);
     void setSide(bool isFirst);
     int getSide()

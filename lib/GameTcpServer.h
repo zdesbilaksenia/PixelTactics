@@ -14,6 +14,7 @@ class GameTcpServer : public TcpServer<GameMsgTypes> {
 public:
     GameTcpServer(std::string ip = "127.0.0.1", uint16_t port = 55555, uint8_t maxLobbiesNum_ = 5);
 
+    void killLobby(uint16_t lobbyID);
 protected:
     virtual void onClientValidated(boost::shared_ptr<TcpConnection<GameMsgTypes>> client);
     virtual bool onClientConnect(boost::shared_ptr<TcpConnection<GameMsgTypes>> client);

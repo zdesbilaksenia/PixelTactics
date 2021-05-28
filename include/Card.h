@@ -61,7 +61,6 @@ public:
     CardsManager(RenderWindow &_window, TilesManager &_tilesManager, stack<Card *> _cardsInStack);
 
     void updateFocus();
-    bool mouseIsPressed();
     void draw();
     bool takeCard();
     void updateHand();
@@ -76,8 +75,7 @@ public:
     {
         if (tilesManager.getStatus() == TilesManagerStatus::statusCardWasJustReleased)
         {
-            cout << "DELETING" << endl;
-            tilesManager.setStatus(TilesManagerStatus::statusNothingHappens);
+            tilesManager.setStatus(TilesManagerStatus::statusAttackingUnit);
             BOOST_LOG_TRIVIAL(info) << "CardsManager::mouseIsPressed() : statusReleasingCard card was just released, removing card from hand!";
             cardsInHand.erase(cardToDeleteId);
             this->updateHand();
@@ -104,7 +102,6 @@ public:
         }
         case CardsManagerStatus::statusNothingHappens:
         {
-            cout << "HERE" << endl;
             if (tilesManager.hasEmptyTiles())
             {
                 BOOST_LOG_TRIVIAL(info) << "CardsManager::mouseIsPressed() : statusNothingHappens Card was clicked!";

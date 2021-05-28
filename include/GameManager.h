@@ -176,6 +176,7 @@ private:
                 //Если нажали на кнопку на мыши
                 case (Event::MouseButtonPressed):
                 {
+                    //playerTilesManager.mouseClicked();
                     if (playerTilesManager.mouseIsPressed())
                     {
                         //В начале игры мы можем только выложить карту на стол.
@@ -185,13 +186,6 @@ private:
                         playerTilesManager.setStatus(TilesManagerStatus::statusCardWasJustReleased);
                     }
                     cardsManager.mouseClicked();
-                    /*if (cardsManager.mouseIsPressed())
-                    {
-                        playerTilesManager.setStatus(TilesManagerStatus::statusGameStartingReleasingCard);
-                        cardsManager.setStatus(CardsManagerStatus::statusGameStartingReleasingCard);
-                        playerTilesManager.updateFocus();
-                    }
-                    */
                     break;
                 }
                 //Закрытие окна
@@ -381,17 +375,12 @@ private:
                     //Если реализовали карту
                     if (playerTilesManager.mouseIsPressed())
                     {
+                        playerTilesManager.setStatus(TilesManagerStatus::statusCardWasJustReleased);
                         BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Card was released!";
                         movesAmount++;
                         BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Moves count = " << movesAmount;
-                        playerTilesManager.setStatus(TilesManagerStatus::statusCardWasJustReleased);
-                        //Это должно быть в этой строчке, поскольку функция отлавливает факт того, что карта была выложена на стол.
-                        cardsManager.mouseIsPressed();
-                        //Чтобы отрисовывались только те тайлы, которыми мы можем управлять.
-                        playerTilesManager.setStatus(TilesManagerStatus::statusAttackingUnit);
                         playerTilesManager.updateFocus();
                     }
-
                     if (playerTilesManager.powerWasUsed())
                     {
                         BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Power was used on player's tile!";
@@ -413,7 +402,6 @@ private:
                         playerTilesManager.setStatus(TilesManagerStatus::statusAttackingUnit);
                         playerTilesManager.updateFocus();
                     }
-
                     if (opponentTilesManager.powerWasUsed())
                     {
                         BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Power was used on opponent's tile!";
@@ -501,16 +489,7 @@ private:
                         playerTilesManager.updateFocus();
                     }
 
-                    //cardsManager.mouseClicked();
-                    
-                    
-                    if (cardsManager.mouseIsPressed())
-                    {
-                        playerTilesManager.setStatus(TilesManagerStatus::statusReleasingCard);
-                        cardsManager.setStatus(CardsManagerStatus::statusReleasingCard);
-                    }
-                    
-                    
+                    cardsManager.mouseClicked();
                     break;
                 }
                 //Если отпустили кнопку на мыши

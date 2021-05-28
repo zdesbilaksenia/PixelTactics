@@ -11,25 +11,8 @@ using namespace std;
 
 GameTcpClient::GameTcpClient() : side(0) {}
 
-void GameTcpClient::getHeroesStats() const
-{
-    Message<GameMsgTypes> msg(GameMsgTypes::GetHeroesStats);
-    send(msg);
-}
-void GameTcpClient::connectToLobby() const
-{
+void GameTcpClient::connectToLobby() const {
     Message<GameMsgTypes> msg(GameMsgTypes::ConnectToLobby);
-    send(msg);
-}
-void GameTcpClient::pingServer() const
-{
-    Message<GameMsgTypes> msg(GameMsgTypes::ServerPing);
-    msg << 50;
-    send(msg);
-}
-void GameTcpClient::messageAll() const
-{
-    Message<GameMsgTypes> msg(GameMsgTypes::MessageAll);
     send(msg);
 }
 
