@@ -124,17 +124,21 @@ void TilesManager::setStatus(const TilesManagerStatus &_status)
     {
     case TilesManagerStatus::statusReleasingCard:
     {
+        vector<bool> activeTiles;
         for (auto tile : tiles)
         {
             if (tile->getStatus() == TileStatus::statusIsEmpty)
             {
                 tile->setFillColor(colorForReleasingUnit);
+                activeTiles.push_back(true);
             }
             else
             {
                 tile->setFillColor(colorWhenCantReleaseUnit);
+                activeTiles.push_back(false);
             }
         }
+        this->setActiveTiles(activeTiles);
     }
     default:
     {
@@ -160,6 +164,7 @@ void TilesManager::enable()
         tile->setFillColor(colorBasic);
         tile->enable();
     }
+    this->updateFocus();
 }
 
 void TilesManager::disable()
@@ -169,6 +174,7 @@ void TilesManager::disable()
         tile->setFillColor(colorDisabled);
         tile->disable();
     }
+    this->updateFocus();
 }
 
 bool TilesManager::getPressed()
@@ -176,7 +182,7 @@ bool TilesManager::getPressed()
     return isPressed;
 }
 
-void TilesManager::setActiveTiles(vector<bool> &_activeTiles)
+void TilesManager::setActiveTiles(const vector<bool> &_activeTiles)
 {
     for (int i = 0; i < 3; ++i)
     {

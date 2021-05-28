@@ -75,6 +75,10 @@ private:
 
         loadHeroesStats(playerUnits, breeds, playerTilesManager, side);
         loadHeroesStats(opponentUnits, breeds, opponentTilesManager, (1 - side));
+
+        playerTilesManager.updateFocus();
+        opponentTilesManager.updateFocus();
+        buttonsManager.updateFocus();
     }
 
     //Юниты противника
@@ -117,6 +121,20 @@ private:
     void gameStart();
     void playersTurn();
     void opponentsTurn();
+
+    bool waitForMessage(const GameMsgTypes &msgType)
+    {
+        auto msg = client.incoming().popFront().msg;
+        if (msg.header.id == msgType)
+        {
+            switch (msgType)
+            {
+                //case GameMsgTypes::
+                //Доделать, возможно, это и не нужно.
+            }
+        }
+        return false;
+    }
 
     int side;
 
@@ -176,16 +194,13 @@ private:
                 //Если нажали на кнопку на мыши
                 case (Event::MouseButtonPressed):
                 {
-                    //playerTilesManager.mouseClicked();
-                    if (playerTilesManager.mouseIsPressed())
+                    playerTilesManager.mouseClicked();
+                    cardsManager.mouseClicked();
+                    if (cardsManager.numberOfCardsInHand() == 2)
                     {
-                        //В начале игры мы можем только выложить карту на стол.
                         BOOST_LOG_TRIVIAL(info) << "GameManager::gameStart(): first card was successufully released!";
                         firstCardIsReleased = true;
-                        //Эту информацию сразу отлавливает CardsManager
-                        playerTilesManager.setStatus(TilesManagerStatus::statusCardWasJustReleased);
                     }
-                    cardsManager.mouseClicked();
                     break;
                 }
                 //Закрытие окна
@@ -200,12 +215,8 @@ private:
 
             if (firstCardIsReleased)
             {
-                playerTilesManager.setStatus(TilesManagerStatus::statusCardWasJustReleased);
-                cardsManager.setStatus(CardsManagerStatus::statusNothingHappens);
                 opponentTilesManager.disable();
                 buttonsManager.disable();
-                opponentTilesManager.updateFocus();
-                buttonsManager.updateFocus();
 
                 if (client.incoming().empty())
                 {
@@ -214,17 +225,11 @@ private:
                 else
                 {
                     BOOST_LOG_TRIVIAL(info) << "GameManager::ForGamesStart() : Got message from opponent!";
-
                     auto msg = client.incoming().popFront().msg;
                     if (msg.header.id == GameMsgTypes::GameHeroesStats)
                     {
                         loadBreeds(msg);
                     }
-
-                    opponentTilesManager.updateFocus();
-                    playerTilesManager.updateFocus();
-                    buttonsManager.updateFocus();
-
                     return;
                 }
             }
@@ -268,7 +273,6 @@ private:
             else
             {
                 moveAmounts++;
-
                 BOOST_LOG_TRIVIAL(info) << client.getSide() << " GameManager::opponentsTurn() : Got message from opponent!";
 
                 auto msg = client.incoming().popFront().msg;
@@ -277,14 +281,8 @@ private:
                 case GameMsgTypes::GameHeroesStats:
                 {
                     loadBreeds(msg);
-
-                    playerTilesManager.updateFocus();
-                    opponentTilesManager.updateFocus();
-                    buttonsManager.updateFocus();
-
                     break;
                 }
-                //Если противник взял карту
                 case GameMsgTypes::GameTakeCard:
                 {
                     BOOST_LOG_TRIVIAL(info) << "GameManager::opponentsTurn() : Opponent took card!";
@@ -372,7 +370,19 @@ private:
                         movesAmount++;
                         BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Moves count = " << movesAmount;
                     }
+                    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    //Необхождимо сделать корректный setActiveTiles для аттаки!!!!
+                    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    if (playerTilesManager.mouseClicked())
+                    {
+                        BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Move was done!";
+                        movesAmount++;
+                        BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Moves count = " << movesAmount;
+                        playerTilesManager.updateFocus();
+                    }
+
                     //Если реализовали карту
+                    /*
                     if (playerTilesManager.mouseIsPressed())
                     {
                         playerTilesManager.setStatus(TilesManagerStatus::statusCardWasJustReleased);
@@ -381,6 +391,8 @@ private:
                         BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Moves count = " << movesAmount;
                         playerTilesManager.updateFocus();
                     }
+                    */
+
                     if (playerTilesManager.powerWasUsed())
                     {
                         BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Power was used on player's tile!";
@@ -402,6 +414,7 @@ private:
                         playerTilesManager.setStatus(TilesManagerStatus::statusAttackingUnit);
                         playerTilesManager.updateFocus();
                     }
+
                     if (opponentTilesManager.powerWasUsed())
                     {
                         BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Power was used on opponent's tile!";

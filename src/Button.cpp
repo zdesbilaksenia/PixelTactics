@@ -96,6 +96,7 @@ void ButtonsManager::disable()
     {
         button->disable();
     }
+    this->updateFocus();
 }
 
 void ButtonsManager::enable()
@@ -104,6 +105,7 @@ void ButtonsManager::enable()
     {
         button->enable();
     }
+    this->updateFocus();
 }
 
 ButtonsManager::~ButtonsManager()

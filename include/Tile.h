@@ -122,11 +122,11 @@ public:
     void enable();
     void disable();
     bool getPressed();
-    void setActiveTiles(vector<bool> &_activeTiles);
+    void setActiveTiles(const vector<bool> &_activeTiles);
     void resetActiveTiles();
 
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    void handleClick(Tile &tile)
+    bool handleClick(Tile &tile)
     {
         switch (status)
         {
@@ -135,7 +135,7 @@ public:
             if (unitBuffer == nullptr)
             {
                 BOOST_LOG_TRIVIAL(error) << "TilesManager::mouseIsPressed():: ERROR! statusReleasingCard : unitBuffer is nullptr!";
-                return;
+                return false;
             }
             BOOST_LOG_TRIVIAL(info) << "TilesManager::mouseIsPressed()::GameStarts releasing first card!";
             //Так как у лидера хп на 10 больше
@@ -145,6 +145,7 @@ public:
             client.sendCardReleased(unitBuffer->getId(), tilesFlank[1]->getCoordX(), tilesFlank[1]->getCoordY());
             unitBuffer = nullptr;
             this->setStatus(TilesManagerStatus::statusCardWasJustReleased);
+            return true;
             break;
         }
         case TilesManagerStatus::statusWaitingForAttack:
@@ -152,20 +153,22 @@ public:
             if (tileBuffer == nullptr)
             {
                 BOOST_LOG_TRIVIAL(error) << "TilesManager::mouseIsPressed():: ERROR! statusWaiting for Attack tileBuffer is nullptr";
-                return;
+                return false;
             }
             BOOST_LOG_TRIVIAL(info) << "TilesManager::mouseIsPressed(): Tile was attacked, sending attacked pos!";
             BOOST_LOG_TRIVIAL(info) << "TilesManager::mouseIsPressed(): Attacker: " << tileBuffer->getCoordX() << " " << tileBuffer->getCoordY();
             BOOST_LOG_TRIVIAL(info) << "TilesManager::mouseIsPressed(): Attacked: " << tile.getCoordX() << " " << tile.getCoordY();
             client.sendAttackedPos(tile.getCoordX(), tile.getCoordY());
+            return true;
             break;
         }
         case TilesManagerStatus::statusReleasingCard:
         {
+            cout << "HERE" << endl;
             if (unitBuffer == nullptr)
             {
                 BOOST_LOG_TRIVIAL(error) << "TilesManager::mouseIsPressed():: ERROR! statusReleasingCard : unitBuffer is nullptr!";
-                return;
+                return false;
             }
             BOOST_LOG_TRIVIAL(info) << "TilesManager::mouseIsPressed()::statusReleasingCard : releasing card!";
             tile.setUnit(*unitBuffer);
@@ -173,11 +176,13 @@ public:
             client.sendCardReleased(unitBuffer->getId(), tile.getCoordX(), tile.getCoordY());
             unitBuffer = nullptr;
             this->setStatus(TilesManagerStatus::statusCardWasJustReleased);
+            return true;
             break;
         }
         case TilesManagerStatus::statusAttackingUnit:
         {
             tileBuffer = &tile;
+            return false;
             break;
         }
         case TilesManagerStatus::statusWaitingForPower:
@@ -187,6 +192,7 @@ public:
 
             client.sendPowerTargetPos(tile.getCoordX(), tile.getCoordY());
             this->setStatus(TilesManagerStatus::statusPowerWasUsed);
+            return true;
             break;
         }
         case TilesManagerStatus::statusWaitingForRemovingBody:
@@ -196,25 +202,30 @@ public:
 
             client.sendRemovedBody(tile.getCoordX(), tile.getCoordY());
             this->setStatus(TilesManagerStatus::statusBodyRemoved);
+            return true;
             break;
         }
         default:
+            return false;
             break;
         }
     }
 
     //Аналог mouseIsPressed().
     //Надо сделать setActiveTiles для авангарда, фланга и тыла
-    void mouseClicked()
+    bool mouseClicked()
     {
+        BOOST_LOG_TRIVIAL(info) << "TilesManager::mouseClicked() : start!";
         for (auto tile : tiles)
         {
             if (tile->hasFocus() && activeTiles[tile->getCoordX()][tile->getCoordY()] == true)
             {
-                handleClick(*tile);
-                return;
+                bool result = handleClick(*tile);
+                BOOST_LOG_TRIVIAL(info) << "TilesManager::mouseClicked() : end, result is " << result;
+                return result;
             }
         }
+        BOOST_LOG_TRIVIAL(info) << "TilesManager::mouseClicked() : end, no tile was chosen" << endl;
     }
 
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
