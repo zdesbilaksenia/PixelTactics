@@ -35,13 +35,13 @@ int main()
 
     GameTcpClient client;
 
-    if (!connectToServer(client, "10.147.17.200"))
+    if (!connectToServer(client, "10.147.17.71"))
     {
         BOOST_LOG_TRIVIAL(fatal) << "main() : error!";
         return 0;
     }
 
-    RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "SFML works!");
+    RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "Pixel Tactics");
 
     Mouse mouse;
     Event event;

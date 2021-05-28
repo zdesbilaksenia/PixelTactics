@@ -33,7 +33,7 @@ void Card::click()
 
 void Card::updateFocus()
 {
-    Clickable::updateFocus();
+    //Clickable::updateFocus();
     if (this->hasFocus())
     {
         DrawableBox::setPosition(defaultPosX, defaultPosY - 20);
@@ -140,18 +140,17 @@ bool CardsManager::mouseIsPressed()
     case CardsManagerStatus::statusNothingHappens:
     {
         //Если некуда ставить
-        if (tilesManager.hasEmptyTiles() == false)
+        if (tilesManager.hasEmptyTiles())
         {
-            return false;
-        }
-        for (auto cardId = cardsInHand.begin(); cardId != cardsInHand.end(); ++cardId)
-        {
-            if ((*cardId)->hasFocus())
+            for (auto cardId = cardsInHand.begin(); cardId != cardsInHand.end(); ++cardId)
             {
-                BOOST_LOG_TRIVIAL(info) << "CardsManager::mouseIsPressed() : statusNothingHappens Card was clicked!";
-                cardToDeleteId = cardId;
-                tilesManager.setUnitBuffer(*(*cardId)->unit);
-                return true;
+                if ((*cardId)->hasFocus())
+                {
+                    BOOST_LOG_TRIVIAL(info) << "CardsManager::mouseIsPressed() : statusNothingHappens Card was clicked!";
+                    cardToDeleteId = cardId;
+                    tilesManager.setUnitBuffer(*(*cardId)->unit);
+                    return true;
+                }
             }
         }
         return false;
@@ -173,6 +172,7 @@ bool CardsManager::mouseIsPressed()
             }
         }
 
+        /*
         if (tilesManager.getStatus() == TilesManagerStatus::statusCardWasJustReleased)
         {
             tilesManager.setStatus(TilesManagerStatus::statusNothingHappens);
@@ -181,6 +181,8 @@ bool CardsManager::mouseIsPressed()
             this->updateHand();
             status = CardsManagerStatus::statusNothingHappens;
         }
+        */
+        removeSelectedCard();
 
         return false;
         break;
@@ -201,6 +203,7 @@ bool CardsManager::mouseIsPressed()
             }
         }
 
+        /*
         if (tilesManager.getStatus() == TilesManagerStatus::statusCardWasJustReleased)
         {
             tilesManager.setStatus(TilesManagerStatus::statusNothingHappens);
@@ -209,6 +212,10 @@ bool CardsManager::mouseIsPressed()
             this->updateHand();
             status = CardsManagerStatus::statusNothingHappens;
         }
+        */
+
+        removeSelectedCard();
+
         return false;
         break;
     }

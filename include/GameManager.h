@@ -184,12 +184,14 @@ private:
                         //Эту информацию сразу отлавливает CardsManager
                         playerTilesManager.setStatus(TilesManagerStatus::statusCardWasJustReleased);
                     }
-                    if (cardsManager.mouseIsPressed())
+                    cardsManager.mouseClicked();
+                    /*if (cardsManager.mouseIsPressed())
                     {
                         playerTilesManager.setStatus(TilesManagerStatus::statusGameStartingReleasingCard);
                         cardsManager.setStatus(CardsManagerStatus::statusGameStartingReleasingCard);
                         playerTilesManager.updateFocus();
                     }
+                    */
                     break;
                 }
                 //Закрытие окна
@@ -499,11 +501,16 @@ private:
                         playerTilesManager.updateFocus();
                     }
 
+                    //cardsManager.mouseClicked();
+                    
+                    
                     if (cardsManager.mouseIsPressed())
                     {
                         playerTilesManager.setStatus(TilesManagerStatus::statusReleasingCard);
                         cardsManager.setStatus(CardsManagerStatus::statusReleasingCard);
                     }
+                    
+                    
                     break;
                 }
                 //Если отпустили кнопку на мыши

@@ -76,6 +76,7 @@ public:
     {
         if (tilesManager.getStatus() == TilesManagerStatus::statusCardWasJustReleased)
         {
+            cout << "DELETING" << endl;
             tilesManager.setStatus(TilesManagerStatus::statusNothingHappens);
             BOOST_LOG_TRIVIAL(info) << "CardsManager::mouseIsPressed() : statusReleasingCard card was just released, removing card from hand!";
             cardsInHand.erase(cardToDeleteId);
@@ -95,28 +96,36 @@ public:
                  0, 1, 0,
                  0, 0, 0};
             tilesManager.setActiveTiles(activeTiles);
+            (*cardToDeleteId)->setFillColor(colorReleasingCard);
             tilesManager.setUnitBuffer(*(*cardToDeleteId)->unit);
+            tilesManager.setStatus(TilesManagerStatus::statusGameStartingReleasingCard);
             BOOST_LOG_TRIVIAL(info) << "CardsManager::mouseIsPressed() : statusGameStarting Card was clicked!";
             break;
         }
         case CardsManagerStatus::statusNothingHappens:
         {
-            if (tilesManager.hasEmptyTiles() == false)
+            cout << "HERE" << endl;
+            if (tilesManager.hasEmptyTiles())
             {
                 BOOST_LOG_TRIVIAL(info) << "CardsManager::mouseIsPressed() : statusNothingHappens Card was clicked!";
-                cardToDeleteId;
+                (*cardToDeleteId)->setFillColor(colorReleasingCard);
                 tilesManager.setUnitBuffer(*(*cardToDeleteId)->unit);
+                tilesManager.setStatus(TilesManagerStatus::statusReleasingCard);
+                status = CardsManagerStatus::statusReleasingCard;
             }
             break;
         }
         case CardsManagerStatus::statusReleasingCard:
         {
+            (*cardToDeleteId)->setFillColor(colorReleasingCard);
             tilesManager.setUnitBuffer(*(*cardToDeleteId)->unit);
+            tilesManager.setStatus(TilesManagerStatus::statusReleasingCard);
             break;
         }
         case CardsManagerStatus::statusGameStartingReleasingCard:
         {
             tilesManager.setUnitBuffer(*(*cardToDeleteId)->unit);
+            tilesManager.setStatus(TilesManagerStatus::statusGameStartingReleasingCard);
             break;
         }
         }
@@ -127,6 +136,7 @@ public:
     //Надо сделать setActiveTiles для авангарда, фланга и тыла
     void mouseClicked()
     {
+        removeSelectedCard();
         for (auto card = cardsInHand.begin(); card != cardsInHand.end(); card++)
         {
             if ((*card)->hasFocus())
