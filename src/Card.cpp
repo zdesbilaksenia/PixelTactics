@@ -147,4 +147,7 @@ bool CardsManager::getCardWasTaken()
     return result;
 }
 
-CardsManager::~CardsManager() {}
+CardsManager::~CardsManager() 
+{
+    unitBuffer = nullptr;
+}

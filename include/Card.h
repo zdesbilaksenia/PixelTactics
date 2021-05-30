@@ -83,6 +83,8 @@ public:
             BOOST_LOG_TRIVIAL(info) << "CardsManager::mouseIsPressed() : statusReleasingCard card was just released, removing card from hand!";
             cardsInHand.erase(cardToDeleteId);
             this->updateHand();
+            tilesManager.setStatus(TilesManagerStatus::statusAttackingUnit);
+            tilesManager.updateFocus();
             status = CardsManagerStatus::statusNothingHappens;
         }
     }
@@ -93,7 +95,7 @@ public:
         {
         case CardsManagerStatus::statusGameStarting:
         {
-            BOOST_LOG_TRIVIAL(info) << "CardsManager::handleClick() : statusGameStarting!";
+            BOOST_LOG_TRIVIAL(debug) << "CardsManager::handleClick() : statusGameStarting!";
             vector<bool> activeTiles =
                 {0, 0, 0,
                  0, 1, 0,
@@ -102,7 +104,8 @@ public:
             (*cardToDeleteId)->setFillColor(colorReleasingCard);
             tilesManager.setUnitBuffer(*(*cardToDeleteId)->unit);
             tilesManager.setStatus(TilesManagerStatus::statusGameStartingReleasingCard);
-            BOOST_LOG_TRIVIAL(info) << "CardsManager::handleClick() : statusGameStarting Card was clicked!";
+            tilesManager.updateFocus();
+            BOOST_LOG_TRIVIAL(debug) << "CardsManager::handleClick() : statusGameStarting Card was clicked!";
             break;
         }
         case CardsManagerStatus::statusNothingHappens:
@@ -114,6 +117,7 @@ public:
                 (*cardToDeleteId)->setFillColor(colorReleasingCard);
                 tilesManager.setUnitBuffer(*(*cardToDeleteId)->unit);
                 tilesManager.setStatus(TilesManagerStatus::statusReleasingCard);
+                tilesManager.updateFocus();
                 status = CardsManagerStatus::statusReleasingCard;
             }
             break;
@@ -124,6 +128,7 @@ public:
             (*cardToDeleteId)->setFillColor(colorReleasingCard);
             tilesManager.setUnitBuffer(*(*cardToDeleteId)->unit);
             tilesManager.setStatus(TilesManagerStatus::statusReleasingCard);
+            tilesManager.updateFocus();
             break;
         }
         case CardsManagerStatus::statusGameStartingReleasingCard:
@@ -132,6 +137,7 @@ public:
 
             tilesManager.setUnitBuffer(*(*cardToDeleteId)->unit);
             tilesManager.setStatus(TilesManagerStatus::statusGameStartingReleasingCard);
+            tilesManager.updateFocus();
             break;
         }
         }
@@ -142,19 +148,23 @@ public:
     //Надо сделать setActiveTiles для авангарда, фланга и тыла
     void mouseClicked()
     {
-        BOOST_LOG_TRIVIAL(info) << "CardsManager::mouseClicked() : start!";
+        BOOST_LOG_TRIVIAL(debug) << "CardsManager::mouseClicked() : start!";
         removeSelectedCard();
+        if (status == CardsManagerStatus::statusReleasingCard || status == CardsManagerStatus::statusGameStartingReleasingCard)
+        {
+            (*cardToDeleteId)->setFillColor(Color::White);
+        }
         for (auto card = cardsInHand.begin(); card != cardsInHand.end(); card++)
         {
             if ((*card)->hasFocus())
             {
                 cardToDeleteId = card;
                 handleClick(*(*card));
-                BOOST_LOG_TRIVIAL(info) << "CardsManager::mouseClicked() : end!";
+                BOOST_LOG_TRIVIAL(debug) << "CardsManager::mouseClicked() : end!";
                 return;
             }
         }
-        BOOST_LOG_TRIVIAL(info) << "CardsManager::mouseClicked() : end, no card was chosen!";
+        BOOST_LOG_TRIVIAL(debug) << "CardsManager::mouseClicked() : end, no card was chosen!";
     }
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

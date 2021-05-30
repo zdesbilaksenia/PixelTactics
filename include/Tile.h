@@ -62,6 +62,8 @@ private:
 //
 enum class TilesManagerStatus
 {
+    //Когда недоступен
+    statusDisabled,
     //Когда ничего не происходит
     statusNothingHappens,
 
@@ -69,7 +71,6 @@ enum class TilesManagerStatus
     statusGameStarting,
     //Реализуем карту в начале игры
     statusGameStartingReleasingCard,
-
     //Готовы выложить карту
     statusReleasingCard,
     //Готовы атаковать юнита противника
@@ -112,7 +113,6 @@ public:
     void setUnitBuffer(Unit &_unit);
     void setTileBuffer(Tile *_tile);
     Tile *getTileBuffer();
-    bool mouseIsPressed();
     void updateFocus();
     void draw();
     void setTexture(Texture *_texture);
@@ -164,7 +164,6 @@ public:
         }
         case TilesManagerStatus::statusReleasingCard:
         {
-            cout << "HERE" << endl;
             if (unitBuffer == nullptr)
             {
                 BOOST_LOG_TRIVIAL(error) << "TilesManager::mouseIsPressed():: ERROR! statusReleasingCard : unitBuffer is nullptr!";
@@ -185,6 +184,7 @@ public:
             return false;
             break;
         }
+        //НАДО ПРОТЕСТИРОВАТЬ
         case TilesManagerStatus::statusWaitingForPower:
         {
             BOOST_LOG_TRIVIAL(info) << "TilesManager::mouseIsPressed(): Used power on tile, sending coordinates!";
@@ -192,7 +192,7 @@ public:
 
             client.sendPowerTargetPos(tile.getCoordX(), tile.getCoordY());
             this->setStatus(TilesManagerStatus::statusPowerWasUsed);
-            return true;
+            return false;
             break;
         }
         case TilesManagerStatus::statusWaitingForRemovingBody:
@@ -202,30 +202,30 @@ public:
 
             client.sendRemovedBody(tile.getCoordX(), tile.getCoordY());
             this->setStatus(TilesManagerStatus::statusBodyRemoved);
-            return true;
+            return false;
             break;
         }
+        
         default:
             return false;
             break;
         }
     }
 
-    //Аналог mouseIsPressed().
-    //Надо сделать setActiveTiles для авангарда, фланга и тыла
     bool mouseClicked()
     {
-        BOOST_LOG_TRIVIAL(info) << "TilesManager::mouseClicked() : start!";
+        BOOST_LOG_TRIVIAL(debug) << "TilesManager::mouseClicked() : start!";
         for (auto tile : tiles)
         {
             if (tile->hasFocus() && activeTiles[tile->getCoordX()][tile->getCoordY()] == true)
             {
                 bool result = handleClick(*tile);
-                BOOST_LOG_TRIVIAL(info) << "TilesManager::mouseClicked() : end, result is " << result;
+                BOOST_LOG_TRIVIAL(debug) << "TilesManager::mouseClicked() : end, result is " << result;
+                this->updateFocus();
                 return result;
             }
         }
-        BOOST_LOG_TRIVIAL(info) << "TilesManager::mouseClicked() : end, no tile was chosen" << endl;
+        BOOST_LOG_TRIVIAL(debug) << "TilesManager::mouseClicked() : end, no tile was chosen" << endl;
     }
 
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -251,6 +251,41 @@ public:
     void deleteUnit(int x, int y);
     void setUnit(Unit &unit, int coordX, int coordY);
     bool hasBodies();
+
+    void setActiveRoundTiles()
+    {
+        this->resetActiveTiles();
+        switch (round)
+        {
+        case RoundType::roundAvangard:
+            for (int i = 0; i < 3; ++i)
+            {
+                if (tilesAvangard[i]->getStatus() == TileStatus::statusHasUnit)
+                {
+                    activeTiles[0][i] = true;
+                }
+            }
+            break;
+        case RoundType::roundFlank:
+            for (int i = 0; i < 3; ++i)
+            {
+                if (tilesFlank[i]->getStatus() == TileStatus::statusHasUnit)
+                {
+                    activeTiles[1][i] = true;
+                }
+            }
+            break;
+        case RoundType::roundRear:
+            for (int i = 0; i < 3; ++i)
+            {
+                if (tilesRear[i]->getStatus() == TileStatus::statusHasUnit)
+                {
+                    activeTiles[2][i] = true;
+                }
+            }
+            break;
+        }
+    }
 
     ~TilesManager();
 
@@ -280,6 +315,12 @@ private:
 
     bool isPressed;
 
+    Color colorActive;
+    Color colorPassive;
+
+    bool activeTiles[3][3];
+};
+
     //Цвета для всех случаев
     const Color colorBasic = Color::White;
     const Color colorDisabled = Color(150, 150, 150);
@@ -291,6 +332,4 @@ private:
     const Color colorWhenCantAttack = Color(30, 30, 30);
     const Color colorWhenCanAttack = Color(255, 162, 50);
     const Color colorWaitingForAttack = Color(200, 40, 240);
-
-    bool activeTiles[3][3];
-};
+    const Color colorForRemovingBody = Color::Blue;

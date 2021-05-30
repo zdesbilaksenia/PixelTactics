@@ -133,6 +133,12 @@ void GameManager::opponentsTurn()
     buttonsManager.disable();
 
     _whileForOpponentsTurn();
+
+    //Won - в том случае, если противник ливнёт
+    if (stage == GameStage::stageLost || stage == GameStage::stageWon)
+    {
+        return;
+    }
 }
 
 void GameManager::playersTurn()
@@ -146,13 +152,11 @@ void GameManager::playersTurn()
     playerTilesManager.setStatus(TilesManagerStatus::statusAttackingUnit);
 
     playerTilesManager.enable();
-    playerTilesManager.updateFocus();
-
     opponentTilesManager.enable();
-    opponentTilesManager.updateFocus();
-
     buttonsManager.enable();
-    buttonsManager.updateFocus();
+
+    //Возможно, неправильно работает, не проверял
+    playerTilesManager.setActiveRoundTiles();
 
     _whileForPlayersTurn();
 
@@ -164,7 +168,6 @@ void GameManager::playersTurn()
 
 GameManager::~GameManager()
 {
-
     btnAttack = nullptr;
     btnPower = nullptr;
     btnCancel = nullptr;

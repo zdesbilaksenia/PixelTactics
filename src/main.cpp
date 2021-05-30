@@ -26,7 +26,6 @@ using namespace sf;
 
 int main()
 {
-
     setlocale(LC_ALL, "Russian");
 
     BOOST_LOG_TRIVIAL(info) << "main() : Starting!";
