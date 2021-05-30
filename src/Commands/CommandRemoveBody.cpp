@@ -6,7 +6,6 @@ CommandRemoveBody::CommandRemoveBody(TilesManager &_tilesManager, GameTcpClient 
 
 void CommandRemoveBody::execute()
 {
-    BOOST_LOG_TRIVIAL(info) << "CommandRemoveBody::execute(): start!";
     client.sendRemoveBodyRequest();
 
     client.incoming().wait();
@@ -18,7 +17,8 @@ void CommandRemoveBody::execute()
     {
         BOOST_LOG_TRIVIAL(info) << "CommandRemoveBody::execute(): Trying to load active tiles!";
         msg >> activeTiles;
-        cout << endl << "size = " << activeTiles.size() << endl;
+        cout << endl
+             << "size = " << activeTiles.size() << endl;
         for (int i = 0; i < 9; ++i)
         {
             cout << activeTiles[i] << " ";
@@ -38,13 +38,10 @@ void CommandRemoveBody::execute()
     }
     default:
     {
-        cout << msg << endl;
-        cout << "OTHER" << endl;
+        BOOST_LOG_TRIVIAL(error) << "CommandRemoveBody::execute(): Other msg = " << msg;
         return;
     }
     }
-
-    //playerTilesManager.updateFocus();
 }
 
 CommandRemoveBody::~CommandRemoveBody()

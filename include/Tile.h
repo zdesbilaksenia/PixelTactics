@@ -32,11 +32,7 @@ public:
     Unit *getUnit();
     int &getCoordX();
     int &getCoordY();
-    void deleteUnit()
-    {
-        status = TileStatus::statusIsEmpty;
-        unit = nullptr;
-    }
+    void deleteUnit();
 
     //coordX - столбец
     //coordY - строка
@@ -124,168 +120,15 @@ public:
     bool getPressed();
     void setActiveTiles(const vector<bool> &_activeTiles);
     void resetActiveTiles();
-
-    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    bool handleClick(Tile &tile)
-    {
-        switch (status)
-        {
-        case TilesManagerStatus::statusGameStartingReleasingCard:
-        {
-            if (unitBuffer == nullptr)
-            {
-                BOOST_LOG_TRIVIAL(error) << "TilesManager::mouseIsPressed():: ERROR! statusReleasingCard : unitBuffer is nullptr!";
-                return false;
-            }
-            BOOST_LOG_TRIVIAL(info) << "TilesManager::mouseIsPressed()::GameStarts releasing first card!";
-            //Так как у лидера хп на 10 больше
-            unitBuffer->setTextHP(unitBuffer->getHealth() + 10);
-            tilesFlank[1]->setUnit(*unitBuffer);
-            BOOST_LOG_TRIVIAL(info) << "TilesManager::mouseIsPressed()::GameStarts released first card, ID = " << unitBuffer->getId();
-            client.sendCardReleased(unitBuffer->getId(), tilesFlank[1]->getCoordX(), tilesFlank[1]->getCoordY());
-            unitBuffer = nullptr;
-            this->setStatus(TilesManagerStatus::statusCardWasJustReleased);
-            return true;
-            break;
-        }
-        case TilesManagerStatus::statusWaitingForAttack:
-        {
-            if (tileBuffer == nullptr)
-            {
-                BOOST_LOG_TRIVIAL(error) << "TilesManager::mouseIsPressed():: ERROR! statusWaiting for Attack tileBuffer is nullptr";
-                return false;
-            }
-            BOOST_LOG_TRIVIAL(info) << "TilesManager::mouseIsPressed(): Tile was attacked, sending attacked pos!";
-            BOOST_LOG_TRIVIAL(info) << "TilesManager::mouseIsPressed(): Attacker: " << tileBuffer->getCoordX() << " " << tileBuffer->getCoordY();
-            BOOST_LOG_TRIVIAL(info) << "TilesManager::mouseIsPressed(): Attacked: " << tile.getCoordX() << " " << tile.getCoordY();
-            client.sendAttackedPos(tile.getCoordX(), tile.getCoordY());
-            return true;
-            break;
-        }
-        case TilesManagerStatus::statusReleasingCard:
-        {
-            if (unitBuffer == nullptr)
-            {
-                BOOST_LOG_TRIVIAL(error) << "TilesManager::mouseIsPressed():: ERROR! statusReleasingCard : unitBuffer is nullptr!";
-                return false;
-            }
-            BOOST_LOG_TRIVIAL(info) << "TilesManager::mouseIsPressed()::statusReleasingCard : releasing card!";
-            tile.setUnit(*unitBuffer);
-            BOOST_LOG_TRIVIAL(info) << "TilesManager::mouseIsPressed()::ReleasingCard ID = " << unitBuffer->getId();
-            client.sendCardReleased(unitBuffer->getId(), tile.getCoordX(), tile.getCoordY());
-            unitBuffer = nullptr;
-            this->setStatus(TilesManagerStatus::statusCardWasJustReleased);
-            return true;
-            break;
-        }
-        case TilesManagerStatus::statusAttackingUnit:
-        {
-            tileBuffer = &tile;
-            return false;
-            break;
-        }
-        //НАДО ПРОТЕСТИРОВАТЬ
-        case TilesManagerStatus::statusWaitingForPower:
-        {
-            BOOST_LOG_TRIVIAL(info) << "TilesManager::mouseIsPressed(): Used power on tile, sending coordinates!";
-            BOOST_LOG_TRIVIAL(info) << "TilesManager::mouseIsPressed(): Power target: " << tile.getCoordX() << " " << tile.getCoordY();
-
-            client.sendPowerTargetPos(tile.getCoordX(), tile.getCoordY());
-            this->setStatus(TilesManagerStatus::statusPowerWasUsed);
-            return false;
-            break;
-        }
-        case TilesManagerStatus::statusWaitingForRemovingBody:
-        {
-            BOOST_LOG_TRIVIAL(info) << "TilesManager::mouseIsPressed(): Removing Body!";
-            BOOST_LOG_TRIVIAL(info) << "TilesManager::mouseIsPressed(): Body: " << tile.getCoordX() << " " << tile.getCoordY();
-
-            client.sendRemovedBody(tile.getCoordX(), tile.getCoordY());
-            this->setStatus(TilesManagerStatus::statusBodyRemoved);
-            return false;
-            break;
-        }
-        
-        default:
-            return false;
-            break;
-        }
-    }
-
-    bool mouseClicked()
-    {
-        BOOST_LOG_TRIVIAL(debug) << "TilesManager::mouseClicked() : start!";
-        for (auto tile : tiles)
-        {
-            if (tile->hasFocus() && activeTiles[tile->getCoordX()][tile->getCoordY()] == true)
-            {
-                bool result = handleClick(*tile);
-                BOOST_LOG_TRIVIAL(debug) << "TilesManager::mouseClicked() : end, result is " << result;
-                this->updateFocus();
-                return result;
-            }
-        }
-        BOOST_LOG_TRIVIAL(debug) << "TilesManager::mouseClicked() : end, no tile was chosen" << endl;
-    }
-
-    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-    bool removedBody()
-    {
-        if (status == TilesManagerStatus::statusBodyRemoved)
-        {
-            return true;
-        }
-        return false;
-    }
-
-    bool powerWasUsed()
-    {
-        if (status == TilesManagerStatus::statusPowerWasUsed)
-        {
-            return true;
-        }
-        return false;
-    }
-
+    bool handleClick(Tile &tile);
+    bool mouseClicked();
+    bool removedBody();
+    bool powerWasUsed();
     void deleteUnit(int x, int y);
     void setUnit(Unit &unit, int coordX, int coordY);
     bool hasBodies();
 
-    void setActiveRoundTiles()
-    {
-        this->resetActiveTiles();
-        switch (round)
-        {
-        case RoundType::roundAvangard:
-            for (int i = 0; i < 3; ++i)
-            {
-                if (tilesAvangard[i]->getStatus() == TileStatus::statusHasUnit)
-                {
-                    activeTiles[0][i] = true;
-                }
-            }
-            break;
-        case RoundType::roundFlank:
-            for (int i = 0; i < 3; ++i)
-            {
-                if (tilesFlank[i]->getStatus() == TileStatus::statusHasUnit)
-                {
-                    activeTiles[1][i] = true;
-                }
-            }
-            break;
-        case RoundType::roundRear:
-            for (int i = 0; i < 3; ++i)
-            {
-                if (tilesRear[i]->getStatus() == TileStatus::statusHasUnit)
-                {
-                    activeTiles[2][i] = true;
-                }
-            }
-            break;
-        }
-    }
+    void setActiveRoundTiles();
 
     ~TilesManager();
 

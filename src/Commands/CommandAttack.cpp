@@ -22,9 +22,6 @@ void CommandAttack::execute()
         else
         {
                 BOOST_LOG_TRIVIAL(info) << "CommandAttack::execute(): Attacking!";
-
-                //opponentTilesManager.updateFocus();
-
                 BOOST_LOG_TRIVIAL(info) << "CommandAttack::execute(): Sending attacker position!";
                 cout << " ATTACKER POS = " << playerTilesManager.getTileBuffer()->getCoordX() << " " << playerTilesManager.getTileBuffer()->getCoordY() << endl;
                 client.sendAttackerPos(playerTilesManager.getTileBuffer()->getCoordX(), playerTilesManager.getTileBuffer()->getCoordY());

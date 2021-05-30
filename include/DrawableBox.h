@@ -14,7 +14,6 @@ public:
     virtual void setSize(const int &_width, const int &_height);
     virtual void setPosition(const int &_posX, const int &_posY);
 
-    //Мб не const ibnt&, а просто int
     const int &getPosX();
     const int &getPosY();
     const int &getWidth();
@@ -25,7 +24,6 @@ public:
     virtual void draw() = 0;
     ~DrawableBox();
 
-    //Пока сделал protected
 protected:
     int posX;
     int posY;
