@@ -68,6 +68,21 @@ void Tile::draw()
     }
 }
 
+void Tile::updateUnitFocus()
+{
+    if (this->unit != nullptr)
+    {
+        if (this->getStatus() == TileStatus::statusHasDeadBody)
+        {
+            unit->setFillColor(Color(100, 12, 171));
+        }
+        else
+        {
+            unit->setFillColor(Color::White);
+        }
+    }
+}
+
 void Tile::deleteUnit()
 {
     status = TileStatus::statusIsEmpty;
@@ -213,7 +228,7 @@ bool TilesManager::handleClick(Tile &tile)
 
 bool TilesManager::mouseClicked()
 {
-    if(status == TilesManagerStatus::statusWhenThePowerWhichChangesStatsImmidiatelyWasActivated)
+    if (status == TilesManagerStatus::statusWhenThePowerWhichChangesStatsImmidiatelyWasActivated)
     {
         return true;
     }
@@ -424,7 +439,7 @@ auto updateFocusOnLine{
 
 void TilesManager::updateFocus()
 {
-
+    
     switch (status)
     {
     case TilesManagerStatus::statusDisabled:
@@ -458,7 +473,7 @@ void TilesManager::updateFocus()
     case TilesManagerStatus::statusWaitingForAttack:
     {
         colorPassive = colorDisabled;
-        colorActive = colorBasic;
+        colorActive = colorToBeAttacked;
         break;
     }
 
@@ -466,7 +481,7 @@ void TilesManager::updateFocus()
     case TilesManagerStatus::statusWaitingForPower:
     {
         colorPassive = colorDisabled;
-        colorActive = colorBasic;
+        colorActive = colorForPower;
         break;
     }
 
@@ -498,6 +513,7 @@ void TilesManager::updateFocus()
 
     for (auto tile : tiles)
     {
+        tile->updateUnitFocus();
         if (activeTiles[tile->getCoordX()][tile->getCoordY()] == true)
         {
             if (tile->hasFocus())

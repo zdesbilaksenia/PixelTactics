@@ -50,28 +50,12 @@ GameManager::GameManager(RenderWindow &_window,
     BOOST_LOG_TRIVIAL(info) << "GameManager::GameManager() : side = " << side;
 }
 
-void GameManager::setAttackButton(Button &_btnAttack)
+void GameManager::setSpecialButtons(Button &_btnAttack, Button &_btnPower, Button &_btnCancel, Button &_btnTakeCard, Button &_btnRemoveBody)
 {
     btnAttack = &_btnAttack;
-}
-
-void GameManager::setPowerButton(Button &_btnPower)
-{
     btnPower = &_btnPower;
-}
-
-void GameManager::setCancelButton(Button &_btnCancel)
-{
     btnCancel = &_btnCancel;
-}
-
-void GameManager::setTakeCardButton(Button &_btnTakeCard)
-{
     btnTakeCard = &_btnTakeCard;
-}
-
-void GameManager::setRemoveBodyButton(Button &_btnRemoveBody)
-{
     btnRemoveBody = &_btnRemoveBody;
 }
 
@@ -494,7 +478,10 @@ void GameManager::_whileForPlayersTurn()
             {
                 //Порядок важен
                 buttonsManager.mouseIsPressed();
-                //Надо сделать if (cardsManager.getCardWasTaken()) и проверить, нормально ли работает
+                if(btnRemoveBody->hasFocus())
+                {
+                    btnRemoveBody->disable();
+                }
                 if (cardsManager.getCardWasTaken() && btnTakeCard->hasFocus() || playerTilesManager.mouseClicked())
                 {
                     BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Card was taken!";

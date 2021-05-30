@@ -189,12 +189,7 @@ int main()
                    playerUnits,
                    opponentUnits);
 
-    gm.setAttackButton(attackButton);
-    gm.setPowerButton(powerButton);
-    gm.setTakeCardButton(buttonTakeCard);
-    gm.setCancelButton(cancelButton);
-    gm.setRemoveBodyButton(removeBodyButton);
-
+    gm.setSpecialButtons(attackButton, powerButton, cancelButton, buttonTakeCard, removeBodyButton);
     gm.play();
 
     while (window.isOpen())

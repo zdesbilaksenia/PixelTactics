@@ -36,11 +36,7 @@ public:
                 vector<Unit> &_platerUnits,
                 vector<Unit> &_opponentUnits);
 
-    void setAttackButton(Button &_btnAttack);
-    void setPowerButton(Button &_btnPower);
-    void setCancelButton(Button &_btnCancel);
-    void setTakeCardButton(Button &_btnTakeCard);
-    void setRemoveBodyButton(Button &_btnRemoveBody);
+    void setSpecialButtons(Button &_btnAttack, Button &_btnPower, Button &_btnCancel, Button &_btnTakeCard, Button &_btnRemoveBody);
 
     void play();
 

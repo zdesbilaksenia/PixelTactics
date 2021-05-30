@@ -33,6 +33,7 @@ public:
     int &getCoordX();
     int &getCoordY();
     void deleteUnit();
+    void updateUnitFocus();
 
     //coordX - столбец
     //coordY - строка
@@ -170,9 +171,10 @@ private:
     const Color colorInFocus = Color(65, 105, 225);
     const Color colorForReleasingUnit = Color::Yellow;
     const Color colorWhenCantReleaseUnit = Color::Black;
-    const Color colorForDeadBody = Color(100, 30, 100);
-    const Color colorToBeAttacked = Color::Red;
+    const Color colorForDeadBody = Color(100, 12, 171);
+    const Color colorToBeAttacked = Color(247, 156, 255);
     const Color colorWhenCantAttack = Color(30, 30, 30);
     const Color colorWhenCanAttack = Color(255, 162, 50);
     const Color colorWaitingForAttack = Color(200, 40, 240);
     const Color colorForRemovingBody = Color::Blue;
+    const Color colorForPower = Color(74, 201, 255);
