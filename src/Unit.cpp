@@ -1,7 +1,9 @@
 #include "Unit.h"
 #include <iostream>
 #include "configurations.cpp"
-using namespace std;
+using std::cout;
+using std::endl;
+using std::to_string;
 
 Unit::Unit(RenderWindow &_window) : DrawableBox(_window) {}
 

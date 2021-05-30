@@ -5,7 +5,8 @@
 #include <fstream>
 #include "GameTcpClient.h"
 #include "GameMsgTypes.h"
-using namespace std;
+using std::cout;
+using std::endl;
 
 #include <boost/log/trivial.hpp>
 using namespace boost::log;
@@ -89,7 +90,7 @@ private:
     void opponentsTurn();
 
     bool handleMessage(const GameMsgTypes &msgType);
-    void handleMessageFromOpponent();
+    bool handleMessageFromOpponent();
 
     int side;
 

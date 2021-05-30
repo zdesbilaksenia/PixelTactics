@@ -1,6 +1,7 @@
 #include "Commands/CommandConnectToLobby.h"
 #include <iostream>
-using namespace std;
+using std::cout;
+using std::endl;
 
 CommandConnectToLobby::CommandConnectToLobby(GameTcpClient &_client, bool& _lobbyWasCreated) : client(_client), lobbyWasCreated(_lobbyWasCreated) {}
 

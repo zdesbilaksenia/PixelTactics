@@ -22,7 +22,7 @@ enum class CardStatus
 class Card : public Clickable
 {
 public:
-
+    //Мб unit сразу загрузить в конструктор засунуть, не помню, почему так не сделал
     Card(RenderWindow &_window, Mouse &_mouse);
     void setUnit(Unit *_unit);
     void draw() override;
@@ -59,17 +59,17 @@ public:
 
     void updateFocus();
     void draw();
-    bool takeCard();
     void updateHand();
     void setCardShirtTexture(Texture *_texture);
     void setStatus(CardsManagerStatus _status);
     void setUnitBuffer(Unit *unit);
-    bool canTakeCard();
-    bool getCardWasTaken();
-    int numberOfCardsInHand();
     void removeSelectedCard();
     void handleClick(Card &card);
     void mouseClicked();
+    bool takeCard();
+    bool canTakeCard();
+    bool getCardWasTaken();
+    int numberOfCardsInHand();
 
     ~CardsManager();
 

@@ -1,7 +1,8 @@
 #include "Commands/CommandAttack.h"
 
 #include "iostream"
-using namespace std;
+using std::cout;
+using std::endl;
 // ====================================
 // ===========CommandAttack============
 // ====================================

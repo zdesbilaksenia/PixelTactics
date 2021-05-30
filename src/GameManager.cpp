@@ -95,7 +95,7 @@ void GameManager::play()
     gameStart();
     stage = GameStage::stagePlayersTurn;
 
-    //Если второй игрокvoid
+    //Если второй игрок
     if (side == 1)
     {
         //Ждём здесь, пока ответ о конце хода противника не придёт:
@@ -155,9 +155,11 @@ void GameManager::opponentsTurn()
 
     _whileForOpponentsTurn();
 
+    cout << "HERE" << endl;
     //Won - в том случае, если противник ливнёт
     if (stage == GameStage::stageLost || stage == GameStage::stageWon)
     {
+        cout << "HERE" << endl;
         return;
     }
 }
@@ -176,7 +178,6 @@ void GameManager::playersTurn()
     opponentTilesManager.enable();
     buttonsManager.enable();
 
-    //Возможно, неправильно работает, не проверял
     playerTilesManager.setActiveRoundTiles();
 
     _whileForPlayersTurn();
@@ -206,7 +207,6 @@ bool GameManager::handleMessage(const GameMsgTypes &msgType)
             return false;
             break;
         }
-            //Доделать, возможно, это и не нужно.
         }
     }
     else if (msg.header.id == GameMsgTypes::GameWon)
@@ -222,7 +222,7 @@ bool GameManager::handleMessage(const GameMsgTypes &msgType)
     return false;
 }
 
-void GameManager::handleMessageFromOpponent()
+bool GameManager::handleMessageFromOpponent()
 {
     auto msg = client.incoming().popFront().msg;
     switch (msg.header.id)
@@ -230,11 +230,13 @@ void GameManager::handleMessageFromOpponent()
     case GameMsgTypes::GameHeroesStats:
     {
         loadBreeds(msg);
+        return true;
         break;
     }
     case GameMsgTypes::GameTakeCard:
     {
         BOOST_LOG_TRIVIAL(info) << "GameManager::opponentsTurn() : Opponent took card!";
+        return true;
         break;
     }
     case GameMsgTypes::GameCardReleased:
@@ -254,28 +256,45 @@ void GameManager::handleMessageFromOpponent()
         opponentUnits[ID].setTextHP(HP);
         opponentTilesManager.setUnit(opponentUnits[ID], posX, posY);
         opponentTilesManager.updateFocus();
+        return true;
         break;
     }
     case GameMsgTypes::GameLost:
     {
         BOOST_LOG_TRIVIAL(info) << "GameManager::opponentsTurn() : You lost!";
         stage = GameStage::stageLost;
-        return;
+        return false;
         break;
     }
     case GameMsgTypes::GameWon:
     {
-        BOOST_LOG_TRIVIAL(info) << "1 GameManager::opponentsTurn() : You Won!";
+        BOOST_LOG_TRIVIAL(info) << "GameManager::opponentsTurn() : You Won!";
         stage = GameStage::stageWon;
-        return;
+        return false;
         break;
     }
     default:
     {
-        BOOST_LOG_TRIVIAL(info) << "GameManager::opponentsTurn() : Some other type";
+        BOOST_LOG_TRIVIAL(error) << "GameManager::opponentsTurn() : Some other type";
+        return true;
         break;
     }
     }
+}
+
+void GameManager::loadBreeds(Message<GameMsgTypes> &msg)
+{
+    vector<Breed> breeds;
+    BOOST_LOG_TRIVIAL(info) << "GameManager::loadBreeds() : Trying to load breed!";
+    msg >> breeds;
+    BOOST_LOG_TRIVIAL(info) << "GameManager::loadBreeds() : breed loaded!";
+
+    loadHeroesStats(playerUnits, breeds, playerTilesManager, side);
+    loadHeroesStats(opponentUnits, breeds, opponentTilesManager, (1 - side));
+
+    playerTilesManager.updateFocus();
+    opponentTilesManager.updateFocus();
+    buttonsManager.updateFocus();
 }
 
 void GameManager::_whileForPlay()
@@ -312,6 +331,16 @@ void GameManager::_whileForPlay()
         default:
             break;
         }
+    }
+    if (stage == GameStage::stageLost)
+    {
+        BOOST_LOG_TRIVIAL(info) << "GameManager::play(): You lost!";
+        return;
+    }
+    else if (stage == GameStage::stageWon)
+    {
+        BOOST_LOG_TRIVIAL(info) << "GameManager::play(): You won!";
+        return;
     }
 }
 
@@ -420,7 +449,10 @@ void GameManager::_whileForOpponentsTurn()
             moveAmounts++;
             BOOST_LOG_TRIVIAL(info) << client.getSide() << " GameManager::opponentsTurn() : Got message from opponent!";
             //Возможно, здесь может быть ошибка, необходимо проверить
-            handleMessageFromOpponent();
+            if (!handleMessageFromOpponent())
+            {
+                return;
+            }
             if (moveAmounts == 2)
             {
                 BOOST_LOG_TRIVIAL(info) << "GameManager::opponentsTurn(): Ended!";
@@ -463,88 +495,55 @@ void GameManager::_whileForPlayersTurn()
                 //Порядок важен
                 buttonsManager.mouseIsPressed();
                 //Надо сделать if (cardsManager.getCardWasTaken()) и проверить, нормально ли работает
-                if (cardsManager.getCardWasTaken() && btnTakeCard->hasFocus())
+                if (cardsManager.getCardWasTaken() && btnTakeCard->hasFocus() || playerTilesManager.mouseClicked())
                 {
                     BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Card was taken!";
                     movesAmount++;
                     BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Moves count = " << movesAmount;
-                }
-
-                if (playerTilesManager.mouseClicked())
-                {
-                    BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Move was done!";
-                    movesAmount++;
-                    BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Moves count = " << movesAmount;
                     playerTilesManager.setActiveRoundTiles();
-                    playerTilesManager.updateFocus();
-                }
-
-                if (playerTilesManager.powerWasUsed())
-                {
-                    BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Power was used on player's tile!";
-                    movesAmount++;
-                    BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Moves count = " << movesAmount;
-                    if (!handleMessage(GameMsgTypes::GameHeroesStats))
+                    if (!cardsManager.canTakeCard())
                     {
-                        return;
+                        btnTakeCard->disable();
                     }
-                    playerTilesManager.setActiveRoundTiles();
-                    playerTilesManager.setStatus(TilesManagerStatus::statusAttackingUnit);
-                    playerTilesManager.updateFocus();
-                }
-
-                if (opponentTilesManager.powerWasUsed())
-                {
-                    BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Power was used on opponent's tile!";
-                    movesAmount++;
-                    BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Moves count = " << movesAmount;
-                    client.incoming().wait();
-                    if (!handleMessage(GameMsgTypes::GameHeroesStats))
+                    else
                     {
-                        return;
+                        btnTakeCard->enable();
                     }
-                    opponentTilesManager.setStatus(TilesManagerStatus::statusNothingHappens);
-                    opponentTilesManager.updateFocus();
-                    playerTilesManager.setActiveRoundTiles();
-                    playerTilesManager.setStatus(TilesManagerStatus::statusAttackingUnit);
-                    playerTilesManager.updateFocus();
-                }
-
-                if (playerTilesManager.removedBody())
-                {
-                    BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Body was removed!";
-                    movesAmount++;
-                    BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Moves count = " << movesAmount;
-                    client.incoming().wait();
-                    if (!handleMessage(GameMsgTypes::GameHeroesStats))
-                    {
-                        return;
-                    }
-                    playerTilesManager.setActiveRoundTiles();
-                    playerTilesManager.setStatus(TilesManagerStatus::statusAttackingUnit);
-                    playerTilesManager.updateFocus();
                 }
 
                 //Если атаковали противника
-                if (opponentTilesManager.mouseClicked())
+                if (opponentTilesManager.mouseClicked() ||
+                    playerTilesManager.powerWasUsed() ||
+                    opponentTilesManager.powerWasUsed() ||
+                    playerTilesManager.removedBody())
                 {
-                    BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Opponent's tile was attacked succesfully!";
+                    BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : something was done!";
                     movesAmount++;
                     BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Moves count = " << movesAmount;
-                    while (client.incoming().empty())
-                    {
-                        this->draw();
-                    }
                     if (!handleMessage(GameMsgTypes::GameHeroesStats))
                     {
                         return;
                     }
-                    BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Moves count = " << movesAmount;
-                    opponentTilesManager.setStatus(TilesManagerStatus::statusNothingHappens);
-                    opponentTilesManager.updateFocus();
+                    if (!playerTilesManager.hasBodies())
+                    {
+                        btnRemoveBody->disable();
+                    }
+                    else
+                    {
+                        btnRemoveBody->enable();
+                    }
+                    if (!cardsManager.canTakeCard())
+                    {
+                        btnTakeCard->disable();
+                    }
+                    else
+                    {
+                        btnTakeCard->enable();
+                    }
                     playerTilesManager.setActiveRoundTiles();
                     playerTilesManager.setStatus(TilesManagerStatus::statusAttackingUnit);
-                    playerTilesManager.updateFocus();
+                    opponentTilesManager.resetActiveTiles();
+                    opponentTilesManager.setStatus(TilesManagerStatus::statusNothingHappens);
                 }
 
                 cardsManager.mouseClicked();
@@ -587,21 +586,6 @@ void GameManager::_whileForPlayersTurn()
             return;
         }
     }
-}
-
-void GameManager::loadBreeds(Message<GameMsgTypes> &msg)
-{
-    vector<Breed> breeds;
-    BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Trying to load breed!";
-    msg >> breeds;
-    BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : breed loaded!";
-
-    loadHeroesStats(playerUnits, breeds, playerTilesManager, side);
-    loadHeroesStats(opponentUnits, breeds, opponentTilesManager, (1 - side));
-
-    playerTilesManager.updateFocus();
-    opponentTilesManager.updateFocus();
-    buttonsManager.updateFocus();
 }
 
 GameManager::~GameManager()

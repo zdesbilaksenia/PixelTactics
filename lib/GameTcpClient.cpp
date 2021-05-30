@@ -7,7 +7,8 @@
 #include "GameMsgTypes.h"
 
 #include <iostream>
-using namespace std;
+using std::cout;
+using std::endl;
 
 GameTcpClient::GameTcpClient() : side(0) {}
 

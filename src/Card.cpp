@@ -1,7 +1,8 @@
 #include "Card.h"
 #include "configurations.cpp"
 #include <iostream>
-using namespace std;
+using std::cout;
+using std::endl;
 
 Card::Card(RenderWindow &_window, Mouse &_mouse) : Clickable(_window, _mouse)
 {
@@ -33,7 +34,6 @@ void Card::click()
 
 void Card::updateFocus()
 {
-    //Clickable::updateFocus();
     if (this->hasFocus())
     {
         DrawableBox::setPosition(defaultPosX, defaultPosY - 20);
@@ -138,6 +138,7 @@ bool CardsManager::canTakeCard()
 void CardsManager::setStatus(CardsManagerStatus _status)
 {
     status = _status;
+    //this->updateFocus();
 }
 
 void CardsManager::setUnitBuffer(Unit *unit)
@@ -161,7 +162,6 @@ void CardsManager::removeSelectedCard()
         cardsInHand.erase(cardToDeleteId);
         this->updateHand();
         tilesManager.setStatus(TilesManagerStatus::statusAttackingUnit);
-        tilesManager.updateFocus();
         status = CardsManagerStatus::statusNothingHappens;
     }
 }
@@ -181,8 +181,16 @@ void CardsManager::handleClick(Card &card)
         (*cardToDeleteId)->setFillColor(colorReleasingCard);
         tilesManager.setUnitBuffer(*(*cardToDeleteId)->unit);
         tilesManager.setStatus(TilesManagerStatus::statusGameStartingReleasingCard);
-        tilesManager.updateFocus();
+        this->setStatus(CardsManagerStatus::statusGameStartingReleasingCard);
         BOOST_LOG_TRIVIAL(debug) << "CardsManager::handleClick() : statusGameStarting Card was clicked!";
+        break;
+    }
+    case CardsManagerStatus::statusGameStartingReleasingCard:
+    {
+        BOOST_LOG_TRIVIAL(info) << "CardsManager::handleClick() : statusGameStartingReleasingCard!";
+        (*cardToDeleteId)->setFillColor(colorReleasingCard);
+        tilesManager.setUnitBuffer(*(*cardToDeleteId)->unit);
+        tilesManager.setStatus(TilesManagerStatus::statusGameStartingReleasingCard);
         break;
     }
     case CardsManagerStatus::statusNothingHappens:
@@ -194,7 +202,6 @@ void CardsManager::handleClick(Card &card)
             (*cardToDeleteId)->setFillColor(colorReleasingCard);
             tilesManager.setUnitBuffer(*(*cardToDeleteId)->unit);
             tilesManager.setStatus(TilesManagerStatus::statusReleasingCard);
-            tilesManager.updateFocus();
             status = CardsManagerStatus::statusReleasingCard;
         }
         break;
@@ -205,16 +212,6 @@ void CardsManager::handleClick(Card &card)
         (*cardToDeleteId)->setFillColor(colorReleasingCard);
         tilesManager.setUnitBuffer(*(*cardToDeleteId)->unit);
         tilesManager.setStatus(TilesManagerStatus::statusReleasingCard);
-        tilesManager.updateFocus();
-        break;
-    }
-    case CardsManagerStatus::statusGameStartingReleasingCard:
-    {
-        BOOST_LOG_TRIVIAL(info) << "CardsManager::handleClick() : statusGameStartingReleasingCard!";
-
-        tilesManager.setUnitBuffer(*(*cardToDeleteId)->unit);
-        tilesManager.setStatus(TilesManagerStatus::statusGameStartingReleasingCard);
-        tilesManager.updateFocus();
         break;
     }
     }
@@ -226,6 +223,7 @@ void CardsManager::mouseClicked()
     removeSelectedCard();
     if (status == CardsManagerStatus::statusReleasingCard || status == CardsManagerStatus::statusGameStartingReleasingCard)
     {
+        cout << "HERE" << endl;
         (*cardToDeleteId)->setFillColor(Color::White);
     }
     for (auto card = cardsInHand.begin(); card != cardsInHand.end(); card++)

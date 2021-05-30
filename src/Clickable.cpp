@@ -1,6 +1,7 @@
 #include "Clickable.h"
 #include <iostream>
-using namespace std;
+using std::cout;
+using std::endl;
 
 Clickable::Clickable(RenderWindow &_window, Mouse &_mouse) : DrawableBox(_window),
                                                              mouse(_mouse), enabled(true)
@@ -52,8 +53,6 @@ void Clickable::release()
     this->setFillColor(this->basicColor);
     isPressed = false;
 }
-
-//Потом удалить!!!
 
 void Clickable::setColors(Color _basicColor, Color _focusedColor, Color _clickedColor, Color _disabledColor)
 {

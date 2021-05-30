@@ -2,7 +2,8 @@
 #include "configurations.cpp"
 
 #include <iostream>
-using namespace std;
+using std::cout;
+using std::endl;
 
 Tile::Tile(RenderWindow &_window, Mouse &_mouse) : Clickable(_window, _mouse)
 {
@@ -212,12 +213,17 @@ bool TilesManager::handleClick(Tile &tile)
 
 bool TilesManager::mouseClicked()
 {
+    if(status == TilesManagerStatus::statusWhenThePowerWhichChangesStatsImmidiatelyWasActivated)
+    {
+        return true;
+    }
     for (auto tile : tiles)
     {
         if (tile->hasFocus() && activeTiles[tile->getCoordX()][tile->getCoordY()] == true)
         {
             bool result = handleClick(*tile);
             this->updateFocus();
+            cout << "HERE, result = " << result << endl;
             return result;
         }
     }
@@ -269,6 +275,7 @@ void TilesManager::setStatus(const TilesManagerStatus &_status)
         break;
     }
     }
+    this->updateFocus();
 }
 
 void TilesManager::setTileBuffer(Tile *_tile)
@@ -628,6 +635,7 @@ void TilesManager::setActiveRoundTiles()
         }
         break;
     }
+    this->updateFocus();
 }
 
 TilesManager::~TilesManager()

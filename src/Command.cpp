@@ -1,6 +1,7 @@
 #include "../include/Command.h"
 #include <iostream>
-using namespace std;
+using std::cout;
+using std::endl;
 
 Command::Command() {}
 

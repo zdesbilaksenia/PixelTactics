@@ -3,7 +3,8 @@
 
 //Удалить
 #include <iostream>
-using namespace std;
+using std::cout;
+using std::endl;
 
 Button::Button(RenderWindow &_window, Mouse &_mouse, Command *_command) : Clickable(_window, _mouse, _command)
 {

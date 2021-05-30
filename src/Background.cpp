@@ -11,6 +11,10 @@ Background::Background(RenderWindow &_window) : window(_window)
 
 void Background::setTextures(Texture *_txBgr, Texture *_txLP)
 {
+    if(_txBgr == nullptr || _txLP == nullptr)
+    {
+        return;
+    }
     backgroundRect.setTexture(_txBgr);
     lowerPanelRect.setTexture(_txLP);
 }

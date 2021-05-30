@@ -6,7 +6,8 @@
 #include "GameMsgTypes.h"
 #include <boost/log/trivial.hpp>
 using namespace boost::log;
-using namespace std;
+using std::cout;
+using std::endl;
 
 #include <SFML/Graphics.hpp>
 using namespace sf;
@@ -30,8 +31,6 @@ int main()
 
     BOOST_LOG_TRIVIAL(info) << "main() : Starting!";
 
-#if SERVER_CONNECTING == 1
-
     GameTcpClient client;
 
     if (!connectToServer(client, "10.147.17.71"))
@@ -54,8 +53,6 @@ int main()
     {
         BOOST_LOG_TRIVIAL(info) << "main() : Game Created!";
     }
-
-#endif //SERVER_CONNECTING
 
 #if GAME_ELEMENTS == 1
 
@@ -178,7 +175,7 @@ int main()
 
 #endif //GAME_ELEMENTS
 
-    //BOOST_LOG_TRIVIAL(fatal) << "WTF";
+    //BOOST_LOG_TRIVIAL(fatal) << "WTF???";
 
     GameManager gm(window,
                    mouse,

@@ -7,7 +7,8 @@ using namespace boost::log;
 using std::string;
 
 #include <iostream>
-using namespace std;
+using std::cout;
+using std::endl;
 
 class Unit : public DrawableBox
 {

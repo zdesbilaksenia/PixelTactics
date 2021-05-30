@@ -39,7 +39,6 @@ void setData(GameTcpClient &client,
     vector<CardInfo> opponentCardsInfo;
 
     //Считываем имя с сервера
-#if SERVER_CONNECTING == 1
 
     client.incoming().wait();
     auto msg = client.incoming().popFront().msg;
@@ -96,17 +95,6 @@ void setData(GameTcpClient &client,
 
         opponentUnits[i].setData(opponentCardsInfo[i].ID, opponentCardsInfo[i].name, description, opponentCardsInfo[i].HP, opponentCardsInfo[i].strength);
     }
-
-#endif // SERVER_CONNECTING
-
-#if SERVER_CONNECTING == 0
-
-    for (size_t i = 0; i < playerUnits.size(); ++i)
-    {
-        playerUnits[i].setTexture(&textures[i % numberOfUnits]);
-    }
-
-#endif //SERVER_CONNECTING
 
     for (size_t i = 0; i < cards.size(); ++i)
     {

@@ -6,7 +6,8 @@
 #include "GameMsgTypes.h"
 #include <boost/log/trivial.hpp>
 using namespace boost::log;
-using namespace std;
+using std::cout;
+using std::endl;
 
 #include <SFML/Graphics.hpp>
 using namespace sf;

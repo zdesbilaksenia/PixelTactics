@@ -1,7 +1,8 @@
 #include "Commands/CommandPower.h"
 
 #include "iostream"
-using namespace std;
+using std::cout;
+using std::endl;
 // ====================================
 // ===========CommandPower============
 // ====================================
@@ -37,6 +38,7 @@ void CommandPower::execute()
         }
         case GameMsgTypes::GameBeforeHeroesStats:
         {
+            BOOST_LOG_TRIVIAL(info) << "CommandPower::execute(): got message GameBeforeHeroesStats!";
             opponentTilesManager.setStatus(TilesManagerStatus::statusWhenThePowerWhichChangesStatsImmidiatelyWasActivated);
             break;
         }

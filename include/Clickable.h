@@ -34,6 +34,7 @@ protected:
     bool isInFocus;
     bool isPressed;
 
+    //Потом заменить на текстуры!
     Color basicColor;
     Color focusedColor;
     Color clickedColor;

@@ -1,7 +1,8 @@
 #include "Commands/CommandTakeCard.h"
 
 #include <iostream>
-using namespace std;
+using std::cout;
+using std::endl;
 
 CommandTakeCard::CommandTakeCard(CardsManager &_cardsManager, GameTcpClient& _client) : cardsManager(_cardsManager), client(_client)
 {
