@@ -14,14 +14,16 @@ enum class StageBackground
 class Background
 {
 public:
-    Background(RenderWindow &_window);
-    void setTextures(Texture* _txBgr, Texture* _txLP);
-    void draw();
+    Background(RenderWindow &_window, Mouse &_mouse);
+    void setTextures(Texture *_txBgr, Texture *_txLP);
     void setStage(StageBackground _stage);
+    void updateFocus();
+    void draw();
     ~Background();
 
 private:
     RenderWindow &window;
+    Mouse &mouse;
     RectangleShape backgroundRect;
     RectangleShape lowerPanelRect;
 };

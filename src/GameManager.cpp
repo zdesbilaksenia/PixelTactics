@@ -340,6 +340,7 @@ void GameManager::_whileForGameStart()
             //Если двигаем мышкой
             case (Event::MouseMoved):
             {
+                background.updateFocus();
                 playerTilesManager.updateFocus();
                 cardsManager.updateFocus();
                 break;
@@ -408,6 +409,7 @@ void GameManager::_whileForOpponentsTurn()
             {
             case (Event::MouseMoved):
             {
+                background.updateFocus();
                 playerTilesManager.updateFocus();
                 opponentTilesManager.updateFocus();
                 cardsManager.updateFocus();
@@ -468,6 +470,7 @@ void GameManager::_whileForPlayersTurn()
             //Если двигаем мышкой
             case (Event::MouseMoved):
             {
+                background.updateFocus();
                 playerTilesManager.updateFocus();
                 opponentTilesManager.updateFocus();
                 cardsManager.updateFocus();
@@ -476,12 +479,18 @@ void GameManager::_whileForPlayersTurn()
             }
             case (Event::MouseButtonPressed):
             {
+                if(event.mouseButton.button == Mouse::Right)
+                {
+                    playerTilesManager.mouseRightClick();
+                    opponentTilesManager.mouseRightClick();
+                }
                 //Порядок важен
                 buttonsManager.mouseIsPressed();
                 if(btnRemoveBody->hasFocus())
                 {
                     btnRemoveBody->disable();
                 }
+                //Надо сделать if (cardsManager.getCardWasTaken()) и проверить, нормально ли работает
                 if (cardsManager.getCardWasTaken() && btnTakeCard->hasFocus() || playerTilesManager.mouseClicked())
                 {
                     BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Card was taken!";

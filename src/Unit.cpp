@@ -5,7 +5,9 @@ using std::cout;
 using std::endl;
 using std::to_string;
 
-Unit::Unit(RenderWindow &_window) : DrawableBox(_window) {}
+Unit::Unit(RenderWindow &_window) : DrawableBox(_window) 
+{ 
+}
 
 void Unit::setCharacter() {}
 

@@ -59,6 +59,7 @@ void setData(GameTcpClient &client,
         playerUnits[i].setTextName(playerCardsInfo[i].name);
         playerUnits[i].setTextHP(playerCardsInfo[i].HP);
         playerUnits[i].setTextAttack(playerCardsInfo[i].strength);
+        playerUnits[i].rotateTexture();
 
         string description[3];
         description[0] = playerCardsInfo[i].frontLinePower;

@@ -1,4 +1,7 @@
-#include "../include/DrawableBox.h"
+#include "DrawableBox.h"
+
+#include <iostream>
+using namespace std;
 
 DrawableBox::DrawableBox(RenderWindow &_window) : window(_window)
 {
@@ -53,6 +56,16 @@ const int &DrawableBox::getWidth()
 const int &DrawableBox::getHeight()
 {
     return height;
+}
+
+void DrawableBox::rotateTexture()
+{
+    rect.setOrigin(Vector2f(rect.getLocalBounds().width, 0));
+    rect.scale(Vector2f(-1, 1));
+    //cout << "posX = " << posX << " ";
+    //posX += width;
+    //cout << "posX = " << posX << endl;
+    //this->setPosition(posX, posY);
 }
 
 void DrawableBox::setFont(const string &fontPath)

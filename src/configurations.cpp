@@ -19,16 +19,21 @@ const int cardsInHandPosX = 300;
 const int cardsInHandPosY = 500;
 const int maxNumberOfCardsInHand = 5;
 
+//Units
+const int unitWidth = 100;
+const int unitHeight = 150;
+
 //Tiles
 const int numberOfTiles = 9;
 const int tileWidth = 120;
 const int tileHeight = 80;
 
 //Background
-const int backgroundWidth = windowWidth;
+const float parallaxCoefficient = -0.01f;
+const int backgroundWidth = windowWidth * 1.2;
 const int backgroundHeight = windowHeight;
-const int backgroundPosX = 0;
-const int backgroundPosY = -100;
+const float backgroundPosX = 200;
+const float backgroundPosY = -100;
 const int lowerPanelWidth = windowWidth;
 const int lowerPanelHeight = windowWidth / 4;
 const int lowerPanelPosX = 0;

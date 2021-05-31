@@ -19,6 +19,8 @@ public:
     const int &getWidth();
     const int &getHeight();
 
+    void rotateTexture();
+
     virtual void setFont(const string& fontPath);
 
     virtual void draw() = 0;

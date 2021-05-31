@@ -170,7 +170,7 @@ int main()
     Texture lowerPanelTx;
     lowerPanelTx.loadFromFile("../img/low_panel.png");
 
-    Background background(window);
+    Background background(window, mouse);
     background.setTextures(&backgroundTx, &lowerPanelTx);
 
 #endif //GAME_ELEMENTS

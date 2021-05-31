@@ -123,6 +123,7 @@ public:
     void resetActiveTiles();
     bool handleClick(Tile &tile);
     bool mouseClicked();
+    void mouseRightClick();
     bool removedBody();
     bool powerWasUsed();
     void deleteUnit(int x, int y);
