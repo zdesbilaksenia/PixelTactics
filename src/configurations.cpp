@@ -22,6 +22,8 @@ const int maxNumberOfCardsInHand = 5;
 //Units
 const int unitWidth = 100;
 const int unitHeight = 150;
+const int statPictureWidth = 25;
+const int statPictureHeight = 25;
 
 //Tiles
 const int numberOfTiles = 9;
@@ -29,7 +31,7 @@ const int tileWidth = 120;
 const int tileHeight = 80;
 
 //Background
-const float parallaxCoefficient = -0.01f;
+const float parallaxCoefficient = -0.05f;
 const int backgroundWidth = windowWidth * 1.2;
 const int backgroundHeight = windowHeight;
 const float backgroundPosX = 200;

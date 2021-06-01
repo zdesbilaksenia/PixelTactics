@@ -223,7 +223,6 @@ void CardsManager::mouseClicked()
     removeSelectedCard();
     if (status == CardsManagerStatus::statusReleasingCard || status == CardsManagerStatus::statusGameStartingReleasingCard)
     {
-        cout << "HERE" << endl;
         (*cardToDeleteId)->setFillColor(Color::White);
     }
     for (auto card = cardsInHand.begin(); card != cardsInHand.end(); card++)

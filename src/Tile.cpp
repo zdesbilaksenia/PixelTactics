@@ -238,7 +238,6 @@ bool TilesManager::mouseClicked()
         {
             bool result = handleClick(*tile);
             this->updateFocus();
-            cout << "HERE, result = " << result << endl;
             return result;
         }
     }

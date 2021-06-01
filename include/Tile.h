@@ -110,6 +110,10 @@ public:
     void setUnitBuffer(Unit &_unit);
     void setTileBuffer(Tile *_tile);
     Tile *getTileBuffer();
+    bool hasTileBuffer()
+    {
+        return (tileBuffer != nullptr);
+    }
     void updateFocus();
     void draw();
     void setTexture(Texture *_texture);

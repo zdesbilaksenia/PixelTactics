@@ -81,16 +81,23 @@ int main()
     texturesForUnits[9].loadFromFile("../img/units/oracle.png");
     texturesForUnits[10].loadFromFile("../img/units/paladin.png");
 
+    Texture swordTx;
+    swordTx.loadFromFile("../img/sword.png");
+    Texture heartTx;
+    heartTx.loadFromFile("../img/heart.png");
+
     vector<Unit> playerUnits;
     for (int i = 0; i < numberOfCards; ++i)
     {
         playerUnits.push_back(Unit(window));
+        playerUnits[i].setHeartAndSwordTx(&heartTx, &swordTx);
     }
 
     vector<Unit> opponentUnits;
     for (int i = 0; i < numberOfCards; ++i)
     {
         opponentUnits.push_back(Unit(window));
+        opponentUnits[i].setHeartAndSwordTx(&heartTx, &swordTx);
     }
 
     vector<Card> cards;
@@ -120,46 +127,38 @@ int main()
     CardsManager cardsManager(window, playerTilesManager, cardsStack);
     cardsManager.setCardShirtTexture(&cardShirtTexture);
 
-    Texture takeCardButtonTx;
-    takeCardButtonTx.loadFromFile("../img/take_card.png");
-    CommandTakeCard cmdtakecard(cardsManager, client);
-    Button buttonTakeCard(window, mouse, &cmdtakecard);
-    buttonTakeCard.setPosition(50, 30);
-    buttonTakeCard.setTexture(&takeCardButtonTx);
-    buttonTakeCard.setColors(Color::White, Color(20, 100, 255), Color::Magenta, Color(200, 200, 200));
-
     Texture attackButtonTx;
     attackButtonTx.loadFromFile("../img/attack.png");
-    Texture powerButtonTx;
-    powerButtonTx.loadFromFile("../img/power.png");
-    Texture cancelButtonTx;
-    Texture removeBodyButtonTx;
-    removeBodyButtonTx.loadFromFile("../img/remove.png");
-
     CommandAttack cmdattack(playerTilesManager, opponentTilesManager, client);
     Button attackButton(window, mouse, &cmdattack);
     attackButton.setColors(Color::White, Color(240, 200, 150), Color(190, 70, 80), Color(200, 200, 200));
     attackButton.setPosition(50, 80);
     attackButton.setTexture(&attackButtonTx);
 
+    Texture powerButtonTx;
+    powerButtonTx.loadFromFile("../img/power.png");
     CommandPower cmdpower(playerTilesManager, opponentTilesManager, client);
     Button powerButton(window, mouse, &cmdpower);
     powerButton.setColors(Color::White, Color(240, 200, 150), Color(190, 70, 80), Color(200, 200, 200));
     powerButton.setPosition(50, 130);
     powerButton.setTexture(&powerButtonTx);
 
-    CommandStringTest cmdtest3("CommandStringTest::execute(): Cancel!");
-    Button cancelButton(window, mouse, &cmdtest3);
-    cancelButton.setColors(Color::White, Color(240, 200, 150), Color(190, 70, 80), Color(200, 200, 200));
-    cancelButton.setPosition(300, 130);
+    Texture takeCardButtonTx;
+    takeCardButtonTx.loadFromFile("../img/take_card.png");
+    CommandTakeCard cmdtakecard(cardsManager, client);
+    Button buttonTakeCard(window, mouse, &cmdtakecard);
+    buttonTakeCard.setPosition(300, 80);
+    buttonTakeCard.setTexture(&takeCardButtonTx);
+    buttonTakeCard.setColors(Color::White, Color(20, 100, 255), Color::Magenta, Color(200, 200, 200));
 
+    Texture removeBodyButtonTx;
+    removeBodyButtonTx.loadFromFile("../img/remove.png");
     CommandRemoveBody cmdremovebody(playerTilesManager, client);
     Button removeBodyButton(window, mouse, &cmdremovebody);
     removeBodyButton.setTexture(&removeBodyButtonTx);
     removeBodyButton.setColors(Color::Cyan, Color(240, 200, 150), Color(190, 70, 80), Color(200, 200, 200));
-    removeBodyButton.setPosition(500, 130);
+    removeBodyButton.setPosition(300, 130);
 
-    //vector<Button *> buttons = {&buttonTakeCard, &attackButton, &powerButton, &cancelButton, &removeBodyButton};
     vector<Button *> buttons = {&buttonTakeCard, &attackButton, &powerButton, &removeBodyButton};
     ButtonsManager buttonsManager;
     buttonsManager.setButtons(buttons);
@@ -189,7 +188,7 @@ int main()
                    playerUnits,
                    opponentUnits);
 
-    gm.setSpecialButtons(attackButton, powerButton, cancelButton, buttonTakeCard, removeBodyButton);
+    gm.setSpecialButtons(attackButton, powerButton, buttonTakeCard, removeBodyButton);
     gm.play();
 
     while (window.isOpen())

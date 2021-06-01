@@ -50,11 +50,10 @@ GameManager::GameManager(RenderWindow &_window,
     BOOST_LOG_TRIVIAL(info) << "GameManager::GameManager() : side = " << side;
 }
 
-void GameManager::setSpecialButtons(Button &_btnAttack, Button &_btnPower, Button &_btnCancel, Button &_btnTakeCard, Button &_btnRemoveBody)
+void GameManager::setSpecialButtons(Button &_btnAttack, Button &_btnPower, Button &_btnTakeCard, Button &_btnRemoveBody)
 {
     btnAttack = &_btnAttack;
     btnPower = &_btnPower;
-    btnCancel = &_btnCancel;
     btnTakeCard = &_btnTakeCard;
     btnRemoveBody = &_btnRemoveBody;
 }
@@ -139,11 +138,9 @@ void GameManager::opponentsTurn()
 
     _whileForOpponentsTurn();
 
-    cout << "HERE" << endl;
     //Won - в том случае, если противник ливнёт
     if (stage == GameStage::stageLost || stage == GameStage::stageWon)
     {
-        cout << "HERE" << endl;
         return;
     }
 }
@@ -479,18 +476,13 @@ void GameManager::_whileForPlayersTurn()
             }
             case (Event::MouseButtonPressed):
             {
-                if(event.mouseButton.button == Mouse::Right)
+                if (event.mouseButton.button == Mouse::Right)
                 {
                     playerTilesManager.mouseRightClick();
                     opponentTilesManager.mouseRightClick();
                 }
                 //Порядок важен
                 buttonsManager.mouseIsPressed();
-                if(btnRemoveBody->hasFocus())
-                {
-                    btnRemoveBody->disable();
-                }
-                //Надо сделать if (cardsManager.getCardWasTaken()) и проверить, нормально ли работает
                 if (cardsManager.getCardWasTaken() && btnTakeCard->hasFocus() || playerTilesManager.mouseClicked())
                 {
                     BOOST_LOG_TRIVIAL(info) << "GameManager::playersTurn() : Card was taken!";
@@ -505,6 +497,17 @@ void GameManager::_whileForPlayersTurn()
                     {
                         btnTakeCard->enable();
                     }
+                }
+
+                if (playerTilesManager.hasTileBuffer() == false)
+                {
+                    btnAttack->disable();
+                    btnPower->disable();
+                }
+                else
+                {
+                    btnAttack->enable();
+                    btnPower->enable();
                 }
 
                 //Если атаковали противника
@@ -588,7 +591,6 @@ GameManager::~GameManager()
 {
     btnAttack = nullptr;
     btnPower = nullptr;
-    btnCancel = nullptr;
     btnTakeCard = nullptr;
     btnRemoveBody = nullptr;
 }

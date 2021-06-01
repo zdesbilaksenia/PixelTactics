@@ -34,6 +34,7 @@ void CommandPower::execute()
         case GameMsgTypes::GameReject:
         {
             BOOST_LOG_TRIVIAL(info) << "CommandPower::execute(): Can't use power!";
+            playerTilesManager.setTileBuffer(nullptr);
             return;
         }
         case GameMsgTypes::GameBeforeHeroesStats:
@@ -73,13 +74,13 @@ void CommandPower::execute()
             break;
         }
         default:
-            cout << "Other type" << endl;
+            BOOST_LOG_TRIVIAL(error) << "CommandAttack::execute(): got other type of message: " << msg;
+            playerTilesManager.setTileBuffer(nullptr);
+            return;
             break;
         }
 
-        //Здесь это, вроде не нужно, нужно менять потом.
         playerTilesManager.setTileBuffer(nullptr);
-        //playerTilesManager.setStatus(TilesManagerStatus::statusNothingHappens);
         playerTilesManager.updateFocus();
         opponentTilesManager.updateFocus();
     }

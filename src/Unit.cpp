@@ -5,8 +5,10 @@ using std::cout;
 using std::endl;
 using std::to_string;
 
-Unit::Unit(RenderWindow &_window) : DrawableBox(_window) 
-{ 
+Unit::Unit(RenderWindow &_window) : DrawableBox(_window)
+{
+    heartRect.setSize(Vector2f(statPictureWidth, statPictureHeight));
+    swordRect.setSize(Vector2f(statPictureWidth, statPictureHeight));
 }
 
 void Unit::setCharacter() {}
@@ -34,15 +36,18 @@ int Unit::getAttack()
 
 void Unit::draw(const Mouse &mouse)
 {
-    textHP.setPosition(Vector2f(this->getPosX() - 20, this->getPosY() + tileHeight + 10));
-    textAttack.setPosition(Vector2f(this->getPosX() + 40, this->getPosY() + tileHeight + 10));
+    heartRect.setPosition(Vector2f(this->getPosX() + 10, this->getPosY() + tileHeight + 10));
+    textHP.setPosition(Vector2f(this->getPosX() + 40, this->getPosY() + tileHeight + 10));
+    swordRect.setPosition(Vector2f(this->getPosX() + 60, this->getPosY() + tileHeight + 10));
+    textAttack.setPosition(Vector2f(this->getPosX() + 90, this->getPosY() + tileHeight + 10));
     window.draw(rect);
     if (rect.getGlobalBounds().contains(mouse.getPosition(window).x, mouse.getPosition(window).y))
     {
         window.draw(textName);
     }
-
+    window.draw(heartRect);
     window.draw(textHP);
+    window.draw(swordRect);
     window.draw(textAttack);
 }
 
@@ -62,10 +67,10 @@ void Unit::setFont(const string &fontPath)
     textName.setFont(font);
     textHP.setFont(font);
     textAttack.setFont(font);
-    textAttack.setCharacterSize(20);
     textName.setCharacterSize(40);
+    textAttack.setCharacterSize(30);
+    textHP.setCharacterSize(30);
     textName.setPosition(Vector2f(500, 400));
-    textHP.setCharacterSize(20);
 }
 
 void Unit::setTextName(const string &str)
@@ -78,7 +83,7 @@ void Unit::setTextHP(const int HP)
 {
     health = HP;
     textHP.setColor(Color(255, 30, 90));
-    string str = "HP: " + to_string(HP);
+    string str = to_string(HP);
     textHP.setString(str);
 }
 
@@ -86,8 +91,14 @@ void Unit::setTextAttack(const int &attack)
 {
     this->attack = attack;
     textAttack.setColor(Color::Black);
-    string str = "Attack: " + to_string(attack);
+    string str = to_string(attack);
     textAttack.setString(str);
+}
+
+void Unit::setHeartAndSwordTx(Texture *heartTx, Texture *swordTx)
+{
+    heartRect.setTexture(heartTx);
+    swordRect.setTexture(swordTx);
 }
 
 Unit::~Unit() {}

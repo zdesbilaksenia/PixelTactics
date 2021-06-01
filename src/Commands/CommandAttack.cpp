@@ -47,14 +47,12 @@ void CommandAttack::execute()
                 case GameMsgTypes::GameReject:
                 {
                         BOOST_LOG_TRIVIAL(info) << "CommandAttack::execute(): Can't attack!";
+                        playerTilesManager.setTileBuffer(nullptr);
                         return;
                 }
                 }
 
-                opponentTilesManager.updateFocus();
-
                 playerTilesManager.setTileBuffer(nullptr);
-                //playerTilesManager.setStatus(TilesManagerStatus::statusNothingHappens);
                 playerTilesManager.updateFocus();
         }
 }

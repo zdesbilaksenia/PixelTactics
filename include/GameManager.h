@@ -36,7 +36,7 @@ public:
                 vector<Unit> &_platerUnits,
                 vector<Unit> &_opponentUnits);
 
-    void setSpecialButtons(Button &_btnAttack, Button &_btnPower, Button &_btnCancel, Button &_btnTakeCard, Button &_btnRemoveBody);
+    void setSpecialButtons(Button &_btnAttack, Button &_btnPower, Button &_btnTakeCard, Button &_btnRemoveBody);
 
     void play();
 
@@ -60,7 +60,6 @@ private:
 
     Button *btnAttack;
     Button *btnPower;
-    Button *btnCancel;
     Button *btnTakeCard;
     Button *btnRemoveBody;
 

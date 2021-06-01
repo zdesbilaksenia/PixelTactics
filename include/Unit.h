@@ -25,6 +25,7 @@ public:
     void setTextName(const string &str);
     void setTextHP(const int HP);
     void setTextAttack(const int &attack);
+    void setHeartAndSwordTx(Texture* heartTx, Texture* swordTx);
 
     ~Unit();
 
@@ -38,4 +39,7 @@ private:
     Text textName;
     Text textHP;
     Text textAttack;
+
+    RectangleShape swordRect;
+    RectangleShape heartRect;
 };

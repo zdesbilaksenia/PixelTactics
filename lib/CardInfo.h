@@ -19,4 +19,5 @@ struct Breed
     int HP;
     int strength;
     int cardID;
+    bool distant;
 };
