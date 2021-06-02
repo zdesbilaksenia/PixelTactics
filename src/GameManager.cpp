@@ -475,6 +475,14 @@ void GameManager::_whileForPlayersTurn()
 {
     int movesAmount = 0;
     buttonsManager.disable();
+    if (playerTilesManager.hasBodies())
+    {
+        btnRemoveBody->enable();
+    }
+    if (cardsManager.canTakeCard())
+    {
+        btnTakeCard->enable();
+    }
 
     while (window.isOpen())
     {
