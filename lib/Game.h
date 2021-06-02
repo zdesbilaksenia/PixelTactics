@@ -50,6 +50,12 @@ public:
 
     void SendBeforeHeroStats();
 
+    void SendReject();
+
+    vector<Breed> GetBreeds();
+
+    bool FieldIsChanged(vector<Breed> before, vector<Breed> after);
+
 private:
     int currentSide;
     MySQL sql;

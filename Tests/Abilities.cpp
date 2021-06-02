@@ -44,7 +44,7 @@ TEST(Perehvat,Test_1){
     pole.Show();
     EXPECT_FALSE(OraclePos->GetHero().frontLinePower == NULL);
     OraclePos->GetHero().frontLinePower(heroes);
-    Interception(OraclePos,pole);
+   // Interception(OraclePos,pole);
     
     heroes.clear();
     heroes.resize(0);
@@ -113,7 +113,7 @@ TEST(Witch_and_Priest,Test_2){
     pole.Show();
     EXPECT_FALSE(OraclePos->GetHero().frontLinePower == NULL);
     OraclePos->GetHero().frontLinePower(heroes);
-    Interception(OraclePos,pole);
+//    Interception(OraclePos,pole);
     
     heroes.clear();
     heroes.resize(0);

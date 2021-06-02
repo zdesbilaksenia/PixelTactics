@@ -13,61 +13,30 @@ struct Breed {
     int HP;
     int Strength;
     int ID;
+    bool distant;
 };
 
-void SendBreeds(Pole &pole, int numOfPlayers);
+void Interception(Position *position, Pole &pole_, bool &done);
 
-std::vector<Breed> ReturnRequest(Pole &pole_);
+void HPFromDead(Position *position, Pole &pole_, bool &done);
 
-vector<bool> AttackRequest(Pole &pole_, int side);
-
-int AttackWasDone(int xAttack, int yAttack, int xAttacked, int yAttacked, int friendlyside, Pole &pole_);
-
-void UseMagic(int xAttack, int yAttack, int friendlyside, Pole &pole_, int phase);
-
-void FrontRequest(Position *friendPosition, Pole &pole, int friendlyside);
-
-void MiddleRequest(Position *friendPosition, Pole &pole, int friendlyside);
-
-void BackRequest(Position *friendPosition, Pole &pole, int friendlyside);
-
-void Interception(Position *position, Pole &pole_);
-
-void HPFromDead(Position *position, Pole &pole_);
-
-void PlusPower(Position *friendPosition, Pole &pole, int friendlyside);
-
-void InterceptionPlusPower(Position *friendPosition, Pole &pole);
-
-void AttackDamageToHP(Position *friendPosition, Pole &pole, int friendlyside);
-
-void TransferDamage(Position *friendPosition, Pole &pole, int friendlyside);
+void InterceptionPlusPower(Position *position, Pole &pole_, int type, bool &done);
 
 void Resurrect(Position *friendPosition, Pole &pole, int friendlyside);
-
-void Castling(Position *friendPosition, Pole &pole, int friendlyside);
 
 void PlusStrMinusHP(Position *friendPosition, Pole &pole);
 
 void Resurrect(Position *friendPosition, Pole &pole, int friendlyside);
 
-void LeaderMakeDistantAttack(Position *position, Pole &pole_, int friendlyside);
+void HitAvangard(Position *position, Pole &pole_, int friendlyside, bool &done);
 
-void PlusPowerInCloseAttack(Position *position, Pole &pole_, int friendlyside);
+void PlusPowerByDead(Position *position, Pole &pole_, int friendlyside, bool &done);
 
-void ResAndGetDamage(Position *position, Pole &pole_, int friendlyside);
+void DamageTwoRows(Position *position, Pole &pole_, Position *target, bool &done);
 
-void KillWthDamage(Position *position, Pole &pole_, int friendlyside);
+void DamageTwoCols(Position *position, Pole &pole_, Position *target, bool &done);
 
-void HitAvangard(Position *position, Pole &pole_, int friendlyside);
-
-void CastlingWithDead(Position *position, Pole &pole_, int friendlyside);
-
-void PlusPowerByDead(Position *position, Pole &pole_, int friendlyside);
-
-void DamageTwoRows(Position *position, Pole &pole_, int friendlyside);
-
-void FrontAndBackGetDamage(Position *position, Pole &pole_, int friendlyside);
+void FrontAndBackGetDamage(Position *position, Pole &pole_, int friendlyside, bool &done);
 
 vector<bool> MakeDistantAttack(Pole &pole_, int friendlyside);
 
@@ -75,11 +44,9 @@ vector<bool> SendAllDeadFriends(Position *position, Pole &pole_, int friendlySid
 
 vector<bool> SendAllAliveEnemies(Position *position, Pole &pole_, int friendlyside);
 
-vector<bool>  SendAllAliveFriends(Position *position, Pole &pole_, int friendlyside);
+vector<bool> SendAllAliveFriends(Position *position, Pole &pole_, int friendlyside);
 
 void DoubleStrengthAgainstLeader(Position *position, Pole &pole_, int friendlyside);
-
-void HitFrontRowHeroes(Position *position, Pole &pole_, int friendlyside);
 
 #endif
 
