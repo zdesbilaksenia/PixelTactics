@@ -85,6 +85,7 @@ private:
     void gameStart();
     void playersTurn();
     void opponentsTurn();
+    void gameEnd();
 
     bool handleMessage(const GameMsgTypes &msgType);
     bool handleMessageFromOpponent();

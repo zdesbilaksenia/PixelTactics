@@ -10,9 +10,9 @@ Unit::Unit(RenderWindow &_window) : DrawableBox(_window)
     heartRect.setSize(Vector2f(statPictureWidth, statPictureHeight));
     swordRect.setSize(Vector2f(statPictureWidth, statPictureHeight));
     textName.setCharacterSize(20);
-    textName.setPosition(Vector2f(textDescPosX, infoRectPosY + 20));
+    textName.setPosition(Vector2f(textDescPosX + 20, infoRectPosY + 20));
     textName.setColor(Color(80, 102, 255));
-    textAttack.setCharacterSize(30);
+    textAttack.setCharacterSize(20);
     textAttack.setColor(Color(95, 12, 172));
     textHP.setCharacterSize(20);
     textHP.setColor(Color(255, 30, 90));

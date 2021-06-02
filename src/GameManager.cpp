@@ -95,12 +95,42 @@ void GameManager::play()
     if (stage == GameStage::stageLost)
     {
         BOOST_LOG_TRIVIAL(info) << "GameManager::play(): You lost!";
-        return;
+        stageText.setRound(Round::lost);
     }
     else
     {
         BOOST_LOG_TRIVIAL(info) << "GameManager::play(): You won!";
-        return;
+        stageText.setRound(Round::won);
+    }
+    gameEnd();
+}
+
+void GameManager::gameEnd()
+{
+    while (window.isOpen())
+    {
+        while (window.pollEvent(event))
+        {
+            switch (event.type)
+            {
+            //Если нажали на кнопку на мыши
+            case (Event::MouseButtonPressed):
+            {
+                return;
+                break;
+            }
+            //Закрытие окна
+            case (Event::Closed):
+            {
+                window.close();
+            }
+            default:
+                break;
+            }
+        }
+        window.clear();
+        stageText.endDraw();
+        window.display();
     }
 }
 

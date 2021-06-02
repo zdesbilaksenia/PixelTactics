@@ -18,6 +18,11 @@ void StageText::draw()
     moments = -1;
 }
 
+void StageText::endDraw()
+{
+    window.draw(rect);
+}
+
 void StageText::restart()
 {
     moments = 0;

@@ -36,7 +36,7 @@ void Card::draw()
         return;
     }
 
-    unit->setPosition(rect.getPosition().x + 10, rect.getPosition().y + 10);
+    unit->setPosition(rect.getPosition().x + 20, rect.getPosition().y + 30);
     unit->draw(mouse);
 }
 
@@ -207,7 +207,7 @@ void CardsManager::updateHand()
     int i = 0;
     for (auto card : cardsInHand)
     {
-        card->setPosition(cardsInHandPosX + i * 100, cardsInHandPosY);
+        card->setPosition(cardsInHandPosX + i * 150, cardsInHandPosY);
         ++i;
     }
 }

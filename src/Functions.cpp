@@ -28,6 +28,26 @@ bool connectToServer(GameTcpClient &client, const string &host)
     }
 }
 
+void setDataForPlayer(vector<Unit> &units, vector<Texture> &textures, vector<CardInfo>& cardsInfo)
+{
+    for (size_t i = 0; i < units.size(); ++i)
+    {
+        BOOST_LOG_TRIVIAL(info) << "||\tname: " << cardsInfo[i].name << " ID: " << cardsInfo[i].ID;
+        units[i].setTexture(&textures[cardsInfo[i].textureId - 1]);
+
+        units[i].setFont("../src/Pixel.ttf");
+        units[i].setTextHP(cardsInfo[i].HP);
+        units[i].setTextAttack(cardsInfo[i].strength);
+
+        string description[3];
+        description[0] = cardsInfo[i].frontLinePower;
+        description[1] = cardsInfo[i].middleLinePower;
+        description[2] = cardsInfo[i].backLinePower;
+
+        units[i].setData(cardsInfo[i].ID, cardsInfo[i].name, description, cardsInfo[i].HP, cardsInfo[i].strength);
+    }
+}
+
 void setData(GameTcpClient &client,
              vector<Unit> &playerUnits,
              vector<Unit> &opponentUnits,
@@ -50,24 +70,7 @@ void setData(GameTcpClient &client,
     }
 
     BOOST_LOG_TRIVIAL(info) << "SetData() : loaded cards : " << endl;
-    for (size_t i = 0; i < playerUnits.size(); ++i)
-    {
-        BOOST_LOG_TRIVIAL(info) << "||\tname: " << playerCardsInfo[i].name << " ID: " << playerCardsInfo[i].ID;
-        playerUnits[i].setTexture(&textures[playerCardsInfo[i].textureId - 1]);
-
-        playerUnits[i].setFont("../src/Pixel.ttf");
-        playerUnits[i].setTextHP(playerCardsInfo[i].HP);
-        playerUnits[i].setTextAttack(playerCardsInfo[i].strength);
-        playerUnits[i].rotateTexture();
-
-        string description[3];
-        description[0] = playerCardsInfo[i].frontLinePower;
-        description[1] = playerCardsInfo[i].middleLinePower;
-        description[2] = playerCardsInfo[i].backLinePower;
-
-
-        playerUnits[i].setData(playerCardsInfo[i].ID, playerCardsInfo[i].name, description, playerCardsInfo[i].HP, playerCardsInfo[i].strength);
-    }
+    setDataForPlayer(playerUnits, textures, playerCardsInfo);
 
     client.incoming().wait();
     msg = client.incoming().popFront().msg;
@@ -79,23 +82,7 @@ void setData(GameTcpClient &client,
     }
 
     BOOST_LOG_TRIVIAL(info) << "SetData() : loaded cards : " << endl;
-    for (size_t i = 0; i < opponentUnits.size(); ++i)
-    {
-        BOOST_LOG_TRIVIAL(info) << "||\tname: " << opponentCardsInfo[i].name << " ID: " << opponentCardsInfo[i].ID;
-        opponentUnits[i].setTexture(&textures[opponentCardsInfo[i].textureId - 1]);
-
-        opponentUnits[i].setFont("../src/Pixel.ttf");
-        opponentUnits[i].setTextHP(opponentCardsInfo[i].HP);
-        opponentUnits[i].setTextAttack(opponentCardsInfo[i].strength);
-
-        string description[3];
-        description[0] = opponentCardsInfo[i].frontLinePower;
-        description[1] = opponentCardsInfo[i].middleLinePower;
-        description[2] = opponentCardsInfo[i].backLinePower;
-
-
-        opponentUnits[i].setData(opponentCardsInfo[i].ID, opponentCardsInfo[i].name, description, opponentCardsInfo[i].HP, opponentCardsInfo[i].strength);
-    }
+    setDataForPlayer(opponentUnits, textures, opponentCardsInfo);
 
     for (size_t i = 0; i < cards.size(); ++i)
     {
@@ -124,7 +111,7 @@ bool menu(RenderWindow &window,
     RectangleShape tacticsRect;
     tacticsRect.setSize(Vector2f(700, 320));
     tacticsRect.setTexture(&tacticsTx);
-    tacticsRect.setPosition(Vector2f((windowWidth - 700)/2, 100));
+    tacticsRect.setPosition(Vector2f((windowWidth - 700) / 2, 100));
 
     bool lobbyWasCreated = false;
     CommandConnectToLobby cmdConnectToLobby(client, lobbyWasCreated);

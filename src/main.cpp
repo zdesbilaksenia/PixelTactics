@@ -26,36 +26,8 @@ using namespace sf;
 #include "Functions.h"
 #include "StageText.h"
 
-int main()
+void startGame(RenderWindow &window, Mouse &mouse, Event &event, GameTcpClient &client)
 {
-    setlocale(LC_ALL, "Russian");
-
-    BOOST_LOG_TRIVIAL(info) << "main() : Starting!";
-
-    GameTcpClient client;
-
-    if (!connectToServer(client, "10.147.17.71"))
-    {
-        BOOST_LOG_TRIVIAL(fatal) << "main() : error!";
-        return 0;
-    }
-
-    RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "Pixel Tactics");
-
-    Mouse mouse;
-    Event event;
-
-    if (menu(window, mouse, event, client) == false)
-    {
-        BOOST_LOG_TRIVIAL(fatal) << "main() : Can't create lobby!";
-        return 0;
-    }
-    else
-    {
-        BOOST_LOG_TRIVIAL(info) << "main() : Game Created!";
-    }
-
-#if GAME_ELEMENTS == 1
 
     TilesManager playerTilesManager(window, mouse, Side::sidePlayer, client);
     TilesManager opponentTilesManager(window, mouse, Side::sideOpponent, client);
@@ -108,6 +80,10 @@ int main()
     }
 
     setData(client, playerUnits, opponentUnits, cards, texturesForUnits);
+    for (int i = 0; i < playerUnits.size(); ++i)
+    {
+        playerUnits[i].rotateTexture();
+    }
 
     Texture cardTexture;
     cardTexture.loadFromFile("../img/card.png");
@@ -188,6 +164,10 @@ int main()
     rearTx.loadFromFile("../img/rear.png");
     Texture opponentTx;
     opponentTx.loadFromFile("../img/opponent.png");
+    Texture wonTx;
+    wonTx.loadFromFile("../img/won.png");
+    Texture lostTx;
+    lostTx.loadFromFile("../img/lost.png");
 
     StageText stageText(window);
     stageText.setTextures(
@@ -196,28 +176,46 @@ int main()
         &flankTx,
         &rearTx,
         &opponentTx,
-        &texturesForUnits[4],
-        &texturesForUnits[5]);
+        &wonTx,
+        &lostTx);
 
-#endif //GAME_ELEMENTS
+    //BOOST_LOG_TRIVIAL(fatal) << "WTF???";
 
-        //BOOST_LOG_TRIVIAL(fatal) << "WTF???";
-
-        GameManager gm(window,
-                       mouse,
-                       event,
-                       client,
-                       buttonsManager,
-                       playerTilesManager,
-                       opponentTilesManager,
-                       cardsManager,
-                       background,
-                       playerUnits,
-                       opponentUnits,
-                       stageText);
+    GameManager gm(window,
+                   mouse,
+                   event,
+                   client,
+                   buttonsManager,
+                   playerTilesManager,
+                   opponentTilesManager,
+                   cardsManager,
+                   background,
+                   playerUnits,
+                   opponentUnits,
+                   stageText);
 
     gm.setSpecialButtons(attackButton, powerButton, buttonTakeCard, removeBodyButton);
     gm.play();
+}
+
+int main()
+{
+    setlocale(LC_ALL, "Russian");
+
+    BOOST_LOG_TRIVIAL(info) << "main() : Starting!";
+
+    GameTcpClient client;
+
+    if (!connectToServer(client, "10.147.17.71"))
+    {
+        BOOST_LOG_TRIVIAL(fatal) << "main() : error!";
+        return 0;
+    }
+
+    RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "Pixel Tactics");
+
+    Mouse mouse;
+    Event event;
 
     while (window.isOpen())
     {
@@ -230,10 +228,8 @@ int main()
         {
             BOOST_LOG_TRIVIAL(info) << "main() : Game Created!";
         }
-        BOOST_LOG_TRIVIAL(info) << "main() : starting game!";
-        setData(client, playerUnits, opponentUnits, cards, texturesForUnits);
-        gm.play();
-        BOOST_LOG_TRIVIAL(info) << "main() : game finished!";
+
+        startGame(window, mouse, event, client);
     }
 
     return 0;
