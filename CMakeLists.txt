@@ -51,7 +51,8 @@ set(LIB_SOURCE_FILES
     src/Commands/CommandTakeCard.cpp
     src/Commands/CommandConnectToLobby.cpp
     src/Commands/CommandRemoveBody.cpp
-    src/Functions.cpp)
+    src/Functions.cpp
+    src/StageText.cpp)
 
 # Что бы не было относительных ссылок на файлы
 include_directories(include)

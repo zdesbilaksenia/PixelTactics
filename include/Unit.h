@@ -22,7 +22,6 @@ public:
     void draw();
     int getId();
     void setFont(const string &fontPath) override;
-    void setTextName(const string &str);
     void setTextHP(const int HP);
     void setTextAttack(const int &attack);
     void setHeartAndSwordTx(Texture* heartTx, Texture* swordTx);
@@ -31,15 +30,15 @@ public:
 
 private:
     int Id;
-    string name;
-    string description[3];
     int health;
     int attack;
 
     Text textName;
     Text textHP;
     Text textAttack;
+    Text textDescriptions[3];
 
     RectangleShape swordRect;
     RectangleShape heartRect;
+    RectangleShape* infoRect;
 };

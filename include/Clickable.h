@@ -3,14 +3,13 @@
 #include <SFML/Graphics.hpp>
 #include "DrawableBox.h"
 #include "Command.h"
-//#include "../Commands/Command.h"
 using namespace sf;
 
 class Clickable : public DrawableBox
 {
 public:
     Clickable(RenderWindow &_window, Mouse &_mouse);
-    Clickable(RenderWindow &_window, Mouse &_mouse, Command *_command);
+    Clickable(RenderWindow &_window, Mouse &_mouse, Command& _command);
 
     bool hasFocus();
     virtual void updateFocus();

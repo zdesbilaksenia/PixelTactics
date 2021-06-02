@@ -10,7 +10,7 @@ using namespace boost::log;
 class Button : public Clickable
 {
 public:
-    Button(RenderWindow &_window, Mouse &_mouse, Command *_command);
+    Button(RenderWindow &_window, Mouse &_mouse, Command& _command);
     void click() override;
     void draw() override;
     ~Button();

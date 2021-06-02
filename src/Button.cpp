@@ -6,7 +6,7 @@
 using std::cout;
 using std::endl;
 
-Button::Button(RenderWindow &_window, Mouse &_mouse, Command *_command) : Clickable(_window, _mouse, _command)
+Button::Button(RenderWindow &_window, Mouse &_mouse, Command& _command) : Clickable(_window, _mouse, _command)
 {
     this->setSize(buttonWidth, buttonHeight);
 }
@@ -111,4 +111,8 @@ void ButtonsManager::enable()
 
 ButtonsManager::~ButtonsManager()
 {
+    for (auto button : buttons)
+    {
+        button = nullptr;
+    }
 }

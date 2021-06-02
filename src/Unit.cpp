@@ -9,17 +9,31 @@ Unit::Unit(RenderWindow &_window) : DrawableBox(_window)
 {
     heartRect.setSize(Vector2f(statPictureWidth, statPictureHeight));
     swordRect.setSize(Vector2f(statPictureWidth, statPictureHeight));
+    textName.setCharacterSize(40);
+    textName.setPosition(Vector2f(500, 400));
+    textName.setColor(Color(80, 102, 255));
+    textAttack.setCharacterSize(30);
+    textAttack.setColor(Color(95, 12, 172));
+    textHP.setCharacterSize(20);
+    textHP.setColor(Color(255, 30, 90));
+    for (int i = 0; i < 3; ++i)
+    {
+        textDescriptions[i].setCharacterSize(15);
+        textDescriptions[i].setColor(Color::Black);
+        textDescriptions[i].setPosition(Vector2f(textDescPosX, textDescPosY + 20 * i));
+    }
 }
 
 void Unit::setCharacter() {}
 
-void Unit::setData(const int &_Id, const string &_name, const string _description[3], const int &_health, const int &_attack)
+void Unit::setData(const int &_Id, const string &strName, const string strDescs[3], const int &_health, const int &_attack)
 {
     this->Id = _Id;
-    this->name = _name;
-    this->description[0] = _description[0];
-    this->description[1] = _description[1];
-    this->description[2] = _description[2];
+    textName.setString(String::fromUtf8(strName.begin(), strName.end()));
+    for (int i = 0; i < 3; ++i)
+    {
+        textDescriptions[i].setString(String::fromUtf8(strDescs[i].begin(), strDescs[i].end()));
+    }
     this->health = _health;
     this->attack = _attack;
 }
@@ -40,11 +54,15 @@ void Unit::draw(const Mouse &mouse)
     textHP.setPosition(Vector2f(this->getPosX() + 40, this->getPosY() + tileHeight + 10));
     swordRect.setPosition(Vector2f(this->getPosX() + 60, this->getPosY() + tileHeight + 10));
     textAttack.setPosition(Vector2f(this->getPosX() + 90, this->getPosY() + tileHeight + 10));
-    window.draw(rect);
     if (rect.getGlobalBounds().contains(mouse.getPosition(window).x, mouse.getPosition(window).y))
     {
         window.draw(textName);
+        for (int i = 0; i < 3; ++i)
+        {
+            window.draw(textDescriptions[i]);
+        }
     }
+    window.draw(rect);
     window.draw(heartRect);
     window.draw(textHP);
     window.draw(swordRect);
@@ -67,22 +85,15 @@ void Unit::setFont(const string &fontPath)
     textName.setFont(font);
     textHP.setFont(font);
     textAttack.setFont(font);
-    textName.setCharacterSize(40);
-    textAttack.setCharacterSize(30);
-    textHP.setCharacterSize(30);
-    textName.setPosition(Vector2f(500, 400));
-}
-
-void Unit::setTextName(const string &str)
-{
-    textName.setColor(Color::Magenta);
-    textName.setString(str);
+    for (int i = 0; i < 3; ++i)
+    {
+        textDescriptions[i].setFont(font);
+    }
 }
 
 void Unit::setTextHP(const int HP)
 {
     health = HP;
-    textHP.setColor(Color(255, 30, 90));
     string str = to_string(HP);
     textHP.setString(str);
 }
@@ -90,7 +101,6 @@ void Unit::setTextHP(const int HP)
 void Unit::setTextAttack(const int &attack)
 {
     this->attack = attack;
-    textAttack.setColor(Color::Black);
     string str = to_string(attack);
     textAttack.setString(str);
 }

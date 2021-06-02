@@ -56,7 +56,6 @@ void setData(GameTcpClient &client,
         playerUnits[i].setTexture(&textures[playerCardsInfo[i].textureId - 1]);
 
         playerUnits[i].setFont("../src/Pixel.ttf");
-        playerUnits[i].setTextName(playerCardsInfo[i].name);
         playerUnits[i].setTextHP(playerCardsInfo[i].HP);
         playerUnits[i].setTextAttack(playerCardsInfo[i].strength);
         playerUnits[i].rotateTexture();
@@ -65,6 +64,7 @@ void setData(GameTcpClient &client,
         description[0] = playerCardsInfo[i].frontLinePower;
         description[1] = playerCardsInfo[i].middleLinePower;
         description[2] = playerCardsInfo[i].backLinePower;
+
 
         playerUnits[i].setData(playerCardsInfo[i].ID, playerCardsInfo[i].name, description, playerCardsInfo[i].HP, playerCardsInfo[i].strength);
     }
@@ -85,7 +85,6 @@ void setData(GameTcpClient &client,
         opponentUnits[i].setTexture(&textures[opponentCardsInfo[i].textureId - 1]);
 
         opponentUnits[i].setFont("../src/Pixel.ttf");
-        opponentUnits[i].setTextName(opponentCardsInfo[i].name);
         opponentUnits[i].setTextHP(opponentCardsInfo[i].HP);
         opponentUnits[i].setTextAttack(opponentCardsInfo[i].strength);
 
@@ -94,12 +93,13 @@ void setData(GameTcpClient &client,
         description[1] = opponentCardsInfo[i].middleLinePower;
         description[2] = opponentCardsInfo[i].backLinePower;
 
+
         opponentUnits[i].setData(opponentCardsInfo[i].ID, opponentCardsInfo[i].name, description, opponentCardsInfo[i].HP, opponentCardsInfo[i].strength);
     }
 
     for (size_t i = 0; i < cards.size(); ++i)
     {
-        cards[i].setUnit(&playerUnits[i]);
+        cards[i].setUnit(playerUnits[i]);
         cards[i].setColors(Color::White, Color::Magenta, Color::Green);
     }
 
@@ -131,7 +131,7 @@ bool menu(RenderWindow &window,
 
     Texture txMakeLobby;
     txMakeLobby.loadFromFile("../img/play.png");
-    Button btnConnectToLobby(window, mouse, &cmdConnectToLobby);
+    Button btnConnectToLobby(window, mouse, cmdConnectToLobby);
     btnConnectToLobby.setTexture(&txMakeLobby);
     btnConnectToLobby.setColors(Color::White, Color(140, 20, 230), Color::Green);
     btnConnectToLobby.setSize(playButtonWidth, playButtonHeight);

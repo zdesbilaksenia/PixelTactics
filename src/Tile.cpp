@@ -243,18 +243,6 @@ bool TilesManager::mouseClicked()
     }
 }
 
-void TilesManager::mouseRightClick()
-{
-    for (auto tile : tiles)
-    {
-        if (tile->hasFocus() && tile->getStatus() == TileStatus::statusHasUnit)
-        {
-            cout << "mouse right click!" << endl;
-            return;
-        }
-    }
-}
-
 bool TilesManager::removedBody()
 {
     if (status == TilesManagerStatus::statusBodyRemoved)

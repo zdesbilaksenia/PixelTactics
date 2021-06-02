@@ -24,6 +24,7 @@ using namespace sf;
 #include "configurations.cpp"
 #include "GameManager.h"
 #include "Functions.h"
+#include "StageText.h"
 
 int main()
 {
@@ -130,34 +131,36 @@ int main()
     Texture attackButtonTx;
     attackButtonTx.loadFromFile("../img/attack.png");
     CommandAttack cmdattack(playerTilesManager, opponentTilesManager, client);
-    Button attackButton(window, mouse, &cmdattack);
+    Button attackButton(window, mouse, cmdattack);
     attackButton.setColors(Color::White, Color(240, 200, 150), Color(190, 70, 80), Color(200, 200, 200));
-    attackButton.setPosition(50, 80);
+    attackButton.setPosition(50, 10);
+    attackButton.setSize(90, 80);
     attackButton.setTexture(&attackButtonTx);
 
     Texture powerButtonTx;
     powerButtonTx.loadFromFile("../img/power.png");
     CommandPower cmdpower(playerTilesManager, opponentTilesManager, client);
-    Button powerButton(window, mouse, &cmdpower);
+    Button powerButton(window, mouse, cmdpower);
     powerButton.setColors(Color::White, Color(240, 200, 150), Color(190, 70, 80), Color(200, 200, 200));
-    powerButton.setPosition(50, 130);
+    powerButton.setPosition(155, 10);
+    powerButton.setSize(90, 80);
     powerButton.setTexture(&powerButtonTx);
 
     Texture takeCardButtonTx;
     takeCardButtonTx.loadFromFile("../img/take_card.png");
     CommandTakeCard cmdtakecard(cardsManager, client);
-    Button buttonTakeCard(window, mouse, &cmdtakecard);
-    buttonTakeCard.setPosition(300, 80);
+    Button buttonTakeCard(window, mouse, cmdtakecard);
+    buttonTakeCard.setPosition(50, 100);
     buttonTakeCard.setTexture(&takeCardButtonTx);
     buttonTakeCard.setColors(Color::White, Color(20, 100, 255), Color::Magenta, Color(200, 200, 200));
 
     Texture removeBodyButtonTx;
     removeBodyButtonTx.loadFromFile("../img/remove.png");
     CommandRemoveBody cmdremovebody(playerTilesManager, client);
-    Button removeBodyButton(window, mouse, &cmdremovebody);
+    Button removeBodyButton(window, mouse, cmdremovebody);
     removeBodyButton.setTexture(&removeBodyButtonTx);
     removeBodyButton.setColors(Color::Cyan, Color(240, 200, 150), Color(190, 70, 80), Color(200, 200, 200));
-    removeBodyButton.setPosition(300, 130);
+    removeBodyButton.setPosition(50, 150);
 
     vector<Button *> buttons = {&buttonTakeCard, &attackButton, &powerButton, &removeBodyButton};
     ButtonsManager buttonsManager;
@@ -169,24 +172,49 @@ int main()
     Texture lowerPanelTx;
     lowerPanelTx.loadFromFile("../img/low_panel.png");
 
+    Texture infoRectTx;
+    infoRectTx.loadFromFile("../img/info.png");
+
     Background background(window, mouse);
-    background.setTextures(&backgroundTx, &lowerPanelTx);
+    background.setTextures(&backgroundTx, &lowerPanelTx, &infoRectTx);
+
+    Texture gamestartTx;
+    gamestartTx.loadFromFile("../img/gamestart.png");
+    Texture avangardTx;
+    avangardTx.loadFromFile("../img/avangard.png");
+    Texture flankTx;
+    flankTx.loadFromFile("../img/flank.png");
+    Texture rearTx;
+    rearTx.loadFromFile("../img/rear.png");
+    Texture opponentTx;
+    opponentTx.loadFromFile("../img/opponent.png");
+
+    StageText stageText(window);
+    stageText.setTextures(
+        &gamestartTx,
+        &avangardTx,
+        &flankTx,
+        &rearTx,
+        &opponentTx,
+        &texturesForUnits[4],
+        &texturesForUnits[5]);
 
 #endif //GAME_ELEMENTS
 
-    //BOOST_LOG_TRIVIAL(fatal) << "WTF???";
+        //BOOST_LOG_TRIVIAL(fatal) << "WTF???";
 
-    GameManager gm(window,
-                   mouse,
-                   event,
-                   client,
-                   buttonsManager,
-                   playerTilesManager,
-                   opponentTilesManager,
-                   cardsManager,
-                   background,
-                   playerUnits,
-                   opponentUnits);
+        GameManager gm(window,
+                       mouse,
+                       event,
+                       client,
+                       buttonsManager,
+                       playerTilesManager,
+                       opponentTilesManager,
+                       cardsManager,
+                       background,
+                       playerUnits,
+                       opponentUnits,
+                       stageText);
 
     gm.setSpecialButtons(attackButton, powerButton, buttonTakeCard, removeBodyButton);
     gm.play();

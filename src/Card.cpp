@@ -16,32 +16,15 @@ void Card::setPosition(const int &_posX, const int &_posY)
     defaultPosY = _posY;
 }
 
-void Card::setUnit(Unit *_unit)
+void Card::setUnit(Unit& _unit)
 {
-    if (_unit == nullptr)
-    {
-        BOOST_LOG_TRIVIAL(error) << "Card::setUnit() : _unit is nullptr!";
-        return;
-    }
-    this->unit = _unit;
+    this->unit = &_unit;
 }
 
 void Card::click()
 {
     this->status = CardStatus::statusCardWasReleased;
     this->command->execute();
-}
-
-void Card::updateFocus()
-{
-    if (this->hasFocus())
-    {
-        DrawableBox::setPosition(defaultPosX, defaultPosY - 20);
-    }
-    else
-    {
-        DrawableBox::setPosition(defaultPosX, defaultPosY);
-    }
 }
 
 void Card::draw()
@@ -55,6 +38,18 @@ void Card::draw()
 
     unit->setPosition(rect.getPosition().x + 10, rect.getPosition().y + 10);
     unit->draw(mouse);
+}
+
+void Card::updateFocus()
+{
+    if (this->hasFocus())
+    {
+        DrawableBox::setPosition(defaultPosX, defaultPosY - 20);
+    }
+    else
+    {
+        DrawableBox::setPosition(defaultPosX, defaultPosY);
+    }
 }
 
 Card::~Card()
@@ -74,95 +69,26 @@ CardsManager::CardsManager(RenderWindow &_window, TilesManager &_tilesManager, s
     cardShirtRect.setSize(Vector2f(cardWidth, cardHeight));
 }
 
-int CardsManager::numberOfCardsInHand()
-{
-    return cardsInHand.size();
-}
-
-bool CardsManager::takeCard()
-{
-    if (canTakeCard())
-    {
-        cardWasTaken = true;
-        cardsInHand.push_back(cardsInStack.top());
-        cardsInStack.pop();
-        this->updateHand();
-        return true;
-    }
-    return false;
-}
-
-void CardsManager::updateHand()
-{
-    //Числа исправить
-    int i = 0;
-    for (auto card : cardsInHand)
-    {
-        card->setPosition(cardsInHandPosX + i * 100, cardsInHandPosY);
-        ++i;
-    }
-}
-
-void CardsManager::updateFocus()
-{
-    for (auto cardId = cardsInHand.rbegin(); cardId != cardsInHand.rend(); ++cardId)
-    {
-        (*cardId)->updateFocus();
-    }
-}
-
-void CardsManager::draw()
-{
-    for (size_t i = 0; i < cardsInStack.size(); ++i)
-    {
-        cardShirtRect.setPosition(Vector2f(cardsInStackPosX + 4 * i, cardsInStackPosY));
-        window.draw(cardShirtRect);
-    }
-
-    for (auto card : cardsInHand)
-    {
-        card->draw();
-    }
-}
-
 void CardsManager::setCardShirtTexture(Texture *_tx)
 {
     cardShirtRect.setTexture(_tx);
 }
 
-bool CardsManager::canTakeCard()
+void CardsManager::mouseClicked()
 {
-    return (cardsInHand.size() < maxNumberOfCardsInHand && cardsInStack.size() > 0);
-}
-
-void CardsManager::setStatus(CardsManagerStatus _status)
-{
-    status = _status;
-    //this->updateFocus();
-}
-
-void CardsManager::setUnitBuffer(Unit *unit)
-{
-    unitBuffer = unit;
-}
-
-bool CardsManager::getCardWasTaken()
-{
-    bool result = cardWasTaken;
-    cardWasTaken = false;
-    return result;
-}
-
-void CardsManager::removeSelectedCard()
-{
-    if (tilesManager.getStatus() == TilesManagerStatus::statusCardWasJustReleased)
+    removeSelectedCard();
+    if (status == CardsManagerStatus::statusReleasingCard || status == CardsManagerStatus::statusGameStartingReleasingCard)
     {
-        tilesManager.setStatus(TilesManagerStatus::statusAttackingUnit);
-        BOOST_LOG_TRIVIAL(info) << "CardsManager::mouseIsPressed() : statusReleasingCard card was just released, removing card from hand!";
-        cardsInHand.erase(cardToDeleteId);
-        this->updateHand();
-        tilesManager.setStatus(TilesManagerStatus::statusAttackingUnit);
-        status = CardsManagerStatus::statusNothingHappens;
+        (*cardToDeleteId)->setFillColor(Color::White);
+    }
+    for (auto card = cardsInHand.begin(); card != cardsInHand.end(); card++)
+    {
+        if ((*card)->hasFocus())
+        {
+            cardToDeleteId = card;
+            handleClick(*(*card));
+            return;
+        }
     }
 }
 
@@ -218,21 +144,84 @@ void CardsManager::handleClick(Card &card)
     return;
 }
 
-void CardsManager::mouseClicked()
+void CardsManager::updateFocus()
 {
-    removeSelectedCard();
-    if (status == CardsManagerStatus::statusReleasingCard || status == CardsManagerStatus::statusGameStartingReleasingCard)
+    for (auto cardId = cardsInHand.rbegin(); cardId != cardsInHand.rend(); ++cardId)
     {
-        (*cardToDeleteId)->setFillColor(Color::White);
+        (*cardId)->updateFocus();
     }
-    for (auto card = cardsInHand.begin(); card != cardsInHand.end(); card++)
+}
+
+void CardsManager::draw()
+{
+    for (size_t i = 0; i < cardsInStack.size(); ++i)
     {
-        if ((*card)->hasFocus())
-        {
-            cardToDeleteId = card;
-            handleClick(*(*card));
-            return;
-        }
+        cardShirtRect.setPosition(Vector2f(cardsInStackPosX + 4 * i, cardsInStackPosY));
+        window.draw(cardShirtRect);
+    }
+
+    for (auto card : cardsInHand)
+    {
+        card->draw();
+    }
+}
+
+void CardsManager::setStatus(const CardsManagerStatus &_status)
+{
+    status = _status;
+}
+
+int CardsManager::numberOfCardsInHand()
+{
+    return cardsInHand.size();
+}
+
+bool CardsManager::takeCard()
+{
+    if (canTakeCard())
+    {
+        cardWasTaken = true;
+        cardsInHand.push_back(cardsInStack.top());
+        cardsInStack.pop();
+        this->updateHand();
+        return true;
+    }
+    return false;
+}
+
+bool CardsManager::canTakeCard()
+{
+    return (cardsInHand.size() < maxNumberOfCardsInHand && cardsInStack.size() > 0);
+}
+
+bool CardsManager::getCardWasTaken()
+{
+    bool result = cardWasTaken;
+    cardWasTaken = false;
+    return result;
+}
+
+void CardsManager::updateHand()
+{
+    //Числа исправить
+    int i = 0;
+    for (auto card : cardsInHand)
+    {
+        card->setPosition(cardsInHandPosX + i * 100, cardsInHandPosY);
+        ++i;
+    }
+}
+
+void CardsManager::removeSelectedCard()
+{
+    if (tilesManager.getStatus() == TilesManagerStatus::statusCardWasJustReleased)
+    {
+        tilesManager.setStatus(TilesManagerStatus::statusAttackingUnit);
+        BOOST_LOG_TRIVIAL(info) << "CardsManager::mouseIsPressed() : statusReleasingCard card was just released, removing card from hand!";
+        cardsInHand.erase(cardToDeleteId);
+        this->updateHand();
+        tilesManager.setStatus(TilesManagerStatus::statusAttackingUnit);
+        status = CardsManagerStatus::statusNothingHappens;
     }
 }
 

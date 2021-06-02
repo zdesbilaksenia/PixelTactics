@@ -24,6 +24,13 @@ const int unitWidth = 100;
 const int unitHeight = 150;
 const int statPictureWidth = 25;
 const int statPictureHeight = 25;
+const int infoRectWidth = 616;
+const int infoRectHeight = 171;
+const int infoRectPosX = 300;
+const int infoRectPosY = 10;
+const int textDescPosX = infoRectPosX + 60;
+const int textDescPosY = infoRectPosY + 55;
+
 
 //Tiles
 const int numberOfTiles = 9;
@@ -48,6 +55,15 @@ const int stageTextPosY = 50;
 //Game
 const int numberOfCards = 20;
 const int numberOfUnits = 11;
+
+
+//StageText
+const int numberOfTexts = 6;
+const int textWidth = 460;
+const int textHeight = 50;
+const int textPosX = (windowWidth - textWidth)/2;
+const int textPosY = 300;
+const int maxNumberOfMoments = 1000;
 
 //Чтобы визуально сжать код
 #define GAME_ELEMENTS 1

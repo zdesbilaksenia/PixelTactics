@@ -32,19 +32,21 @@ GameManager::GameManager(RenderWindow &_window,
                          CardsManager &_cardsM,
                          Background &_background,
                          vector<Unit> &_playerUnits,
-                         vector<Unit> &_opponentUnits) : window(_window),
-                                                         mouse(_mouse),
-                                                         event(_event),
-                                                         client(client),
-                                                         buttonsManager(_buttonsM),
-                                                         playerTilesManager(_playerTM),
-                                                         opponentTilesManager(_opponentTM),
-                                                         cardsManager(_cardsM),
-                                                         background(_background),
-                                                         stage(GameStage::stageStart),
-                                                         round(RoundType::roundAvangard),
-                                                         playerUnits(_playerUnits),
-                                                         opponentUnits(_opponentUnits)
+                         vector<Unit> &_opponentUnits,
+                         StageText &_stageText) : window(_window),
+                                                  mouse(_mouse),
+                                                  event(_event),
+                                                  client(client),
+                                                  buttonsManager(_buttonsM),
+                                                  playerTilesManager(_playerTM),
+                                                  opponentTilesManager(_opponentTM),
+                                                  cardsManager(_cardsM),
+                                                  background(_background),
+                                                  playerUnits(_playerUnits),
+                                                  opponentUnits(_opponentUnits),
+                                                  stageText(_stageText),
+                                                  stage(GameStage::stageStart),
+                                                  round(RoundType::roundAvangard)
 {
     side = client.getSide();
     BOOST_LOG_TRIVIAL(info) << "GameManager::GameManager() : side = " << side;
@@ -67,6 +69,7 @@ void GameManager::draw()
     playerTilesManager.draw();
     opponentTilesManager.draw();
     cardsManager.draw();
+    stageText.draw();
 
     window.display();
 }
@@ -126,12 +129,18 @@ void GameManager::gameStart()
 
     this->draw();
 
+    stageText.setRound(Round::start);
+    stageText.restart();
+
     _whileForGameStart();
 }
 
 void GameManager::opponentsTurn()
 {
     BOOST_LOG_TRIVIAL(info) << "GameManager::opponentsTurn(): Started!";
+
+    stageText.setRound(Round::opponentsTurn);
+    stageText.restart();
 
     playerTilesManager.disable();
     buttonsManager.disable();
@@ -160,6 +169,20 @@ void GameManager::playersTurn()
     buttonsManager.enable();
 
     playerTilesManager.setActiveRoundTiles();
+
+    if (round == RoundType::roundAvangard)
+    {
+        stageText.setRound(Round::avangard);
+    }
+    else if (round == RoundType::roundFlank)
+    {
+        stageText.setRound(Round::flank);
+    }
+    else if (round == RoundType::roundRear)
+    {
+        stageText.setRound(Round::rear);
+    }
+    stageText.restart();
 
     _whileForPlayersTurn();
 
@@ -285,6 +308,8 @@ void GameManager::_whileForPlay()
         switch (stage)
         {
         case (GameStage::stageOpponentsTurn):
+            stageText.setRound(Round::opponentsTurn);
+            stageText.restart();
             opponentsTurn();
             break;
         case (GameStage::stagePlayersTurn):
@@ -449,14 +474,7 @@ void GameManager::_whileForOpponentsTurn()
 void GameManager::_whileForPlayersTurn()
 {
     int movesAmount = 0;
-    if (!playerTilesManager.hasBodies())
-    {
-        btnRemoveBody->disable();
-    }
-    if (!cardsManager.canTakeCard())
-    {
-        btnTakeCard->disable();
-    }
+    buttonsManager.disable();
 
     while (window.isOpen())
     {
@@ -476,11 +494,6 @@ void GameManager::_whileForPlayersTurn()
             }
             case (Event::MouseButtonPressed):
             {
-                if (event.mouseButton.button == Mouse::Right)
-                {
-                    playerTilesManager.mouseRightClick();
-                    opponentTilesManager.mouseRightClick();
-                }
                 //Порядок важен
                 buttonsManager.mouseIsPressed();
                 if (cardsManager.getCardWasTaken() && btnTakeCard->hasFocus() || playerTilesManager.mouseClicked())

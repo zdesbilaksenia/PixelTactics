@@ -7,9 +7,10 @@ using std::endl;
 // ===========CommandPower============
 // ====================================
 
-CommandPower::CommandPower(TilesManager &_playerTM, TilesManager &_opponentTM, GameTcpClient &_client) : playerTilesManager(_playerTM),
-                                                                                                         opponentTilesManager(_opponentTM),
-                                                                                                         client(_client)
+CommandPower::CommandPower(TilesManager &_playerTM, TilesManager &_opponentTM, GameTcpClient &_client) : client(_client),
+                                                                                                         playerTilesManager(_playerTM),
+                                                                                                         opponentTilesManager(_opponentTM)
+
 {
 }
 

@@ -20,6 +20,7 @@ using namespace sf;
 #include "Background.h"
 #include <thread>
 #include <mutex>
+#include "StageText.h"
 
 class GameManager
 {
@@ -34,7 +35,8 @@ public:
                 CardsManager &_cardsM,
                 Background &_background,
                 vector<Unit> &_platerUnits,
-                vector<Unit> &_opponentUnits);
+                vector<Unit> &_opponentUnits,
+                StageText &_stageText);
 
     void setSpecialButtons(Button &_btnAttack, Button &_btnPower, Button &_btnTakeCard, Button &_btnRemoveBody);
 
@@ -43,11 +45,6 @@ public:
     ~GameManager();
 
 private:
-    void loadBreeds(Message<GameMsgTypes> &msg);
-    //Юниты противника
-    vector<Unit> &playerUnits;
-    vector<Unit> &opponentUnits;
-
     RenderWindow &window;
     Mouse &mouse;
     Event &event;
@@ -57,6 +54,9 @@ private:
     TilesManager &opponentTilesManager;
     CardsManager &cardsManager;
     Background &background;
+    vector<Unit> &playerUnits;
+    vector<Unit> &opponentUnits;
+    StageText &stageText;
 
     Button *btnAttack;
     Button *btnPower;
@@ -78,6 +78,8 @@ private:
 
     GameStage stage;
     RoundType round;
+
+    void loadBreeds(Message<GameMsgTypes> &msg);
 
     void draw();
     void gameStart();

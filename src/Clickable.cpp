@@ -1,18 +1,19 @@
 #include "Clickable.h"
-#include <iostream>
-using std::cout;
-using std::endl;
 
 Clickable::Clickable(RenderWindow &_window, Mouse &_mouse) : DrawableBox(_window),
                                                              mouse(_mouse), enabled(true)
 {
 }
 
-Clickable::Clickable(RenderWindow &_window, Mouse &_mouse, Command *_command) : DrawableBox(_window),
+Clickable::Clickable(RenderWindow &_window, Mouse &_mouse, Command& _command) : DrawableBox(_window),
                                                                                 mouse(_mouse),
-                                                                                command(_command),
+                                                                                command(&_command),
                                                                                 enabled(true)
 {
+    if(command == nullptr)
+    {
+        return;
+    }
 }
 
 Clickable::~Clickable()
