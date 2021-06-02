@@ -18,7 +18,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "-lmysqlclient")
 
 
-include_directories(lib/)
+include_directories(lib/ Game/)
 include_directories(DataBase/ Mapper/ /usr/include/mysql /usr/mysql /usr/lib/mysql)
 add_library(DataBase_lib DataBase/Connection.cpp DataBase/MySQL.cpp Mapper/PowerMapper.cpp)
 include_directories(Request/)
@@ -44,7 +44,7 @@ add_library(network STATIC
     lib/GameTcpServer.cpp)
 
 
-add_executable(main DataBase/Connection.cpp Game/Hero.cpp Mapper/PowerMapper.cpp)
+add_executable(main src/newmain.cpp DataBase/Connection.cpp Game/Hero.cpp Mapper/PowerMapper.cpp)
 add_executable(cl src/client.cpp)
 add_executable(serv src/server.cpp)
 
