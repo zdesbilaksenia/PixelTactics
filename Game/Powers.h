@@ -5,7 +5,7 @@
 #include <map>
 #include <string>
 #include <algorithm>
-#include "hero.h"
+#include "Hero.h"
 
 using std::string;
 using std::vector;

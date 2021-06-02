@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "Hero.h"
+#include "../Game/Hero.h"
 
 TEST(HeroTest, CreateHeroFromCard) {
     Card card;

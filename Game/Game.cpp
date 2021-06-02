@@ -1,5 +1,4 @@
 #include "Game.h"
-#include "request.h"
 
 bool Game::WaitForMessage() {
 

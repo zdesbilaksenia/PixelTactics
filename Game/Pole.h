@@ -2,7 +2,7 @@
 #ifndef POLE_H
 #define POLE_H
 
-#include "position.h"
+#include "Position.h"
 #include <vector>
 #include <iostream>
 

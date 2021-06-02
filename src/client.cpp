@@ -5,7 +5,7 @@
 #include "GameTcpClient.h"
 #include "GameMsgTypes.h"
 
-#include "card.h"
+#include "../Game/Card.h"
 
 
 int main(int argc, char* argv[])

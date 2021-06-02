@@ -5,7 +5,7 @@
 #include <vector>
 #include <cstring>
 
-#include "card.h"
+#include "../Game/Card.h"
 
 template <typename T>
 struct MessageHeader {

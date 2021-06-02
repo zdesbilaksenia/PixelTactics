@@ -1,7 +1,7 @@
 #ifndef DB_POWERMAPPER_H
 #define DB_POWERMAPPER_H
 
-#include "Powers.h"
+#include "../Game/Powers.h"
 
 using std::vector;
 

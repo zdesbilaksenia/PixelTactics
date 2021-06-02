@@ -2,7 +2,7 @@
 #ifndef HERO_H
 #define HERO_H
 
-#include "card.h"
+#include "Card.h"
 #include <vector>
 #include <string>
 

@@ -4,9 +4,9 @@
 
 #include <iostream>
 #include <vector>
-#include "deck.h"
-#include "pole.h"
-#include "hero.h"
+#include "Deck.h"
+#include "Pole.h"
+#include "Hero.h"
 
 
 

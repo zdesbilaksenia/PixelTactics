@@ -23,15 +23,15 @@ include_directories(DataBase/ Mapper/ /usr/include/mysql /usr/mysql /usr/lib/mys
 add_library(DataBase_lib DataBase/Connection.cpp DataBase/MySQL.cpp Mapper/PowerMapper.cpp)
 include_directories(Request/)
 
-add_library(game_libs STATIC 
-    src/Game.cpp 
-    src/position.cpp
-    src/deck.cpp
-    src/hero.cpp
-    src/pole.cpp
-    src/player.cpp)
-add_library(request Request/request.cpp)
-add_library(powers Mapper/PowerMapper.cpp src/Powers.cpp)
+add_library(game_libs STATIC
+        Game/Game.cpp
+        Game/Position.cpp
+        Game/Deck.cpp
+        Game/Hero.cpp
+        Game/Pole.cpp
+        Game/Player.cpp)
+add_library(request PowerRequest/request.cpp)
+add_library(powers Mapper/PowerMapper.cpp Game/Powers.cpp)
 add_library(network STATIC
     lib/Message.cpp
     lib/OwnedMessage.cpp
@@ -44,7 +44,7 @@ add_library(network STATIC
     lib/GameTcpServer.cpp)
 
 
-add_executable(main src/newmain.cpp DataBase/Connection.cpp src/hero.cpp Mapper/PowerMapper.cpp)  
+add_executable(main DataBase/Connection.cpp Game/Hero.cpp Mapper/PowerMapper.cpp)
 add_executable(cl src/client.cpp)
 add_executable(serv src/server.cpp)
 

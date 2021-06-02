@@ -9,7 +9,7 @@
 #include "TcpConnection.h"
 #include "Message.h"
 #include "GameMsgTypes.h"
-#include "Game.h"
+#include "../Game/Game.h"
 
 
 Lobby::Lobby(uint8_t lobbyID_,TsQueue<OwnedMessage<GameMsgTypes>>* pQMsgServer_, GameTcpServer* server_)

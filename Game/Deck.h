@@ -2,7 +2,7 @@
 #ifndef DECK_H
 #define DECK_H
 
-#include "card.h"
+#include "Card.h"
 #include <vector>
 #include <boost/random.hpp>
 #include <iostream>

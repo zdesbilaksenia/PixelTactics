@@ -5,11 +5,11 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#include "../lib/pole.h"
-#include "../lib/player.h"
-#include "../DataBase/MySQL.h"
+#include "Pole.h"
+#include "Player.h"
+#include "MySQL.h"
 #include "PowerMapper.h"
-#include "request.h"
+#include "../PowerRequest/request.h"
 
 
 class Game {

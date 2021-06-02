@@ -1,4 +1,4 @@
-#include "player.h"
+#include "Player.h"
 #include <iostream>
 
 Player::Player(Deck& deck,int side):deck_(deck),side_(side){}

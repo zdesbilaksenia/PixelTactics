@@ -1,5 +1,4 @@
 #include "request.h"
-#include "pole.h"
 
 void Interception(Position *position, Pole &pole_, bool &done) {
     std::vector<Hero *> heroes;

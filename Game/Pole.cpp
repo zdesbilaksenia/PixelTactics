@@ -1,4 +1,4 @@
-#include "pole.h"
+#include "Pole.h"
 
 Pole::Pole()
 {

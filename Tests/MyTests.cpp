@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "Game.h"
+#include "../Game/Game.h"
 
 TEST(CanBeAttackedMeleeRequest,Test_1){
     Pole pole;

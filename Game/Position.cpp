@@ -1,4 +1,4 @@
-#include "../lib/position.h"
+#include "Position.h"
 
 
 

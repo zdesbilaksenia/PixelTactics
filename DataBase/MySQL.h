@@ -2,11 +2,11 @@
 #define PIXELTACTICS_MYSQL_H
 
 #include "Connection.h"
-#include "../lib/card.h"
+#include "../Game/Card.h"
 #include <memory>
 #include <mysql.h>
 #include <vector>
-#include "../lib/deck.h"
+#include "../Game/Deck.h"
 
 using std::vector;
 using std::unique_ptr;

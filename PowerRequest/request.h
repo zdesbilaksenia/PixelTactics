@@ -3,7 +3,7 @@
 #ifndef REQUEST_H
 #define REQUEST_H
 
-#include "pole.h"
+#include "../Game/Pole.h"
 #include "vector"
 #include "Lobby.h"
 
